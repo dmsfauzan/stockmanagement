@@ -1,0 +1,167 @@
+<div>
+    <x-ui.page-header title="Detail Barang Masuk" subtitle="{{ $receipt->number }}">
+        <x-slot:actions>
+            <a href="{{ route('goods-receipts.index') }}" class="app-btn app-btn-secondary">Kembali</a>
+            @if($receipt->status === 'draft')
+                @can('update', $receipt)
+                    <a href="{{ route('goods-receipts.edit', $receipt) }}" class="app-btn app-btn-primary">Edit</a>
+                @endcan
+            @endif
+        </x-slot:actions>
+    </x-ui.page-header>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div class="space-y-4 lg:col-span-2">
+            <x-ui.card>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h2 class="app-card-title">Header</h2>
+                    <div class="flex items-center gap-2">
+                        <x-ui.status-badge :status="$receipt->status" />
+                        @if($receipt->isReversed())
+                            <x-ui.status-badge status="reversed" label="REVERSED" />
+                        @endif
+                    </div>
+                </div>
+                <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Number</dt><dd class="mt-1 text-sm font-medium text-app-text">{{ $receipt->number }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Tanggal</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->transaction_date?->format('d M Y') }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Supplier</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->supplier?->name ?? '-' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Warehouse</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->warehouse?->name ?? '-' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">PO Number</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->po_number ?? '-' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Delivery Note</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->delivery_note ?? '-' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Diterima Oleh</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->received_by ?? '-' }}</dd></div>
+                    <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Catatan</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->notes ?? '-' }}</dd></div>
+                    @if($receipt->rejection_reason)
+                        <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Rejection Reason</dt><dd class="mt-1 text-sm font-medium text-rose-600 dark:text-rose-400">{{ $receipt->rejection_reason }}</dd></div>
+                    @endif
+                </dl>
+            </x-ui.card>
+
+            <x-ui.card padding="p-0">
+                <div class="app-card-header">
+                    <h2 class="app-card-title">Detail Barang</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Barang</th>
+                                <th class="text-right">Qty</th>
+                                <th>Unit</th>
+                                <th>Lokasi</th>
+                                <th>Batch</th>
+                                <th>Expiry</th>
+                                <th>Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($receipt->receiptItems as $row)
+                                <tr>
+                                    <td class="text-app-text">{{ $row->item?->sku ?? '-' }} — {{ $row->item?->name ?? '-' }}</td>
+                                    <td class="text-right font-medium text-app-text">{{ number_format($row->quantity) }}</td>
+                                    <td class="text-app-muted">{{ $row->unit?->code ?? $row->unit?->name ?? '-' }}</td>
+                                    <td class="text-app-muted">{{ $row->location?->fullPath() ?? $row->location?->code ?? '-' }}</td>
+                                    <td class="text-app-muted">{{ $row->batch_number ?? '-' }}</td>
+                                    <td class="text-app-muted">{{ $row->expiry_date?->format('d M Y') ?? '-' }}</td>
+                                    <td class="text-app-muted">{{ $row->notes ?? '-' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @if($receipt->receiptItems->isEmpty())
+                    <x-ui.empty-state title="Tidak ada detail" message="Transaksi ini belum memiliki baris barang." />
+                @endif
+            </x-ui.card>
+        </div>
+
+        <div class="space-y-4">
+            <x-ui.card>
+                <h2 class="app-card-title">Status Timeline</h2>
+                <div class="relative mt-4 pl-6">
+                    <div class="absolute bottom-2 left-[5px] top-2 w-px bg-app-border"></div>
+                    @php
+                        $steps = ['draft' => 'Draft', 'submitted' => 'Submitted', 'approved' => 'Approved', 'posted' => 'Posted'];
+                        $current = $receipt->status;
+                    @endphp
+                    @foreach ($steps as $key => $label)
+                        @php $active = $current === $key; $past = array_search($current, array_keys($steps)) !== false && array_search($key, array_keys($steps)) <= array_search($current, array_keys($steps)); @endphp
+                        <div class="relative flex items-center gap-3 py-1.5 text-sm {{ $active ? 'font-semibold text-primary-600 dark:text-primary-400' : ($past ? 'text-app-text' : 'text-app-muted') }}">
+                            <span class="absolute -left-6 flex h-3 w-3 items-center justify-center rounded-full ring-2 ring-app-surface {{ $past ? 'bg-emerald-500 ring-emerald-200 dark:ring-emerald-900/40' : 'bg-app-border ring-app-surface-2' }}"></span>
+                            {{ $label }}
+                        </div>
+                    @endforeach
+                    @if($receipt->status === 'rejected')
+                        <div class="relative flex items-center gap-3 py-1.5 text-sm font-semibold text-rose-600 dark:text-rose-400">
+                            <span class="absolute -left-6 flex h-3 w-3 rounded-full bg-rose-500 ring-2 ring-rose-200 dark:ring-rose-900/40"></span>
+                            Rejected
+                        </div>
+                    @endif
+                </div>
+            </x-ui.card>
+
+            <x-ui.card>
+                <h2 class="app-card-title">Audit</h2>
+                <dl class="mt-3 space-y-2 text-sm">
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $receipt->creator?->name ?? '-' }} {{ $receipt->created_at?->format('d M Y H:i') }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $receipt->submitter?->name ?? '-' }} {{ $receipt->submitted_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $receipt->approver?->name ?? '-' }} {{ $receipt->approved_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $receipt->rejecter?->name ?? '-' }} {{ $receipt->rejected_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Posted</dt><dd class="text-app-text">{{ $receipt->poster?->name ?? '-' }} {{ $receipt->posted_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                </dl>
+            </x-ui.card>
+
+            <x-ui.card>
+                <h2 class="app-card-title">Actions</h2>
+                <div class="mt-3 flex flex-col gap-2">
+                    @can('submit', $receipt)
+                        @if($receipt->status === 'draft')
+                            <x-ui.confirm action="submit" title="Submit Barang Masuk" message="Kirim transaksi ini untuk disetujui?" confirm-label="Submit" class="app-btn app-btn-primary w-full">Submit</x-ui.confirm>
+                        @endif
+                    @endcan
+                    @can('approve', $receipt)
+                        @if($receipt->status === 'submitted')
+                            <x-ui.confirm action="approve" title="Setujui Barang Masuk" message="Transaksi akan disetujui dan siap untuk posting." confirm-label="Approve" class="app-btn app-btn-primary w-full">Approve</x-ui.confirm>
+                            <div class="rounded-lg border border-app-border bg-app-surface-2/50 p-3">
+                                <label class="app-label">Rejection reason</label>
+                                <textarea wire:model="rejectionReason" rows="2" class="app-textarea mt-1" placeholder="Alasan penolakan..."></textarea>
+                                @error('rejectionReason') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                                <x-ui.confirm action="reject" title="Tolak Barang Masuk" message="Berikan alasan penolakan lalu tolak transaksi ini." confirm-label="Reject" variant="danger" class="app-btn app-btn-danger mt-2 w-full">Reject</x-ui.confirm>
+                            </div>
+                        @endif
+                    @endcan
+                    @can('post', $receipt)
+                        @if($receipt->status === 'approved')
+                            <x-ui.confirm action="post" title="Posting Barang Masuk" message="Sekali diposting, transaksi tidak dapat diedit dan akan mengubah stok." confirm-label="Post" class="app-btn app-btn-primary w-full">Post</x-ui.confirm>
+                        @endif
+                    @endcan
+                </div>
+            </x-ui.card>
+
+            @if($receipt->isReversed())
+                <x-ui.card>
+                    <h2 class="app-card-title">Reversal</h2>
+                    <dl class="mt-3 space-y-2 text-sm">
+                        <div class="flex justify-between gap-2"><dt class="text-app-muted">Reversed By</dt><dd class="text-app-text">{{ $receipt->reverser?->name ?? '-' }}</dd></div>
+                        <div class="flex justify-between gap-2"><dt class="text-app-muted">Reversed At</dt><dd class="text-app-text">{{ $receipt->reversed_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                        <div class="sm:col-span-2"><dt class="text-app-muted">Reason</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->reversal_reason ?? '-' }}</dd></div>
+                    </dl>
+                </x-ui.card>
+            @else
+                @can('reverse', $receipt)
+                    @if($receipt->status === 'posted')
+                        <x-ui.card>
+                            <h2 class="app-card-title">Reversal</h2>
+                            <div class="mt-3 rounded-lg border border-app-border bg-app-surface-2/50 p-3">
+                                <label class="app-label">Reversal reason</label>
+                                <textarea wire:model="reversalReason" rows="2" class="app-textarea mt-1" placeholder="Alasan reversal..."></textarea>
+                                @error('reversalReason') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                                <x-ui.confirm action="reverse" title="Reversal" :message="'Reversal akan membalikkan jurnal stok yang telah diposting. '.$receipt->receiptItems->count().' baris. Lanjutkan?'" confirm-label="Ok, Reversal" variant="danger" class="app-btn app-btn-danger mt-2 w-full">Reversal</x-ui.confirm>
+                            </div>
+                        </x-ui.card>
+                    @endif
+                @endcan
+            @endif
+        </div>
+    </div>
+</div>

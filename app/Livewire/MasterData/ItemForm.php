@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Livewire\MasterData;
+
+use App\Models\Category;
+use App\Models\Item;
+use App\Models\Supplier;
+use App\Models\Unit;
+use App\Services\Support\AuditLogger;
+use Illuminate\Validation\Rule;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+
+#[Layout('layouts.app')]
+#[Title('Form Barang')]
+class ItemForm extends Component
+{
+    public ?int $itemId = null;
+
+    public string $sku = '';
+
+    public string $barcode = '';
+
+    public string $name = '';
+
+    public string $category_id = '';
+
+    public string $unit_id = '';
+
+    public string $brand = '';
+
+    public string $description = '';
+
+    public int $minimum_stock = 0;
+
+    public int $maximum_stock = 0;
+
+    public string $primary_supplier_id = '';
+
+    public string $status = 'active';
+
+    public function mount($item = null): void
+    {
+        $model = $item instanceof Item ? $item : ($item ? Item::findOrFail($item) : null);
+
+        if ($model) {
+            $this->authorize('update', $model);
+
+            $this->itemId = $model->id;
+            $this->sku = (string) $model->sku;
+            $this->barcode = (string) ($model->barcode ?? '');
+            $this->name = (string) $model->name;
+            $this->category_id = (string) $model->category_id;
+            $this->unit_id = (string) $model->unit_id;
+            $this->brand = (string) ($model->brand ?? '');
+            $this->description = (string) ($model->description ?? '');
+            $this->minimum_stock = (int) $model->minimum_stock;
+            $this->maximum_stock = (int) $model->maximum_stock;
+            $this->primary_supplier_id = $model->primary_supplier_id ? (string) $model->primary_supplier_id : '';
+            $this->status = (string) $model->status;
+        } else {
+            $this->authorize('create', Item::class);
+        }
+    }
+
+    protected function rules(): array
+    {
+        return [
+            'sku' => ['required', 'string', 'max:50', Rule::unique('items', 'sku')->ignore($this->itemId)],
+            'barcode' => ['nullable', 'string', 'max:50', Rule::unique('items', 'barcode')->ignore($this->itemId)],
+            'name' => ['required', 'string', 'max:255'],
+            'category_id' => ['required', 'exists:categories,id'],
+            'unit_id' => ['required', 'exists:units,id'],
+            'brand' => ['nullable', 'string', 'max:100'],
+            'description' => ['nullable', 'string'],
+            'minimum_stock' => ['required', 'integer', 'min:0'],
+            'maximum_stock' => ['required', 'integer', 'gte:minimum_stock'],
+            'primary_supplier_id' => ['nullable', 'exists:suppliers,id'],
+            'status' => ['required', 'in:active,inactive'],
+        ];
+    }
+
+    public function save()
+    {
+        $this->barcode = trim($this->barcode);
+        $this->brand = trim($this->brand);
+        $this->description = trim($this->description);
+        $this->primary_supplier_id = trim($this->primary_supplier_id);
+
+        $data = $this->validate();
+
+        $data['barcode'] = $data['barcode'] !== '' ? $data['barcode'] : null;
+        $data['brand'] = $data['brand'] !== '' ? $data['brand'] : null;
+        $data['description'] = $data['description'] !== '' ? $data['description'] : null;
+        $data['primary_supplier_id'] = $data['primary_supplier_id'] !== '' ? $data['primary_supplier_id'] : null;
+
+        if ($this->itemId) {
+            $item = Item::findOrFail($this->itemId);
+
+            $this->authorize('update', $item);
+
+            $old = $item->toArray();
+            $data['updated_by'] = auth()->id();
+            $item->update($data);
+
+            AuditLogger::logModel('update', $item, $old, $item->fresh()->toArray());
+        } else {
+            $this->authorize('create', Item::class);
+
+            $data['created_by'] = auth()->id();
+            $item = Item::create($data);
+
+            AuditLogger::logModel('create', $item, null, $item->toArray());
+        }
+
+        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+
+        return $this->redirect(route('items.index'), navigate: true);
+    }
+
+    public function render()
+    {
+        return view('livewire.master-data.item-form', [
+            'categories' => Category::where('status', 'active')->orderBy('name')->get(['id', 'name']),
+            'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
+            'suppliers' => Supplier::where('status', 'active')->orderBy('name')->get(['id', 'name']),
+        ]);
+    }
+}

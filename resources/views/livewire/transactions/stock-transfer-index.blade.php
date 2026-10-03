@@ -1,0 +1,106 @@
+<div>
+    <x-ui.page-header title="Transfer Barang" subtitle="Daftar transfer stok antar lokasi">
+        <x-slot:actions>
+            @can('create', App\Models\StockTransfer::class)
+                <a href="{{ route('stock-transfers.create') }}" class="app-btn app-btn-primary">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    Buat Transfer
+                </a>
+            @endcan
+        </x-slot:actions>
+    </x-ui.page-header>
+
+    <x-ui.card padding="p-0">
+        <div class="app-card-header flex-col items-stretch gap-3">
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap">
+                    <label class="relative block w-full sm:max-w-xs">
+                        <svg class="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-app-muted" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.3-4.3M10 18a8 8 0 110-16 8 8 0 010 16z"/></svg>
+                        <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari number / notes..." class="app-input pl-9">
+                    </label>
+                    <select wire:model.live="statusFilter" class="app-select sm:w-auto">
+                        <option value="">Semua Status</option>
+                        @foreach ($statuses as $status)
+                            <option value="{{ $status }}">{{ ucwords(str_replace('_', ' ', $status)) }}</option>
+                        @endforeach
+                    </select>
+                    <select wire:model.live="warehouseFromFilter" class="app-select sm:w-auto">
+                        <option value="">Semua Warehouse Asal</option>
+                        @foreach ($warehouses as $warehouse)
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-app-muted">Per halaman</span>
+                    <select wire:model.live="perPage" class="app-select w-auto">
+                        @foreach ([10, 25, 50, 100] as $size)
+                            <option value="{{ $size }}">{{ $size }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <label class="flex items-center gap-2 text-sm">
+                    <span class="text-app-muted">Dari</span>
+                    <input type="date" wire:model.live="dateFrom" class="app-input w-auto">
+                </label>
+                <label class="flex items-center gap-2 text-sm">
+                    <span class="text-app-muted">Sampai</span>
+                    <input type="date" wire:model.live="dateTo" class="app-input w-auto">
+                </label>
+                @if($dateFrom || $dateTo)
+                    <button type="button" wire:click="$set('dateFrom',''); $set('dateTo','')" class="text-xs font-medium app-link">Reset tanggal</button>
+                @endif
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th>
+                            <button type="button" wire:click="sortByDate" class="inline-flex items-center gap-1 hover:text-app-text">
+                                Tanggal
+                                <span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                            </button>
+                        </th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th class="text-right">Items</th>
+                        <th>Status</th>
+                        <th class="text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($transfers as $transfer)
+                        <tr>
+                            <td class="whitespace-nowrap font-medium text-app-text">{{ $transfer->number }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ $transfer->transfer_date?->format('d M Y') }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ $transfer->fromWarehouse?->name ?? '-' }}<br><span class="text-xs">{{ $transfer->fromLocation?->fullPath() ?? $transfer->fromLocation?->code ?? '-' }}</span></td>
+                            <td class="whitespace-nowrap text-app-muted">{{ $transfer->toWarehouse?->name ?? '-' }}<br><span class="text-xs">{{ $transfer->toLocation?->fullPath() ?? $transfer->toLocation?->code ?? '-' }}</span></td>
+                            <td class="whitespace-nowrap text-right text-app-muted">{{ $transfer->items_count }}</td>
+                            <td class="whitespace-nowrap"><x-ui.status-badge :status="$transfer->status" /></td>
+                            <td class="whitespace-nowrap text-right">
+                                <a href="{{ route('stock-transfers.show', $transfer) }}" class="app-btn app-btn-secondary px-2.5 py-1.5 text-xs">View</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7">
+                                <x-ui.empty-state title="Tidak ada transfer barang" message="Belum ada transaksi yang cocok dengan filter." />
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if ($transfers->hasPages())
+            <div class="border-t border-app-border px-4 py-3">
+                {{ $transfers->links() }}
+            </div>
+        @endif
+    </x-ui.card>
+</div>

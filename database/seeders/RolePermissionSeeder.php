@@ -1,0 +1,140 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Permission;
+use App\Models\Role;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
+
+class RolePermissionSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $permissions = [
+            'dashboard.view' => 'dashboard',
+            'items.view' => 'items',
+            'items.create' => 'items',
+            'items.update' => 'items',
+            'items.delete' => 'items',
+            'warehouse.view' => 'warehouse',
+            'warehouse.create' => 'warehouse',
+            'warehouse.update' => 'warehouse',
+            'warehouse.delete' => 'warehouse',
+            'location.view' => 'location',
+            'location.create' => 'location',
+            'location.update' => 'location',
+            'location.delete' => 'location',
+            'goods_receipt.view' => 'goods_receipt',
+            'goods_receipt.create' => 'goods_receipt',
+            'goods_receipt.update' => 'goods_receipt',
+            'goods_receipt.submit' => 'goods_receipt',
+            'goods_receipt.approve' => 'goods_receipt',
+            'goods_receipt.post' => 'goods_receipt',
+            'goods_issue.view' => 'goods_issue',
+            'goods_issue.create' => 'goods_issue',
+            'goods_issue.update' => 'goods_issue',
+            'goods_issue.submit' => 'goods_issue',
+            'goods_issue.approve' => 'goods_issue',
+            'goods_issue.post' => 'goods_issue',
+            'stock.view' => 'stock',
+            'stock.movement' => 'stock',
+            'stock.adjustment' => 'stock',
+            'stock.adjustment.approve' => 'stock',
+            'stock_opname.view' => 'stock_opname',
+            'stock_opname.create' => 'stock_opname',
+            'stock_opname.submit' => 'stock_opname',
+            'stock_opname.approve' => 'stock_opname',
+            'transfer.view' => 'transfer',
+            'transfer.create' => 'transfer',
+            'transfer.approve' => 'transfer',
+            'transfer.receive' => 'transfer',
+            'reports.view' => 'reports',
+            'reports.export' => 'reports',
+            'users.manage' => 'users',
+            'roles.manage' => 'roles',
+            'settings.manage' => 'settings',
+            'audit_logs.view' => 'audit_logs',
+        ];
+
+        $permissionIds = [];
+        foreach ($permissions as $slug => $group) {
+            $name = Str::title(str_replace(['.', '_'], ' ', $slug));
+            $perm = Permission::updateOrCreate(
+                ['slug' => $slug],
+                ['name' => $name, 'group' => $group]
+            );
+            $permissionIds[$slug] = $perm->id;
+        }
+
+        $roles = [
+            'admin' => 'Administrator',
+            'warehouse_staff' => 'Warehouse Staff',
+            'supervisor' => 'Supervisor',
+            'manager' => 'Manager',
+        ];
+
+        $roleModels = [];
+        foreach ($roles as $slug => $name) {
+            $roleModels[$slug] = Role::updateOrCreate(
+                ['slug' => $slug],
+                ['name' => $name, 'is_system' => true]
+            );
+        }
+
+        $this->syncPermissions($roleModels['admin']->id, array_values($permissionIds));
+
+        $warehouseStaffPerms = [
+            'dashboard.view', 'items.view', 'stock.view', 'stock.movement',
+            'goods_receipt.view', 'goods_receipt.create', 'goods_receipt.update', 'goods_receipt.submit',
+            'goods_issue.view', 'goods_issue.create', 'goods_issue.update', 'goods_issue.submit',
+            'location.view', 'warehouse.view',
+            'stock.adjustment', 'stock_opname.view', 'stock_opname.create', 'stock_opname.submit',
+            'transfer.view', 'transfer.create',
+        ];
+        $this->syncPermissions(
+            $roleModels['warehouse_staff']->id,
+            collect($warehouseStaffPerms)->map(fn ($s) => $permissionIds[$s])->values()->all()
+        );
+
+        $supervisorPerms = [
+            'dashboard.view', 'stock.view', 'stock.movement',
+            'goods_receipt.view', 'goods_receipt.approve', 'goods_receipt.post',
+            'goods_issue.view', 'goods_issue.approve', 'goods_issue.post',
+            'reports.view', 'reports.export',
+            'stock.adjustment.approve',
+            'stock_opname.view', 'stock_opname.approve',
+            'transfer.view', 'transfer.approve', 'transfer.receive',
+            'items.view', 'warehouse.view', 'location.view',
+        ];
+        $this->syncPermissions(
+            $roleModels['supervisor']->id,
+            collect($supervisorPerms)->map(fn ($s) => $permissionIds[$s])->values()->all()
+        );
+
+        $managerPerms = [
+            'dashboard.view', 'stock.view', 'items.view',
+            'reports.view', 'reports.export',
+            'goods_receipt.view', 'goods_issue.view',
+            'warehouse.view', 'location.view',
+            'transfer.view',
+        ];
+        $this->syncPermissions(
+            $roleModels['manager']->id,
+            collect($managerPerms)->map(fn ($s) => $permissionIds[$s])->values()->all()
+        );
+    }
+
+    private function syncPermissions(int $roleId, array $permissionIds): void
+    {
+        \Illuminate\Support\Facades\DB::table('role_permission')->where('role_id', $roleId)->delete();
+
+        $rows = collect($permissionIds)
+            ->map(fn ($id) => ['role_id' => $roleId, 'permission_id' => $id])
+            ->all();
+
+        if ($rows !== []) {
+            \Illuminate\Support\Facades\DB::table('role_permission')->insert($rows);
+        }
+    }
+}

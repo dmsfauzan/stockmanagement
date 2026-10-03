@@ -1,0 +1,197 @@
+<?php
+
+namespace App\Livewire\MasterData;
+
+use App\Models\Location;
+use App\Models\Rack;
+use App\Models\Warehouse;
+use App\Models\Zone;
+use App\Services\Support\AuditLogger;
+use Illuminate\Validation\Rule;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+#[Layout('layouts.app')]
+#[Title('Location / Rack')]
+class LocationIndex extends Component
+{
+    use WithPagination;
+
+    public string $search = '';
+
+    public string $warehouseFilter = '';
+
+    public string $zoneFilter = '';
+
+    public int $perPage = 10;
+
+    public bool $showModal = false;
+
+    public ?int $editingId = null;
+
+    public string $warehouse_id = '';
+
+    public string $zone_id = '';
+
+    public string $rack_id = '';
+
+    public string $code = '';
+
+    public string $name = '';
+
+    public function mount(): void
+    {
+        $this->authorize('viewAny', Location::class);
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedWarehouseFilter(): void
+    {
+        $this->zoneFilter = '';
+        $this->resetPage();
+    }
+
+    public function updatedZoneFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedWarehouseId(string $value): void
+    {
+        if ($this->zone_id && ! Zone::where('id', $this->zone_id)->where('warehouse_id', $value)->exists()) {
+            $this->zone_id = '';
+            $this->rack_id = '';
+        }
+    }
+
+    public function updatedZoneId(string $value): void
+    {
+        if ($this->rack_id && ! Rack::where('id', $this->rack_id)->where('zone_id', $value)->exists()) {
+            $this->rack_id = '';
+        }
+    }
+
+    public function openCreate(): void
+    {
+        $this->authorize('create', Location::class);
+
+        $this->resetValidation();
+        $this->reset(['editingId', 'warehouse_id', 'zone_id', 'rack_id', 'code', 'name']);
+        $this->showModal = true;
+    }
+
+    public function openEdit(int $id): void
+    {
+        $location = Location::with('rack.zone')->findOrFail($id);
+        $this->authorize('update', $location);
+        $this->resetValidation();
+
+        $this->editingId = $location->id;
+        $this->rack_id = (string) $location->rack_id;
+        $this->zone_id = (string) $location->rack?->zone_id;
+        $this->warehouse_id = (string) $location->rack?->zone?->warehouse_id;
+        $this->code = (string) $location->code;
+        $this->name = (string) $location->name;
+        $this->showModal = true;
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->resetValidation();
+    }
+
+    public function save(): void
+    {
+        $permission = $this->editingId ? 'update' : 'create';
+        $target = $this->editingId ? Location::findOrFail($this->editingId) : Location::class;
+        $this->authorize($permission, $target);
+
+        $this->validate([
+            'warehouse_id' => ['required', 'exists:warehouses,id'],
+            'zone_id' => ['required', 'exists:zones,id'],
+            'rack_id' => ['required', 'exists:racks,id'],
+            'code' => ['required', 'string', 'max:50', Rule::unique('locations', 'code')->ignore($this->editingId)],
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $rack = Rack::with('zone')->findOrFail($this->rack_id);
+
+        if ((string) $rack->zone_id !== (string) $this->zone_id) {
+            $this->addError('rack_id', 'Rack tidak termasuk dalam Zone yang dipilih.');
+
+            return;
+        }
+
+        if ((string) $rack->zone->warehouse_id !== (string) $this->warehouse_id) {
+            $this->addError('zone_id', 'Zone tidak termasuk dalam Warehouse yang dipilih.');
+
+            return;
+        }
+
+        $data = [
+            'rack_id' => $this->rack_id,
+            'code' => $this->code,
+            'name' => $this->name,
+        ];
+
+        if ($this->editingId) {
+            $location = Location::findOrFail($this->editingId);
+            $old = $location->toArray();
+            $location->update($data);
+            AuditLogger::logModel('update', $location, $old, $location->fresh()->toArray());
+        } else {
+            $location = Location::create($data);
+            AuditLogger::logModel('create', $location, null, $location->toArray());
+        }
+
+        $this->showModal = false;
+        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+    }
+
+    public function delete(int $id): void
+    {
+        $location = Location::findOrFail($id);
+        $this->authorize('delete', $location);
+
+        $old = $location->toArray();
+        $location->delete();
+
+        AuditLogger::logModel('delete', $location, $old);
+
+        $this->dispatch('toast', type: 'success', message: 'Location dihapus.');
+    }
+
+    public function render()
+    {
+        return view('livewire.master-data.location-index', [
+            'locations' => Location::query()
+                ->with(['rack.zone.warehouse'])
+                ->when($this->search !== '', function ($query): void {
+                    $term = '%'.$this->search.'%';
+                    $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+                })
+                ->when($this->warehouseFilter !== '', function ($query): void {
+                    $query->whereHas('rack.zone', fn ($inner) => $inner->where('warehouse_id', $this->warehouseFilter));
+                })
+                ->when($this->zoneFilter !== '', function ($query): void {
+                    $query->whereHas('rack', fn ($inner) => $inner->where('zone_id', $this->zoneFilter));
+                })
+                ->orderBy('code')
+                ->paginate($this->perPage),
+            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name', 'code']),
+            'zones' => Zone::when($this->warehouse_id !== '', fn ($query) => $query->where('warehouse_id', $this->warehouse_id))
+                ->orderBy('name')->get(['id', 'name', 'code', 'warehouse_id']),
+            'racks' => Rack::when($this->zone_id !== '', fn ($query) => $query->where('zone_id', $this->zone_id))
+                ->orderBy('name')->get(['id', 'name', 'code', 'zone_id']),
+            'filterZones' => Zone::when($this->warehouseFilter !== '', fn ($query) => $query->where('warehouse_id', $this->warehouseFilter))
+                ->orderBy('name')->get(['id', 'name', 'code']),
+        ]);
+    }
+}
