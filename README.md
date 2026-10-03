@@ -1,58 +1,131 @@
+<div align="center">
+
 # Warehouse Stock Management System
 
-Sistem manajemen gudang (WMS) end-to-end — transaksi inventory → ledger → balance — dengan prinsip inventori akurat, auditable, tidak pernah negatif.
+**Sistem manajemen gudang (WMS) end-to-end: setiap perubahan stok berasal dari transaksi yang tercatat — akurat, auditable, dan tidak pernah negatif.**
 
-> **Akurasi stok, bukan kosmetik:** setiap perubahan stok berasal dari transaksi yang tercatat; tidak pernah di-edit angka balance secara manual.
+[![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)](https://www.php.net)
+[![Livewire](https://img.shields.io/badge/Livewire-4-4E56A8)](https://livewire.laravel.com)
+[![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
+[![Tests](https://img.shields.io/badge/tests-80_passing-brightgreen)](#pengujian)
+[![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
+
+[Fitur](#fitur) ·
+[Mulai Cepat](#mulai-cepat) ·
+[Arsitektur](#arsitektur) ·
+[Keamanan](#keamanan--validitas) ·
+[Roadmap](#roadmap)
+
+</div>
+
+---
+
+## Kenapa proyek ini
+
+Kebanyakan aplikasi stok menyimpan angka `on_hand` yang bisa diubah bebas. Aplikasi ini tidak. Di sini **ledger adalah satu-satunya sumber kebenaran**:
+
+```mermaid
+flowchart LR
+    T[Posting Transaksi] --> L[Stock Movement<br/>append-only ledger]
+    L --> B[Stock Balance<br/>cached aggregate]
+    B --> Q{Dijawab: kenapa stok = 70?}
+    Q --> H[Histori transaksi pembentuk angka itu]
+```
+
+- **Tidak ada angka ajaib.** Setiap saldo bisa ditelusuri ke transaksi pembentuknya.
+- **Atomic & concurrency-safe.** Posting memakai `SELECT ... FOR UPDATE`, lock baris balance, dan rollback penuh saat stok tidak cukup.
+- **Tidak ada penghapusan histori.** Koreksi dilakukan lewat Reversal/Adjustment, bukan `DELETE`.
 
 ## Fitur
 
-| Area | Status |
+<details open>
+<summary><b>Phase 1 — Inti operasional</b></summary>
+
+| Modul | Keterangan |
 |---|---|
-| **Master Barang** (SKU unik, barcode, kategori, supplier, unit, status) | ✅ |
-| **Kategori, Unit, Supplier, Customer/Department** | ✅ |
-| **Warehouse → Zone → Rack → Location/Bin** | ✅ |
-| **Barang Masuk** (`GR-YYYYMMDD-XXXX`): DRAFT→SUBMITTED→APPROVED→POSTED→REJECTED | ✅ |
-| **Barang Keluar** (`GI-YYYYMMDD-XXXX`): alur sama + cek stok | ✅ |
-| **Stock On Hand** + Stock Movement + Low Stock (auto `Available = On Hand - Reserved`) | ✅ |
-| **Inventory Ledger** (append-only) + **document numbering** concurrency-safe | ✅ |
-| **Stock Adjustment** (`ADJ-...`): draft→submitted→approved→posted (REJECTED, reversed) | ✅ |
-| **Stock Opname** (`OPN-...`): generate daftar item → count fisik → variance → approve → auto-generate & post Adjustment | ✅ |
-| **Transfer Barang** (`TR-...`): DRAFT→REQUESTED→APPROVED→IN_TRANSIT→RECEIVED→COMPLETED (REJECTED) + `TRANSFER_OUT/IN` | ✅ |
-| **Reserved Stock** (`stock_reservations` + `quantity_reserved`; reserve saat Submit/Request, lepas saat Reject/Post/Dispatch) | ✅ |
-| **Batch & Expiry** (Opsi B: tracking di `stock_movements.expiry_date`; Report `reports/expiry` + alert dashboard + expiry ≤7d saat posting) | ✅ |
-| **Barcode/QR**: halaman `Scan` (hardware + kamera), label item/location + cetak bulk, prefill `?scan=` di form | ✅ |
-| **Notifikasi** in-app (low/out, approval request, approved/rejected, opname/transfer) | ✅ |
-| **Reversal** (koreksi transaksi posted tanpa hapus histori) | ✅ |
-| **Dashboard** (KPI + movement chart + inventory by category + low stock + recent activity) | ✅ |
-| **Reports** Stock/Incoming/Outgoing/Movement/Expiry → CSV/Excel/PDF | ✅ |
-| **RBAC** + granular permissions + audit trail + validation + error handling + responsive | ✅ |
-| **UI** Metronic-inspired, light/dark toggle, sidebar grup accordion (tersimpan) | ✅ |
-| Purchase Order, valuation/COGS, Mobile/PWA, ERP/Accounting | ⏳ Phase 3 |
+| Master Barang | SKU & barcode unik, kategori, supplier, unit, status |
+| Kategori / Unit / Supplier / Customer-Department | CRUD penuh + pencarian & filter |
+| Warehouse → Zone → Rack → Location | Hirarki multi-gudang |
+| Barang Masuk (`GR-YYYYMMDD-XXXX`) | DRAFT → SUBMITTED → APPROVED → POSTED / REJECTED |
+| Barang Keluar (`GI-YYYYMMDD-XXXX`) | Alur sama + pengecekan stok sebelum posting |
+| Stock On Hand / Movement / Low Stock | `Available = On Hand − Reserved`, otomatis |
+| Dashboard | KPI, grafik movement, distribusi kategori, low stock, aktivitas terkini |
+| Reports | Stock / Incoming / Outgoing / Movement / Expiry → CSV, Excel, PDF |
+| RBAC | 43 permission granular, 4 peran |
+| Audit trail | Siapa, apa, kapan, nilai lama → baru |
 
-## Prinsip Inventori
+</details>
+
+<details>
+<summary><b>Phase 2 — Kontrol stok lanjutan</b></summary>
+
+| Modul | Keterangan |
+|---|---|
+| Stock Adjustment (`ADJ-...`) | System vs actual qty, alasan, workflow approval, reversal |
+| Stock Opname (`OPN-...`) | Generate daftar item → hitung fisik → varians → approve → auto-generate & post Adjustment |
+| Transfer Barang (`TR-...`) | Antar lokasi & antar gudang: REQUESTED → APPROVED → IN_TRANSIT → RECEIVED → COMPLETED, ledger `TRANSFER_OUT/IN` |
+| Notifikasi in-app | Low/out of stock, approval request, hasil approval, opname, transfer |
+
+</details>
+
+<details>
+<summary><b>Phase 3 — Produktivitas (sebagian)</b></summary>
+
+| Modul | Keterangan |
+|---|---|
+| Barcode / QR | Halaman `/scan` (scanner USB + kamera), label item/lokasi + cetak bulk, prefill `?scan=` di form transaksi |
+| Reserved Stock | Stok "dipesan" dokumen terbuka menahan `available`; lepas saat reject/post/dispatch |
+| Batch & Expiry | Tracking batch/expiry, report kedaluwarsa, alert dashboard, notifikasi batch ≤ 7 hari |
+| Import Barang | Excel/CSV dengan template, validasi per baris, upsert by SKU |
+| Reversal | Koreksi transaksi posted tanpa menghapus histori |
+
+</details>
+
+## Arsitektur
+
+```mermaid
+flowchart TB
+    subgraph UI[Browser]
+        B[Blade + Livewire + Alpine + Tailwind]
+    end
+    subgraph APP[Laravel 13]
+        MW[Middleware: auth, permission, EnsureAccountActive]
+        LW[Livewire Components]
+        SVC[Services: InventoryService · LedgerService<br/>ReservationService · ExpiryService<br/>DocumentNumberService · AuditLogger]
+        POL[Policies & Gates]
+    end
+    subgraph DB[(MySQL 8)]
+        LEDGER[(stock_movements<br/>single source of truth)]
+        BAL[(stock_balances<br/>cached)]
+    end
+    B --> MW --> LW --> SVC --> DB
+    SVC --> LEDGER --> BAL
+```
+
+**Penomoran dokumen** (`GR/GI/TR/ADJ/OPN-YYYYMMDD-XXXX`) memakai tabel `document_sequences` dengan row-lock — aman dari duplikat saat transaksi bersamaan.
+
+**Formula stok** (identik di dashboard, detail item, report):
 
 ```
-Posting transaksi
-        ↓
-Stock Movement (Ledger, immutable)
-        ↓
-Stock Balance (cached: quantity_on_hand, quantity_reserved, quantity_available generated, last_movement_at)
+Stock On Hand = Opening + Incoming + Transfer In + Adjustment In
+                − Outgoing − Transfer Out − Adjustment Out
+Available     = On Hand − Reserved
 ```
 
-Nomor dokumen via `document_sequences` dengan `SELECT ... FOR UPDATE`. Concurrent posting lock `stock_balances` + check `quantity_out <= available`; rollback on insufficient.
+## Mulai Cepat
 
-## Persyaratan
+### Persyaratan
 
 | Tool | Versi |
 |---|---|
-| PHP | ^8.3 |
+| PHP | ^8.3 (`pdo_mysql`, `mbstring`, `zip`, `gd`, `bcmath`, `intl`, `xml`, `fileinfo`) |
 | Composer | ^2.10 |
 | Node + npm | ^24 + ^11 |
-| MySQL | 8.0.30 (bundel Laragon) |
+| MySQL | 8.0 (Laragon membundel semuanya) |
 
-Ekstensi PHP: `pdo_mysql`, `mbstring`, `zip`, `gd`, `bcmath`, `intl`, `xml`, `fileinfo`. Verifikasi: `php -m`.
-
-## Setup Cepat
+### Instalasi (5 menit)
 
 ```bash
 composer install
@@ -69,90 +142,78 @@ npm run build
 php artisan serve
 ```
 
-Laragon (Windows PowerShell) — php/mysql sudah bundel:
+Buka `http://127.0.0.1:8000` dan masuk dengan akun demo di bawah.
 
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
+> Windows + Laragon? PHP/MySQL sudah tersedia — tidak perlu instal apa pun. Lihat juga `composer setup` di `composer.json`.
 
-Skrip `composer setup` juga tersedia: `composer install && key && migrate && npm build` — lihat `composer.json` → `scripts.setup`. Dev: `composer dev`. Test: `composer test`.
-
-### Konfigurasi DB
-
-`.env.example` sudah diset ke MySQL `stockmanagement` (Laragon: `DB_HOST=127.0.0.1 DB_PORT=3306 DB_USERNAME=root DB_PASSWORD=`). Untuk `sqlite`/`pgsql`, ubah `DB_CONNECTION`/`DB_DATABASE` di `.env`.
-
-## Akun Seed
+### Akun Demo
 
 | Email | Password | Peran |
 |---|---|---|
-| `admin@stock.test` | `password` | Administrator (all permissions) |
-| `staff@stock.test` | `password` | Warehouse Staff |
-| `supervisor@stock.test` | `password` | Supervisor |
+| `admin@stock.test` | `password` | Administrator (akses penuh) |
+| `staff@stock.test` | `password` | Warehouse Staff (transaksi) |
+| `supervisor@stock.test` | `password` | Supervisor (approve/posting) |
 | `manager@stock.test` | `password` | Manager (read-only) |
 
-Seed juga membuat: 6 kategori, 10 item, 2 warehouse+zone+rack+location, 3 supplier, 3 customer/department, transaksi demo (GR/GI posted/draft/submitted), adjustment/opname/transfer demo, batch `BATCH-DEMO-1` +5 hari (untuk expiry alert), `status=inactive` diabaikan saat seed.
+Seeder juga membuat 10 item, 2 gudang beserta rak/lokasi, supplier, transaksi contoh (posted/draft/submitted), adjustment, opname, transfer, batch demo `BATCH-DEMO-1` (+5 hari, untuk memicu alert expiry), dan 7 notifikasi.
 
-> Self-registration nonaktif (route `register` dihapus). Akun dibuat via Admin → Users atau seeder.
+> Registrasi mandiri dinonaktifkan — akun dibuat lewat Admin → Users atau seeder.
 
-## Struktur Penting
+### Tur 2 menit (setelah login)
+
+1. **Dashboard** — lihat KPI, grafik movement, panel *Expiring Soon*.
+2. **Transactions → Barang Masuk** — buat, submit, approve, post; lihat ledger di **Inventory → Stock Movement**.
+3. **Inventory → Scan** — ketik barcode/SKU (mis. hasil label), lalu **Cetak Label** dari detail barang.
+4. **Reports → Expiry** — filter batch yang hampir kedaluwarsa, export ke Excel/PDF.
+5. **Topbar bell** — notifikasi low stock & approval; toggle **light/dark** di sebelahnya.
+
+## Struktur Proyek
 
 ```
-app/Livewire/{Dashboard|MasterData|Inventory|Transactions|Reports|Admin|Scanning}
+app/Livewire/{Dashboard,MasterData,Inventory,Transactions,Reports,Admin,Scanning}
 app/Services/Inventory/{InventoryService,LedgerService,ExpiryService,ReservationService}
-app/Services/Barcode/LabelService
+app/Services/Barcode/LabelService            # QR + barcode SVG
 app/Services/Support/{DocumentNumberService,AuditLogger,NotificationService}
-app/Livewire/NotificationsBell.php
-app/Http/Controllers/LabelController.php — handles /labels/* (QR/Barcode)
-resources/views/labels/*, livewire/*, layouts/app.blade.php
+app/Http/Controllers/LabelController.php      # /labels/* (cetak)
+resources/views/{labels,livewire,layouts}     # UI Metronic-inspired
 ```
 
-## Penggunaan
-
-| Halaman | Route |
-|---|---|
-| Dashboard | `GET /dashboard` |
-| Master Barang / Kategori / Unit / Supplier / Customer / Warehouse / Location | `GET /items /categories /units /suppliers /customers /warehouses /locations` |
-| Barang Masuk / Keluar | `GET /goods-receipts /goods-issues` |
-| Stock On Hand / Movement / Low Stock | `GET /stock /stock/movements /stock/low-stock` |
-| Adjustment / Opname / Transfer | `GET /stock-adjustments /stock-opnames /stock-transfers` |
-| Scan | `GET /scan` |
-| Reports | `GET /reports/{stock,incoming,outgoing,movement,expiry}` |
-| Labels (QR/Barcode) | `GET /labels/items/{item} /labels/locations/{location} /labels/bulk?ids[]=1&ids[]=2` |
-| Admin Users / Roles / Audit Logs / Settings | `GET /admin/{users,roles,audit-logs,settings}` |
-
-Prefill transaksi dari Scan: `/goods-receipts/create?scan=BRG-001` (otomatis tambah baris).
-
-## RBAC
-
-43 permission (matrix: `dashboard.view`, `items.*`, `warehouse.*`, `goods_receipt.*`, `goods_issue.*`, `stock.*`, `stock_opname.*`, `transfer.*`, `reports.*`, `users.manage`, `roles.manage`, `settings.manage`, `audit_logs.view`). `Gate::before` mengizinkan `admin` bypass; `hasPermission()` cek `permissions.slug`.
+Rute utama: `/dashboard`, `/items`, `/goods-receipts`, `/goods-issues`, `/stock`, `/stock-adjustments`, `/stock-opnames`, `/stock-transfers`, `/scan`, `/reports/*`, `/admin/*`.
 
 ## Keamanan & Validitas
 
-- Session auth + CSRF, `password: 'hashed'`, rate-limit login via `LoginRequest::ensureIsNotRateLimited` (5/menit key `email|ip`).
-- **Akun inactive diblokir** saat login (`LoginRequest::authenticate` + middleware `EnsureAccountActive` pada grup `auth`) dan dicatat (`last_login_at`).
-- Validasi FE+BE; error teknis tidak diekspos; semua aktivitas penting via `AuditLogger`.
-
-## Export & Chart
-
-Excel via `maatwebsite/excel`, PDF via `barryvdh/laravel-dompdf`, chart dashboard via `apexcharts`.
+- Session auth + CSRF, password di-hash, **rate-limit login** (5/menit per email+IP).
+- **Akun inactive otomatis ditolak** saat login dan dipaksa logout bila dinonaktifkan di tengah sesi (`EnsureAccountActive`); `last_login_at` tercatat.
+- Validasi di frontend *dan* backend; error teknis tidak pernah diekspos ke pengguna.
+- Export Excel (`maatwebsite/excel`), PDF (`laravel-dompdf`), grafik (`apexcharts`).
 
 ## Pengujian
 
 ```bash
 php artisan test
-# filter spesifik
 php artisan test --filter="StockOpnameTest|StockTransferTest|BarcodeQrTest"
 ```
 
-Suite: 80 test, ~249 assertion (Inventory, RBAC, Page smoke, Import, Reversal, Reserved Stock, Expiry, Notifications, dsb.).
+Cakupan: kalkulasi stok, insufficient stock, low/out status, adjustment, transfer antar gudang, posting atomik & anti double-post, permission per peran, import, reversal, reserved stock, expiry, notifikasi, smoke-render seluruh halaman.
 
 ## Build & Deploy
 
 ```bash
-npm run build        # produksi (manifest → public/build)
-php artisan storage:link
+npm run build            # produksi → public/build
+php artisan storage:link # lampiran adjustment
 ```
 
-## Lisensi
+## Roadmap
 
-MIT. Template UI Metronic-inspired (bukan salinan kode Metronic — aman lisensi).
+- [x] Phase 1 — inti operasional
+- [x] Phase 2 — adjustment, opname, transfer, notifikasi
+- [x] Phase 3 (sebagian) — barcode/QR, reserved stock, batch & expiry, import, reversal
+- [ ] Purchase Order → link ke Barang Masuk
+- [ ] Valuasi persediaan (average/FIFO) & COGS
+- [ ] Mobile/PWA, integrasi ERP/Accounting
+
+## Berkontribusi & Lisensi
+
+Pull request dipersilakan — jalankan `php artisan test` dan `vendor/bin/pint` sebelum submit.
+
+Lisensi **MIT**. UI terinspirasi Metronic, ditulis ulang dari nol dengan Tailwind — bukan salinan kode Metronic, jadi aman lisensi.
