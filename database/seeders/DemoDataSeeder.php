@@ -452,6 +452,16 @@ class DemoDataSeeder extends Seeder
         } catch (\Throwable $e) {
         }
 
+        try {
+            \App\Models\Setting::set('account.inventory', '1300', 'accounting');
+            \App\Models\Setting::set('account.cogs', '5100', 'accounting');
+            \App\Models\Setting::set('account.adjustment_gain', '4210', 'accounting');
+            \App\Models\Setting::set('account.adjustment_loss', '5210', 'accounting');
+            \App\Models\Setting::set('account.transfer_clearing', '1310', 'accounting');
+            \App\Models\Setting::set('account.goods_receipt_clearing', '2000', 'accounting');
+        } catch (\Throwable $e) {
+        }
+
         auth()->logout();
     }
 }

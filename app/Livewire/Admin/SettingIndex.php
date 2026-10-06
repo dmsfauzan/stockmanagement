@@ -30,6 +30,14 @@ class SettingIndex extends Component
             'default_minimum_stock' => ['key' => 'inventory.default_minimum', 'label' => 'Default Minimum Stock', 'type' => 'number'],
             'default_maximum_stock' => ['key' => 'inventory.default_maximum', 'label' => 'Default Maximum Stock', 'type' => 'number'],
         ],
+        'accounting' => [
+            'account_inventory' => ['key' => 'account.inventory', 'label' => 'Akun Persediaan', 'type' => 'text'],
+            'account_cogs' => ['key' => 'account.cogs', 'label' => 'Akun COGS / HPP', 'type' => 'text'],
+            'account_adjustment_gain' => ['key' => 'account.adjustment_gain', 'label' => 'Akun Gain Adjustment', 'type' => 'text'],
+            'account_adjustment_loss' => ['key' => 'account.adjustment_loss', 'label' => 'Akun Loss Adjustment', 'type' => 'text'],
+            'account_transfer_clearing' => ['key' => 'account.transfer_clearing', 'label' => 'Akun Transfer Clearing', 'type' => 'text'],
+            'account_goods_receipt_clearing' => ['key' => 'account.goods_receipt_clearing', 'label' => 'Akun GR Clearing', 'type' => 'text'],
+        ],
     ];
 
     /** @var array<string, string> */
@@ -61,6 +69,12 @@ class SettingIndex extends Component
             'low_stock_notification' => 'enabled',
             'default_minimum_stock' => '0',
             'default_maximum_stock' => '0',
+            'account_inventory' => '1300',
+            'account_cogs' => '5100',
+            'account_adjustment_gain' => '4210',
+            'account_adjustment_loss' => '5210',
+            'account_transfer_clearing' => '1310',
+            'account_goods_receipt_clearing' => '2000',
             default => '',
         };
     }
@@ -76,6 +90,12 @@ class SettingIndex extends Component
             'values.low_stock_notification' => ['required', 'in:enabled,disabled'],
             'values.default_minimum_stock' => ['required', 'integer', 'min:0'],
             'values.default_maximum_stock' => ['required', 'integer', 'min:0'],
+            'values.account_inventory' => ['nullable', 'string', 'max:20'],
+            'values.account_cogs' => ['nullable', 'string', 'max:20'],
+            'values.account_adjustment_gain' => ['nullable', 'string', 'max:20'],
+            'values.account_adjustment_loss' => ['nullable', 'string', 'max:20'],
+            'values.account_transfer_clearing' => ['nullable', 'string', 'max:20'],
+            'values.account_goods_receipt_clearing' => ['nullable', 'string', 'max:20'],
         ];
 
         $validated = $this->validate($rules)['values'];

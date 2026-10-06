@@ -27,8 +27,10 @@
         request()->routeIs('reports.adjustment') => 'Laporan Adjustment',
         request()->routeIs('reports.transfer') => 'Laporan Transfer',
         request()->routeIs('reports.warehouse-comparison') => 'Perbandingan Gudang',
+        request()->routeIs('reports.replenishment') => 'Replenishment',
         request()->routeIs('reports.valuation') => 'Valuasi Persediaan',
         request()->routeIs('reports.cogs') => 'Laporan COGS',
+        request()->routeIs('reports.journal') => 'Jurnal Akuntansi',
         request()->routeIs('admin.users') => 'Users',
         request()->routeIs('admin.roles') => 'Roles & Permissions',
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
@@ -275,6 +277,14 @@
                 <a href="{{ route('reports.cogs') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.cogs'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.cogs')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 7V5a1 1 0 011-1h10a1 1 0 011 1v2"/></svg>
                     <span x-show="!collapsed" class="truncate">COGS</span>
+                </a>
+                <a href="{{ route('reports.journal') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.journal'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.journal')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v16H4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 9h16M9 9v11M15 9v11"/></svg>
+                    <span x-show="!collapsed" class="truncate">Jurnal</span>
+                </a>
+                <a href="{{ route('reports.replenishment') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.replenishment'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.replenishment')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6M9 17h4"/></svg>
+                    <span x-show="!collapsed" class="truncate">Replenishment</span>
                 </a>
             </x-sidebar-group>
             @endcan
