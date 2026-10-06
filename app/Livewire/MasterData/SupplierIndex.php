@@ -40,6 +40,12 @@ class SupplierIndex extends Component
 
     public string $status = 'active';
 
+    public int $lead_time_days = 7;
+
+    public string $payment_terms = 'NET 30';
+
+    public string $region = '';
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('items.view'), 403);
@@ -60,8 +66,10 @@ class SupplierIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.create'), 403);
 
         $this->resetValidation();
-        $this->reset(['editingId', 'code', 'name', 'contact_person', 'phone', 'email', 'address']);
+        $this->reset(['editingId', 'code', 'name', 'contact_person', 'phone', 'email', 'address', 'region']);
         $this->status = 'active';
+        $this->lead_time_days = 7;
+        $this->payment_terms = 'NET 30';
         $this->showModal = true;
     }
 
@@ -80,6 +88,9 @@ class SupplierIndex extends Component
         $this->email = (string) ($supplier->email ?? '');
         $this->address = (string) ($supplier->address ?? '');
         $this->status = (string) $supplier->status;
+        $this->lead_time_days = (int) ($supplier->lead_time_days ?? 7);
+        $this->payment_terms = (string) ($supplier->payment_terms ?? 'NET 30');
+        $this->region = (string) ($supplier->region ?? '');
         $this->showModal = true;
     }
 
@@ -102,9 +113,12 @@ class SupplierIndex extends Component
             'email' => ['nullable', 'email', 'max:255'],
             'address' => ['nullable', 'string'],
             'status' => ['required', 'in:active,inactive'],
+            'lead_time_days' => ['required', 'integer', 'min:1', 'max:365'],
+            'payment_terms' => ['required', 'string', 'max:40'],
+            'region' => ['nullable', 'string', 'max:80'],
         ]);
 
-        foreach (['contact_person', 'phone', 'email', 'address'] as $field) {
+        foreach (['contact_person', 'phone', 'email', 'address', 'region'] as $field) {
             $data[$field] = $data[$field] !== '' ? $data[$field] : null;
         }
 

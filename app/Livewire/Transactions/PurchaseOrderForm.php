@@ -4,6 +4,7 @@ namespace App\Livewire\Transactions;
 
 use App\Models\Item;
 use App\Models\PurchaseOrder;
+use App\Models\SupplierItemPrice;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
@@ -117,6 +118,35 @@ class PurchaseOrderForm extends Component
 
         if ($item) {
             $this->items[$index]['unit_id'] = (string) $item->unit_id;
+
+            $price = null;
+
+            if ($this->supplier_id !== '') {
+                $price = SupplierItemPrice::where('supplier_id', $this->supplier_id)
+                    ->where('item_id', $item->id)
+                    ->value('price');
+            }
+
+            $this->items[$index]['unit_price'] = (string) ($price ?? $item->cost ?? 0);
+        }
+    }
+
+    public function updatedSupplierId(): void
+    {
+        foreach (array_keys($this->items) as $index) {
+            $itemId = $this->items[$index]['item_id'] ?? '';
+
+            if ($itemId === '' || $this->supplier_id === '') {
+                continue;
+            }
+
+            $price = SupplierItemPrice::where('supplier_id', $this->supplier_id)
+                ->where('item_id', $itemId)
+                ->value('price');
+
+            if ($price !== null) {
+                $this->items[$index]['unit_price'] = (string) $price;
+            }
         }
     }
 

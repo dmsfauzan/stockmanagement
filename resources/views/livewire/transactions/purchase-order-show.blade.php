@@ -26,7 +26,7 @@
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Number</dt><dd class="mt-1 text-sm font-medium text-app-text">{{ $order->number }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Tanggal PO</dt><dd class="mt-1 text-sm text-app-text">{{ $order->order_date?->format('d M Y') }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Estimasi Datang</dt><dd class="mt-1 text-sm text-app-text">{{ $order->expected_date?->format('d M Y') ?? '-' }}</dd></div>
-                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Supplier</dt><dd class="mt-1 text-sm text-app-text">{{ $order->supplier?->name ?? '-' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Supplier</dt><dd class="mt-1 text-sm text-app-text">@if($order->supplier)<a href="{{ route('suppliers.show', $order->supplier) }}" class="text-primary-600 hover:underline dark:text-primary-400">{{ $order->supplier->name }}</a>@else-@endif</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Warehouse</dt><dd class="mt-1 text-sm text-app-text">{{ $order->warehouse?->name ?? '-' }}</dd></div>
                     <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Catatan</dt><dd class="mt-1 text-sm text-app-text">{{ $order->notes ?? '-' }}</dd></div>
                     @if($order->rejection_reason)

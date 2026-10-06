@@ -36,24 +36,35 @@
                     <tr>
                         <th>Kode</th>
                         <th>Nama</th>
-                        <th>Kontak</th>
-                        <th>Telepon</th>
-                        <th>Email</th>
+                        <th>Lead Time</th>
+                        <th>Payment Terms</th>
+                        <th>Region</th>
+                        <th class="text-right">Primary Items</th>
                         <th>Status</th>
                         <th class="text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($suppliers as $supplier)
-                        <tr>
-                            <td class="whitespace-nowrap font-medium">{{ $supplier->code }}</td>
-                            <td>{{ $supplier->name }}</td>
-                            <td class="text-app-muted">{{ $supplier->contact_person ?? '-' }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $supplier->phone ?? '-' }}</td>
-                            <td class="text-app-muted">{{ $supplier->email ?? '-' }}</td>
+                        <tr class="cursor-pointer hover:bg-app-surface-2/60" onclick="window.location='{{ route('suppliers.show', $supplier) }}'">
+                            <td class="whitespace-nowrap font-medium"><a href="{{ route('suppliers.show', $supplier) }}" class="text-primary-600 hover:underline dark:text-primary-400" wire:click.stop>{{ $supplier->code }}</a></td>
+                            <td><a href="{{ route('suppliers.show', $supplier) }}" class="hover:underline" wire:click.stop>{{ $supplier->name }}</a><div class="text-xs text-app-muted">{{ $supplier->contact_person ?? '-' }} {{ $supplier->phone ? '· '.$supplier->phone : '' }}</div></td>
+                            <td class="whitespace-nowrap text-app-muted">{{ (int) ($supplier->lead_time_days ?? 7) }}d</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ $supplier->payment_terms ?? 'NET 30' }}</td>
+                            <td class="whitespace-nowrap">
+                                @if($supplier->region)
+                                    <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-500/10 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-600">{{ $supplier->region }}</span>
+                                @else
+                                    <span class="text-app-muted">-</span>
+                                @endif
+                            </td>
+                            <td class="whitespace-nowrap text-right font-medium text-app-text">{{ $supplier->primary_items_count ?? 0 }}</td>
                             <td class="whitespace-nowrap"><x-ui.status-badge :status="$supplier->status" /></td>
                             <td class="whitespace-nowrap text-right">
-                                <div class="flex items-center justify-end gap-1">
+                                <div class="flex items-center justify-end gap-1" wire:click.stop>
+                                    <a href="{{ route('suppliers.show', $supplier) }}" class="app-btn app-btn-ghost !p-1.5" title="View">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    </a>
                                     <button type="button" wire:click="openEdit({{ $supplier->id }})" class="app-btn app-btn-ghost !p-1.5" title="Edit">
                                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
                                     </button>
@@ -62,7 +73,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7"><x-ui.empty-state title="Tidak ada supplier" message="Belum ada supplier yang cocok dengan pencarian." /></td></tr>
+                        <tr><td colspan="8"><x-ui.empty-state title="Tidak ada supplier" message="Belum ada supplier yang cocok dengan pencarian." /></td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -99,11 +110,26 @@
                             <input type="text" wire:model="phone" class="app-input">
                             @error('phone') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                         </div>
+                        <div>
+                            <label class="app-label mb-1">Lead Time (days)<span class="text-rose-500">*</span></label>
+                            <input type="number" min="1" max="365" wire:model="lead_time_days" class="app-input">
+                            @error('lead_time_days') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="app-label mb-1">Payment Terms<span class="text-rose-500">*</span></label>
+                            <input type="text" wire:model="payment_terms" placeholder="NET 30" class="app-input">
+                            @error('payment_terms') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                        </div>
                     </div>
                     <div>
                         <label class="app-label mb-1">Email</label>
                         <input type="email" wire:model="email" class="app-input">
                         @error('email') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="app-label mb-1">Region</label>
+                        <input type="text" wire:model="region" placeholder="Jakarta" class="app-input">
+                        @error('region') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="app-label mb-1">Alamat</label>

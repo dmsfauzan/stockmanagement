@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['code', 'name', 'contact_person', 'phone', 'email', 'address', 'status'])]
+#[Fillable(['code', 'name', 'contact_person', 'phone', 'email', 'address', 'status', 'lead_time_days', 'payment_terms', 'region'])]
 class Supplier extends Model
 {
     use HasFactory;
@@ -15,5 +15,15 @@ class Supplier extends Model
     public function primaryItems(): HasMany
     {
         return $this->hasMany(Item::class, 'primary_supplier_id');
+    }
+
+    public function itemPrices(): HasMany
+    {
+        return $this->hasMany(SupplierItemPrice::class);
+    }
+
+    public function pricesFor(int $itemId): ?SupplierItemPrice
+    {
+        return $this->itemPrices()->where('item_id', $itemId)->first();
     }
 }

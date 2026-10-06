@@ -5,6 +5,7 @@ namespace App\Livewire\MasterData;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Supplier;
+use App\Models\SupplierItemPrice;
 use App\Models\Unit;
 use App\Services\Support\AuditLogger;
 use Illuminate\Validation\Rule;
@@ -117,6 +118,13 @@ class ItemForm extends Component
             $item = Item::create($data);
 
             AuditLogger::logModel('create', $item, null, $item->toArray());
+        }
+
+        if ($item->primary_supplier_id && (float) ($item->cost ?? 0) > 0) {
+            SupplierItemPrice::updateOrCreate(
+                ['supplier_id' => $item->primary_supplier_id, 'item_id' => $item->id],
+                ['price' => (float) $item->cost, 'lead_time_days' => 7]
+            );
         }
 
         $this->dispatch('toast', type: 'success', message: 'Tersimpan');

@@ -123,7 +123,47 @@ class DemoDataSeeder extends Seeder
 
         $supplierJkt = \App\Models\Supplier::where('code', 'SUP001')->first();
         $supplierMedia = \App\Models\Supplier::where('code', 'SUP002')->first();
+        $supplierPackaging = \App\Models\Supplier::where('code', 'SUP003')->first();
         $customerRetail = \App\Models\Customer::where('code', 'CUST001')->first();
+
+        $supplierAdvanced = [
+            'SUP001' => ['contact_person' => 'Budi Santoso', 'phone' => '021-5550101', 'email' => 'sales@sumberelektronik.test', 'region' => 'Jakarta', 'lead_time_days' => 7, 'payment_terms' => 'NET 30'],
+            'SUP002' => ['contact_person' => 'Rina Wijaya', 'phone' => '022-5550202', 'email' => 'order@mediacomputer.test', 'region' => 'Bandung', 'lead_time_days' => 5, 'payment_terms' => 'NET 14'],
+            'SUP003' => ['contact_person' => 'Agus Pratama', 'phone' => '031-5550303', 'email' => 'cs@kemasannusantara.test', 'region' => 'Surabaya', 'lead_time_days' => 10, 'payment_terms' => 'COD'],
+        ];
+
+        foreach ($supplierAdvanced as $code => $fields) {
+            DB::table('suppliers')->where('code', $code)->update($fields);
+        }
+
+        $priceSeed = [
+            ['supplier' => 'SUP001', 'sku' => 'BRG-001', 'price' => 15000, 'lead' => 7, 'notes' => 'Harga kontrak 2026'],
+            ['supplier' => 'SUP001', 'sku' => 'BRG-007', 'price' => 1800000, 'lead' => 9, 'notes' => 'Include garansi 1 tahun'],
+            ['supplier' => 'SUP001', 'sku' => 'BRG-008', 'price' => 9000, 'lead' => 6, 'notes' => null],
+            ['supplier' => 'SUP002', 'sku' => 'BRG-001', 'price' => 16500, 'lead' => 5, 'notes' => 'Harga alternatif lebih tinggi (demo variance)'],
+            ['supplier' => 'SUP002', 'sku' => 'BRG-002', 'price' => 50000, 'lead' => 5, 'notes' => null],
+            ['supplier' => 'SUP003', 'sku' => 'BRG-009', 'price' => 7500, 'lead' => 10, 'notes' => null],
+        ];
+
+        foreach ($priceSeed as $row) {
+            $sup = \App\Models\Supplier::where('code', $row['supplier'])->first();
+            $itm = Item::where('sku', $row['sku'])->first();
+
+            if (! $sup || ! $itm) {
+                continue;
+            }
+
+            DB::table('supplier_item_prices')->updateOrInsert(
+                ['supplier_id' => $sup->id, 'item_id' => $itm->id],
+                [
+                    'price' => $row['price'],
+                    'lead_time_days' => $row['lead'],
+                    'notes' => $row['notes'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
 
         if ($supplierJkt && $warehouseJkt && ! GoodsReceipt::where('notes', 'Demo GR POSTED')->exists()) {
             $number = DocumentNumberService::generate('GR');

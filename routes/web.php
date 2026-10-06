@@ -16,6 +16,7 @@ use App\Livewire\MasterData\ItemIndex;
 use App\Livewire\MasterData\ItemShow;
 use App\Livewire\MasterData\LocationIndex;
 use App\Livewire\MasterData\SupplierIndex;
+use App\Livewire\MasterData\SupplierShow;
 use App\Livewire\MasterData\UnitIndex;
 use App\Livewire\MasterData\WarehouseIndex;
 use App\Livewire\NotificationsIndex;
@@ -74,6 +75,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('permission:items.view')->get('/categories', CategoryIndex::class)->name('categories.index');
     Route::middleware('permission:items.view')->get('/units', UnitIndex::class)->name('units.index');
     Route::middleware('permission:items.view')->get('/suppliers', SupplierIndex::class)->name('suppliers.index');
+    Route::middleware('permission:items.view')->get('/suppliers/{supplier}', SupplierShow::class)->name('suppliers.show');
     Route::middleware('permission:items.view')->get('/customers', CustomerIndex::class)->name('customers.index');
 
     Route::get('/notifications', NotificationsIndex::class)->name('notifications.index');
