@@ -39,6 +39,8 @@ class GoodsReceiptForm extends Component
 
     public string $barcodeInput = '';
 
+    public ?int $purchaseOrderLink = null;
+
     public function mount($receipt = null): void
     {
         $this->transaction_date = now()->format('Y-m-d');
@@ -60,6 +62,7 @@ class GoodsReceiptForm extends Component
             $this->warehouse_id = (string) $model->warehouse_id;
             $this->received_by = (string) ($model->received_by ?? '');
             $this->notes = (string) ($model->notes ?? '');
+            $this->purchaseOrderLink = $model->purchase_order_id ? (int) $model->purchase_order_id : null;
 
             $this->items = $model->receiptItems->map(fn ($item) => [
                 'item_id' => (string) $item->item_id,
@@ -81,6 +84,44 @@ class GoodsReceiptForm extends Component
                     $this->addByBarcode();
                 }
             }
+
+            if (! empty(request()->query('po'))) {
+                $this->applyPurchaseOrderPrefill((string) request()->query('po'));
+            }
+        }
+    }
+
+    protected function applyPurchaseOrderPrefill(string $poId): void
+    {
+        $order = \App\Models\PurchaseOrder::with('items')->find($poId);
+
+        if (! $order || ! in_array($order->status, ['approved', 'partial'], true)) {
+            return;
+        }
+
+        if (! auth()->user()?->can('view', $order)) {
+            return;
+        }
+
+        $this->purchaseOrderLink = $order->id;
+        $this->supplier_id = (string) $order->supplier_id;
+        $this->warehouse_id = (string) $order->warehouse_id;
+        $this->po_number = (string) $order->number;
+
+        $rows = $order->items
+            ->filter(fn ($item) => ((int) $item->quantity - (int) $item->received_quantity) > 0)
+            ->map(fn ($item) => [
+                'item_id' => (string) $item->item_id,
+                'quantity' => (int) $item->quantity - (int) $item->received_quantity,
+                'unit_id' => (string) $item->unit_id,
+                'location_id' => '',
+                'batch_number' => '',
+                'expiry_date' => '',
+                'notes' => 'Dari '.$order->number,
+            ])->values()->all();
+
+        if ($rows !== []) {
+            $this->items = $rows;
         }
     }
 
@@ -208,6 +249,7 @@ class GoodsReceiptForm extends Component
             'supplier_id' => $data['supplier_id'],
             'po_number' => $data['po_number'] !== '' ? $data['po_number'] : null,
             'delivery_note' => $data['delivery_note'] !== '' ? $data['delivery_note'] : null,
+            'purchase_order_id' => $this->purchaseOrderLink,
             'warehouse_id' => $data['warehouse_id'],
             'received_by' => $data['received_by'] !== '' ? $data['received_by'] : null,
             'notes' => $data['notes'] !== '' ? $data['notes'] : null,

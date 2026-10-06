@@ -6,6 +6,7 @@ use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
 use App\Models\Location;
+use App\Models\PurchaseOrder;
 use App\Models\StockAdjustment;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -57,6 +58,8 @@ class PageSmokeTest extends TestCase
             'stock-opnames.create',
             'stock-transfers.index',
             'stock-transfers.create',
+            'purchase-orders.index',
+            'purchase-orders.create',
             'scan',
             'stock.index',
             'stock.movements',

@@ -8,6 +8,7 @@ use App\Models\GoodsReceipt;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\Notification;
+use App\Models\PurchaseOrder;
 use App\Models\StockAdjustment;
 use App\Models\StockBalance;
 use App\Models\StockMovement;
@@ -346,6 +347,38 @@ class DemoDataSeeder extends Seeder
             foreach ($samples as $sample) {
                 try {
                     Notification::create($sample);
+                } catch (\Throwable $e) {
+                }
+            }
+        }
+
+        if (! PurchaseOrder::where('number', 'PO-DEMO-001')->exists()) {
+            $poWh = $warehouseJkt ?? Warehouse::where('code', 'WH-JKT')->first();
+            $poSup = \App\Models\Supplier::where('code', 'SUP001')->first();
+            $poItem1 = Item::where('sku', 'BRG-001')->first();
+            $poItem2 = Item::where('sku', 'BRG-002')->first();
+
+            if ($poWh && $poSup && $poItem1 && $poItem2) {
+                try {
+                    $po = PurchaseOrder::create([
+                        'number' => 'PO-DEMO-001',
+                        'order_date' => Carbon::now()->subDays(1)->toDateString(),
+                        'expected_date' => Carbon::now()->addDays(7)->toDateString(),
+                        'supplier_id' => $poSup->id,
+                        'warehouse_id' => $poWh->id,
+                        'status' => 'approved',
+                        'notes' => 'Demo PO — approved',
+                        'created_by' => $staff->id,
+                        'submitted_by' => $staff->id,
+                        'submitted_at' => Carbon::now()->subDays(1),
+                        'approved_by' => $supervisor->id,
+                        'approved_at' => Carbon::now()->subHours(12),
+                    ]);
+
+                    $po->items()->createMany([
+                        ['item_id' => $poItem1->id, 'quantity' => 10, 'received_quantity' => 0, 'unit_id' => $poItem1->unit_id, 'unit_price' => 15000],
+                        ['item_id' => $poItem2->id, 'quantity' => 5, 'received_quantity' => 0, 'unit_id' => $poItem2->unit_id, 'unit_price' => 50000],
+                    ]);
                 } catch (\Throwable $e) {
                 }
             }

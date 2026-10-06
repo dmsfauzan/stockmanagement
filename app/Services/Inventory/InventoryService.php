@@ -58,6 +58,13 @@ class InventoryService
 
             AuditLogger::log('POST', 'goods_receipt', $locked);
 
+            if ($locked->purchase_order_id) {
+                try {
+                    PurchaseOrderService::registerReceipt($locked);
+                } catch (\Throwable $e) {
+                }
+            }
+
             foreach ($locked->receiptItems as $item) {
                 try {
                     NotificationService::notifyLowStock((int) $item->item_id, (int) $locked->warehouse_id);
@@ -380,6 +387,13 @@ class InventoryService
                 'reversed_by' => auth()->id(),
                 'reversal_reason' => $reason,
             ]);
+
+            if ($locked->purchase_order_id) {
+                try {
+                    PurchaseOrderService::revertReceipt($locked);
+                } catch (\Throwable $e) {
+                }
+            }
 
             AuditLogger::log('REVERSE', 'goods_receipt', $locked);
         });

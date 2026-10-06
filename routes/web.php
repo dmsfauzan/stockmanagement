@@ -41,6 +41,9 @@ use App\Livewire\Transactions\StockOpnameCount;
 use App\Livewire\Transactions\StockOpnameForm;
 use App\Livewire\Transactions\StockOpnameIndex;
 use App\Livewire\Transactions\StockOpnameShow;
+use App\Livewire\Transactions\PurchaseOrderForm;
+use App\Livewire\Transactions\PurchaseOrderIndex;
+use App\Livewire\Transactions\PurchaseOrderShow;
 use App\Livewire\Transactions\StockTransferForm;
 use App\Livewire\Transactions\StockTransferIndex;
 use App\Livewire\Transactions\StockTransferShow;
@@ -71,6 +74,11 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::middleware('permission:warehouse.view')->get('/warehouses', WarehouseIndex::class)->name('warehouses.index');
     Route::middleware('permission:location.view')->get('/locations', LocationIndex::class)->name('locations.index');
+
+    Route::middleware('permission:purchase_order.view')->get('/purchase-orders', PurchaseOrderIndex::class)->name('purchase-orders.index');
+    Route::middleware('permission:purchase_order.create')->get('/purchase-orders/create', PurchaseOrderForm::class)->name('purchase-orders.create');
+    Route::middleware('permission:purchase_order.view')->get('/purchase-orders/{purchaseOrder}', PurchaseOrderShow::class)->name('purchase-orders.show');
+    Route::middleware('permission:purchase_order.update')->get('/purchase-orders/{purchaseOrder}/edit', PurchaseOrderForm::class)->name('purchase-orders.edit');
 
     Route::middleware('permission:goods_receipt.view')->get('/goods-receipts', GoodsReceiptIndex::class)->name('goods-receipts.index');
     Route::middleware('permission:goods_receipt.create')->get('/goods-receipts/create', GoodsReceiptForm::class)->name('goods-receipts.create');

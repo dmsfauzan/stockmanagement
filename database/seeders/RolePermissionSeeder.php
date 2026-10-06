@@ -49,6 +49,13 @@ class RolePermissionSeeder extends Seeder
             'transfer.create' => 'transfer',
             'transfer.approve' => 'transfer',
             'transfer.receive' => 'transfer',
+            'purchase_order.view' => 'purchase_order',
+            'purchase_order.create' => 'purchase_order',
+            'purchase_order.update' => 'purchase_order',
+            'purchase_order.submit' => 'purchase_order',
+            'purchase_order.approve' => 'purchase_order',
+            'purchase_order.receive' => 'purchase_order',
+            'purchase_order.close' => 'purchase_order',
             'reports.view' => 'reports',
             'reports.export' => 'reports',
             'users.manage' => 'users',
@@ -91,6 +98,7 @@ class RolePermissionSeeder extends Seeder
             'location.view', 'warehouse.view',
             'stock.adjustment', 'stock_opname.view', 'stock_opname.create', 'stock_opname.submit',
             'transfer.view', 'transfer.create',
+            'purchase_order.view', 'purchase_order.create', 'purchase_order.update', 'purchase_order.submit',
         ];
         $this->syncPermissions(
             $roleModels['warehouse_staff']->id,
@@ -105,6 +113,7 @@ class RolePermissionSeeder extends Seeder
             'stock.adjustment.approve',
             'stock_opname.view', 'stock_opname.approve',
             'transfer.view', 'transfer.approve', 'transfer.receive',
+            'purchase_order.view', 'purchase_order.approve', 'purchase_order.receive', 'purchase_order.close',
             'items.view', 'warehouse.view', 'location.view',
         ];
         $this->syncPermissions(
@@ -118,6 +127,7 @@ class RolePermissionSeeder extends Seeder
             'goods_receipt.view', 'goods_issue.view',
             'warehouse.view', 'location.view',
             'transfer.view',
+            'purchase_order.view',
         ];
         $this->syncPermissions(
             $roleModels['manager']->id,

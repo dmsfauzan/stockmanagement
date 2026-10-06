@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\TransactionStatus;
+use App\Enums\PurchaseOrderStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,31 +10,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'transaction_date', 'supplier_id', 'po_number', 'delivery_note', 'purchase_order_id', 'warehouse_id', 'received_by', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'posted_by', 'submitted_at', 'approved_at', 'rejected_at', 'posted_at', 'rejection_reason', 'reversed_at', 'reversed_by', 'reversal_reason'])]
-class GoodsReceipt extends Model
+#[Fillable(['number', 'order_date', 'expected_date', 'supplier_id', 'warehouse_id', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'closed_by', 'submitted_at', 'approved_at', 'rejected_at', 'closed_at', 'rejection_reason'])]
+class PurchaseOrder extends Model
 {
     use HasFactory;
 
     protected function casts(): array
     {
         return [
-            'transaction_date' => 'date',
+            'order_date' => 'date',
+            'expected_date' => 'date',
             'submitted_at' => 'datetime',
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',
-            'posted_at' => 'datetime',
-            'reversed_at' => 'datetime',
+            'closed_at' => 'datetime',
         ];
-    }
-
-    public function isReversed(): bool
-    {
-        return ! is_null($this->reversed_at);
-    }
-
-    public function reverser(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'reversed_by');
     }
 
     public function supplier(): BelongsTo
@@ -47,14 +37,14 @@ class GoodsReceipt extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
-    public function purchaseOrder(): BelongsTo
+    public function items(): HasMany
     {
-        return $this->belongsTo(PurchaseOrder::class);
+        return $this->hasMany(PurchaseOrderItem::class);
     }
 
-    public function receiptItems(): HasMany
+    public function goodsReceipts(): HasMany
     {
-        return $this->hasMany(GoodsReceiptItem::class);
+        return $this->hasMany(GoodsReceipt::class, 'purchase_order_id');
     }
 
     public function creator(): BelongsTo
@@ -82,24 +72,24 @@ class GoodsReceipt extends Model
         return $this->belongsTo(User::class, 'rejected_by');
     }
 
-    public function poster(): BelongsTo
+    public function closer(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'posted_by');
+        return $this->belongsTo(User::class, 'closed_by');
     }
 
-    public function statusEnum(): TransactionStatus
+    public function statusEnum(): PurchaseOrderStatus
     {
-        return TransactionStatus::from($this->status);
+        return PurchaseOrderStatus::from($this->status);
     }
 
-    public function isPosted(): bool
+    public function isPostedLike(): bool
     {
-        return $this->statusEnum()->isPosted();
+        return $this->statusEnum()->isPostedLike();
     }
 
-    public function isEditable(): bool
+    public function isOpen(): bool
     {
-        return $this->statusEnum()->isEditable();
+        return $this->statusEnum()->isOpen();
     }
 
     public function scopeByStatus(Builder $query, string $status): Builder

@@ -8,6 +8,7 @@
         request()->routeIs('customers.*') => 'Customer / Department',
         request()->routeIs('warehouses.*') => 'Warehouse',
         request()->routeIs('locations.*') => 'Location / Rack',
+        request()->routeIs('purchase-orders.*') => 'Purchase Order',
         request()->routeIs('goods-receipts.*') => 'Barang Masuk',
         request()->routeIs('goods-issues.*') => 'Barang Keluar',
         request()->routeIs('stock-adjustments.*') => 'Stock Adjustment',
@@ -129,8 +130,14 @@
             </x-sidebar-group>
             @endcanany
 
-            @canany(['goods_receipt.view', 'goods_issue.view', 'stock.adjustment', 'stock_opname.view', 'transfer.view'])
+            @canany(['purchase_order.view', 'goods_receipt.view', 'goods_issue.view', 'stock.adjustment', 'stock_opname.view', 'transfer.view'])
             <x-sidebar-group group-key="transactions" label="Transactions">
+                @can('purchase_order.view')
+                <a href="{{ route('purchase-orders.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('purchase-orders.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('purchase-orders.*')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6M9 17h4"/></svg>
+                    <span x-show="!collapsed" class="truncate">Purchase Order</span>
+                </a>
+                @endcan
                 @can('goods_receipt.view')
                 <a href="{{ route('goods-receipts.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('goods-receipts.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('goods-receipts.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M12 9v6m7 2a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2"/></svg>
