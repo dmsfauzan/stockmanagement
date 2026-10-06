@@ -81,6 +81,9 @@ flowchart LR
 | Batch & Expiry | Tracking batch/expiry, report kedaluwarsa, alert dashboard, notifikasi batch ≤ 7 hari |
 | Import Barang | Excel/CSV dengan template, validasi per baris, upsert by SKU |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
+| Purchase Order | PO → Barang Masuk dengan penerimaan sebagian (partial/full), `PO-...` |
+| Multi-Warehouse | Switcher gudang global (session), dashboard per gudang, report perbandingan gudang |
+| Valuation / COGS | Harga pokok rata-rata bergerak (moving average), COGS, report valuasi & COGS |
 
 </details>
 
@@ -208,9 +211,9 @@ php artisan storage:link # lampiran adjustment
 
 - [x] Phase 1 — inti operasional
 - [x] Phase 2 — adjustment, opname, transfer, notifikasi
-- [x] Phase 3 (sebagian) — barcode/QR, reserved stock, batch & expiry, import, reversal
-- [ ] Purchase Order → link ke Barang Masuk
-- [ ] Valuasi persediaan (average/FIFO) & COGS
+- [x] Phase 3 — barcode/QR, reserved stock, batch & expiry, import, reversal
+- [x] Purchase Order & Multi-Warehouse (switcher + comparison report)
+- [x] Valuation (moving average) & COGS
 - [ ] Mobile/PWA, integrasi ERP/Accounting
 
 ## Berkontribusi & Lisensi

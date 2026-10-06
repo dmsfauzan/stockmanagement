@@ -19,7 +19,9 @@ use App\Livewire\MasterData\SupplierIndex;
 use App\Livewire\MasterData\UnitIndex;
 use App\Livewire\MasterData\WarehouseIndex;
 use App\Livewire\Reports\ExpiryReport;
+use App\Livewire\Reports\CogsReport;
 use App\Livewire\Reports\IncomingReport;
+use App\Livewire\Reports\ValuationReport;
 use App\Livewire\Reports\MovementReport;
 use App\Livewire\Reports\AdjustmentReport;
 use App\Livewire\Reports\OpnameReport;
@@ -120,6 +122,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('permission:reports.view')->get('/reports/adjustment', AdjustmentReport::class)->name('reports.adjustment');
     Route::middleware('permission:reports.view')->get('/reports/transfer', TransferReport::class)->name('reports.transfer');
     Route::middleware('permission:reports.view')->get('/reports/warehouse-comparison', WarehouseComparisonReport::class)->name('reports.warehouse-comparison');
+    Route::middleware('permission:reports.view')->get('/reports/valuation', ValuationReport::class)->name('reports.valuation');
+    Route::middleware('permission:reports.view')->get('/reports/cogs', CogsReport::class)->name('reports.cogs');
 
     Route::middleware('permission:users.manage')->get('/admin/users', UserIndex::class)->name('admin.users');
     Route::middleware('permission:roles.manage')->get('/admin/roles', RoleIndex::class)->name('admin.roles');

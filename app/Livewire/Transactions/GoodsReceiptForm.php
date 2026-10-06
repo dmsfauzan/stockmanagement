@@ -67,6 +67,7 @@ class GoodsReceiptForm extends Component
             $this->items = $model->receiptItems->map(fn ($item) => [
                 'item_id' => (string) $item->item_id,
                 'quantity' => (int) $item->quantity,
+                'unit_cost' => (float) $item->unit_cost,
                 'unit_id' => (string) $item->unit_id,
                 'location_id' => (string) $item->location_id,
                 'batch_number' => (string) ($item->batch_number ?? ''),
@@ -113,6 +114,7 @@ class GoodsReceiptForm extends Component
             ->map(fn ($item) => [
                 'item_id' => (string) $item->item_id,
                 'quantity' => (int) $item->quantity - (int) $item->received_quantity,
+                'unit_cost' => (float) $item->unit_price,
                 'unit_id' => (string) $item->unit_id,
                 'location_id' => '',
                 'batch_number' => '',
@@ -138,6 +140,7 @@ class GoodsReceiptForm extends Component
             'items' => ['required', 'array', 'min:1'],
             'items.*.item_id' => ['required', 'exists:items,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.unit_cost' => ['nullable', 'numeric', 'min:0'],
             'items.*.unit_id' => ['required', 'exists:units,id'],
             'items.*.location_id' => ['required', 'exists:locations,id'],
             'items.*.batch_number' => ['nullable', 'string', 'max:60'],
@@ -151,6 +154,7 @@ class GoodsReceiptForm extends Component
         $this->items[] = [
             'item_id' => '',
             'quantity' => 1,
+            'unit_cost' => 0,
             'unit_id' => '',
             'location_id' => '',
             'batch_number' => '',
@@ -181,6 +185,10 @@ class GoodsReceiptForm extends Component
 
         if ($item) {
             $this->items[$index]['unit_id'] = (string) $item->unit_id;
+
+            if (($this->items[$index]['unit_cost'] ?? 0) <= 0) {
+                $this->items[$index]['unit_cost'] = (float) $item->cost;
+            }
         }
     }
 
@@ -204,6 +212,7 @@ class GoodsReceiptForm extends Component
         $this->items[] = [
             'item_id' => (string) $item->id,
             'quantity' => 1,
+            'unit_cost' => (float) $item->cost,
             'unit_id' => (string) $item->unit_id,
             'location_id' => '',
             'batch_number' => '',
@@ -258,6 +267,7 @@ class GoodsReceiptForm extends Component
         $rows = array_map(fn ($row) => [
             'item_id' => $row['item_id'],
             'quantity' => $row['quantity'],
+            'unit_cost' => $row['unit_cost'] ?? 0,
             'unit_id' => $row['unit_id'],
             'location_id' => $row['location_id'],
             'batch_number' => $row['batch_number'] !== '' ? $row['batch_number'] : null,

@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                     <label for="minimum_stock" class="app-label mb-1">Minimum Stock<span class="text-rose-500">*</span></label>
                     <input type="number" id="minimum_stock" wire:model.live="minimum_stock" min="0" class="app-input">
@@ -77,6 +77,11 @@
                     <label for="maximum_stock" class="app-label mb-1">Maximum Stock<span class="text-rose-500">*</span></label>
                     <input type="number" id="maximum_stock" wire:model.live="maximum_stock" min="0" class="app-input">
                     @error('maximum_stock') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="cost" class="app-label mb-1">Harga Satuan</label>
+                    <input type="number" id="cost" wire:model="cost" min="0" step="0.01" class="app-input" placeholder="0">
+                    @error('cost') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label for="status" class="app-label mb-1">Status<span class="text-rose-500">*</span></label>

@@ -2,11 +2,8 @@
 
 namespace App\Livewire\Reports;
 
-use App\Enums\TransactionType;
-use App\Exports\MovementExport;
+use App\Exports\CogsExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
-use App\Models\Item;
-use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
@@ -18,20 +15,14 @@ use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
-#[Title('Laporan Pergerakan Stok')]
-class MovementReport extends Component
+#[Title('Laporan COGS')]
+class CogsReport extends Component
 {
     use HandlesReportExport, WithPagination;
 
     public string $search = '';
 
-    public string $itemFilter = '';
-
     public string $warehouseFilter = '';
-
-    public string $transactionTypeFilter = '';
-
-    public string $userFilter = '';
 
     public string $fromDate = '';
 
@@ -49,22 +40,7 @@ class MovementReport extends Component
         $this->resetPage();
     }
 
-    public function updatedItemFilter(): void
-    {
-        $this->resetPage();
-    }
-
     public function updatedWarehouseFilter(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedTransactionTypeFilter(): void
-    {
-        $this->resetPage();
-    }
-
-    public function updatedUserFilter(): void
     {
         $this->resetPage();
     }
@@ -86,7 +62,7 @@ class MovementReport extends Component
 
     public function resetFilters(): void
     {
-        $this->reset(['search', 'itemFilter', 'warehouseFilter', 'transactionTypeFilter', 'userFilter', 'fromDate', 'toDate']);
+        $this->reset(['search', 'warehouseFilter', 'fromDate', 'toDate']);
         $this->resetPage();
     }
 
@@ -95,8 +71,8 @@ class MovementReport extends Component
         abort_unless(auth()->user()->hasPermission('reports.export'), 403);
 
         return $this->csvResponse(
-            'movement-report-'.now()->format('Ymd-His').'.csv',
-            ['Date', 'SKU', 'Item', 'Warehouse', 'Location', 'Type', 'Qty In', 'Qty Out', 'Balance', 'Unit Cost', 'Total Cost', 'User'],
+            'cogs-report-'.now()->format('Ymd-His').'.csv',
+            ['Date', 'Reference', 'SKU', 'Item', 'Warehouse', 'Qty Out', 'Unit Cost', 'Total Cost'],
             $this->exportRows(),
         );
     }
@@ -105,36 +81,32 @@ class MovementReport extends Component
     {
         abort_unless(auth()->user()->hasPermission('reports.export'), 403);
 
-        return Excel::download(new MovementExport($this->filterPayload()), 'movement-report-'.now()->format('Ymd-His').'.xlsx');
+        return Excel::download(new CogsExport($this->filterPayload()), 'cogs-report-'.now()->format('Ymd-His').'.xlsx');
     }
 
     public function exportPdf(): StreamedResponse
     {
         abort_unless(auth()->user()->hasPermission('reports.export'), 403);
 
-        return $this->pdfResponse('reports.pdf.movement', [
+        return $this->pdfResponse('reports.pdf.cogs', [
             'rows' => $this->exportRows(),
             'filters' => $this->filterLines(),
             'totals' => $this->totals(),
             'generatedAt' => now()->format('d M Y H:i'),
-        ], 'movement-report-'.now()->format('Ymd-His').'.pdf');
+        ], 'cogs-report-'.now()->format('Ymd-His').'.pdf');
     }
 
     protected function exportRows()
     {
         return $this->baseQuery()->get()->map(fn ($r) => [
             'created_at' => $r->created_at,
+            'reference' => $r->reference_type.' #'.$r->reference_id,
             'sku' => $r->sku,
             'item_name' => $r->item_name,
             'warehouse_name' => $r->warehouse_name,
-            'location_code' => $r->location_code,
-            'transaction_type' => $r->transaction_type,
-            'quantity_in' => (int) $r->quantity_in,
             'quantity_out' => (int) $r->quantity_out,
-            'balance_after' => (int) $r->balance_after,
             'unit_cost' => (float) $r->unit_cost,
             'total_cost' => (float) $r->total_cost,
-            'user_name' => $r->user_name,
         ]);
     }
 
@@ -142,12 +114,12 @@ class MovementReport extends Component
     {
         $row = $this->baseQuery()
             ->reorder()
-            ->select(DB::raw('COALESCE(SUM(stock_movements.quantity_in),0) as total_in, COALESCE(SUM(stock_movements.quantity_out),0) as total_out, COUNT(*) as total_rows'))
+            ->select(DB::raw('COALESCE(SUM(stock_movements.total_cost),0) as total_cogs, COALESCE(SUM(stock_movements.quantity_out),0) as total_qty, COUNT(*) as total_rows'))
             ->first();
 
         return [
-            'in' => (int) ($row->total_in ?? 0),
-            'out' => (int) ($row->total_out ?? 0),
+            'cogs' => (float) ($row->total_cogs ?? 0),
+            'qty' => (int) ($row->total_qty ?? 0),
             'rows' => (int) ($row->total_rows ?? 0),
         ];
     }
@@ -155,10 +127,7 @@ class MovementReport extends Component
     protected function filterLines(): array
     {
         return array_filter([
-            'Item' => $this->itemFilter !== '' ? Item::whereKey($this->itemFilter)->value('sku') : null,
             'Warehouse' => $this->warehouseFilter !== '' ? Warehouse::whereKey($this->warehouseFilter)->value('name') : null,
-            'Type' => $this->transactionTypeFilter !== '' ? $this->transactionTypeFilter : null,
-            'User' => $this->userFilter !== '' ? User::whereKey($this->userFilter)->value('name') : null,
             'From' => $this->fromDate ?: null,
             'To' => $this->toDate ?: null,
             'Search' => $this->search !== '' ? $this->search : null,
@@ -169,10 +138,7 @@ class MovementReport extends Component
     {
         return [
             'search' => $this->search,
-            'item' => $this->itemFilter,
             'warehouse' => $this->warehouseFilter,
-            'transaction_type' => $this->transactionTypeFilter,
-            'user' => $this->userFilter,
             'fromDate' => $this->fromDate,
             'toDate' => $this->toDate,
         ];
@@ -181,37 +147,33 @@ class MovementReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('stock_movements')
-            ->leftJoin('items', 'stock_movements.item_id', '=', 'items.id')
-            ->leftJoin('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
-            ->leftJoin('locations', 'stock_movements.location_id', '=', 'locations.id')
-            ->leftJoin('users', 'stock_movements.created_by', '=', 'users.id')
+            ->join('items', 'stock_movements.item_id', '=', 'items.id')
+            ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
+            ->whereIn('stock_movements.transaction_type', ['outgoing', 'adjustment_out', 'transfer_out'])
+            ->where('stock_movements.total_cost', '>', 0)
+            ->whereNull('items.deleted_at')
             ->select([
                 'stock_movements.id',
                 'stock_movements.created_at',
                 'stock_movements.reference_type',
                 'stock_movements.reference_id',
-                'stock_movements.transaction_type',
-                'stock_movements.quantity_in',
-                'stock_movements.quantity_out',
-                'stock_movements.balance_after',
-                'stock_movements.unit_cost',
-                'stock_movements.total_cost',
                 'items.sku',
                 'items.name as item_name',
                 'warehouses.name as warehouse_name',
-                'locations.code as location_code',
-                'users.name as user_name',
+                'warehouses.id as warehouse_id',
+                'stock_movements.quantity_out',
+                'stock_movements.unit_cost',
+                'stock_movements.total_cost',
             ])
             ->when($this->search !== '', function (QueryBuilder $query): void {
                 $term = '%'.$this->search.'%';
                 $query->where(function (QueryBuilder $inner) use ($term): void {
-                    $inner->where('items.sku', 'like', $term)->orWhere('items.name', 'like', $term);
+                    $inner->where('items.sku', 'like', $term)
+                        ->orWhere('items.barcode', 'like', $term)
+                        ->orWhere('items.name', 'like', $term);
                 });
             })
-            ->when($this->itemFilter !== '', fn (QueryBuilder $query) => $query->where('stock_movements.item_id', $this->itemFilter))
-            ->when($this->warehouseFilter !== '', fn (QueryBuilder $query) => $query->where('stock_movements.warehouse_id', $this->warehouseFilter))
-            ->when($this->transactionTypeFilter !== '', fn (QueryBuilder $query) => $query->where('stock_movements.transaction_type', $this->transactionTypeFilter))
-            ->when($this->userFilter !== '', fn (QueryBuilder $query) => $query->where('stock_movements.created_by', $this->userFilter))
+            ->when($this->warehouseFilter !== '', fn (QueryBuilder $query) => $query->where('warehouses.id', $this->warehouseFilter))
             ->when($this->fromDate !== '', fn (QueryBuilder $query) => $query->whereDate('stock_movements.created_at', '>=', $this->fromDate))
             ->when($this->toDate !== '', fn (QueryBuilder $query) => $query->whereDate('stock_movements.created_at', '<=', $this->toDate))
             ->orderBy('stock_movements.created_at', 'desc')
@@ -220,13 +182,10 @@ class MovementReport extends Component
 
     public function render()
     {
-        return view('livewire.reports.movement-report', [
+        return view('livewire.reports.cogs-report', [
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
             'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
-            'items' => Item::orderBy('name')->get(['id', 'sku', 'name']),
-            'users' => User::orderBy('name')->get(['id', 'name']),
-            'transactionTypes' => TransactionType::cases(),
         ]);
     }
 }

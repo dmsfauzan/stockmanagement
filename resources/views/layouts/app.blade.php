@@ -27,6 +27,8 @@
         request()->routeIs('reports.adjustment') => 'Laporan Adjustment',
         request()->routeIs('reports.transfer') => 'Laporan Transfer',
         request()->routeIs('reports.warehouse-comparison') => 'Perbandingan Gudang',
+        request()->routeIs('reports.valuation') => 'Valuasi Persediaan',
+        request()->routeIs('reports.cogs') => 'Laporan COGS',
         request()->routeIs('admin.users') => 'Users',
         request()->routeIs('admin.roles') => 'Roles & Permissions',
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
@@ -238,10 +240,6 @@
                     <span x-show="!collapsed" class="truncate">Movement</span>
                 </a>
                 <a href="{{ route('reports.expiry') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.expiry'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.expiry')])>
-                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8l4 4-4 4M8 12h8"/></svg>
-                    <span x-show="!collapsed" class="truncate">Movement</span>
-                </a>
-                <a href="{{ route('reports.expiry') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.expiry'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.expiry')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v1m0 0V6m0 2a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12"/></svg>
                     <span x-show="!collapsed" class="truncate">Kedaluwarsa</span>
                 </a>
@@ -260,6 +258,14 @@
                 <a href="{{ route('reports.warehouse-comparison') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.warehouse-comparison'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.warehouse-comparison')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21V7a2 2 0 012-2h2.5a1 1 0 011 1v1.5A1 1 0 009 8.5H15a1 1 0 001-1V6a1 1 0 011-1H19a2 2 0 012 2v14M3.75 21h16.5"/></svg>
                     <span x-show="!collapsed" class="truncate">Warehouse Comparison</span>
+                </a>
+                <a href="{{ route('reports.valuation') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.valuation'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.valuation')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1M12 19v1M3 12h1M20 12h1M5.6 5.6l.7.7M17.7 17.7l.7.7M5.6 18.4l.7-.7M17.7 6.3l.7-.7"/></svg>
+                    <span x-show="!collapsed" class="truncate">Valuasi</span>
+                </a>
+                <a href="{{ route('reports.cogs') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.cogs'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.cogs')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 7V5a1 1 0 011-1h10a1 1 0 011 1v2"/></svg>
+                    <span x-show="!collapsed" class="truncate">COGS</span>
                 </a>
             </x-sidebar-group>
             @endcan

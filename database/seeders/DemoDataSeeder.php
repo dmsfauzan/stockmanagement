@@ -53,6 +53,26 @@ class DemoDataSeeder extends Seeder
         $map = MasterDataSeeder::itemLocationMap();
         $warehouseJkt = Warehouse::where('code', 'WH-JKT')->first();
 
+        $demoCosts = [
+            'BRG-001' => 15000,
+            'BRG-002' => 50000,
+            'BRG-003' => 25000,
+            'BRG-004' => 12000,
+            'BRG-005' => 18000,
+            'BRG-006' => 22000,
+            'BRG-007' => 35000,
+            'BRG-008' => 9000,
+            'BRG-009' => 7500,
+            'BRG-010' => 45000,
+        ];
+
+        foreach ($demoCosts as $sku => $cost) {
+            $item = Item::where('sku', $sku)->first();
+            if ($item) {
+                $item->forceFill(['cost' => $cost])->save();
+            }
+        }
+
         foreach ($quantities as $sku => $qty) {
             $item = Item::where('sku', $sku)->first();
             if (! $item || ! $warehouseJkt) {
@@ -135,6 +155,7 @@ class DemoDataSeeder extends Seeder
                 $receipt->receiptItems()->create([
                     'item_id' => $item->id,
                     'quantity' => $row['qty'],
+                    'unit_cost' => $item->cost,
                     'unit_id' => $item->unit_id,
                     'location_id' => $loc->id,
                     'batch_number' => $row['batch'] ?? null,
@@ -174,6 +195,7 @@ class DemoDataSeeder extends Seeder
                 $receipt->receiptItems()->create([
                     'item_id' => $item->id,
                     'quantity' => $row['qty'],
+                    'unit_cost' => $item->cost ?? 0,
                     'unit_id' => $item->unit_id,
                     'location_id' => $loc->id,
                 ]);

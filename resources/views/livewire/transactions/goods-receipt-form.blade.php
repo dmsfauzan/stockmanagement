@@ -80,6 +80,7 @@
                         <tr>
                             <th>Barang</th>
                             <th class="text-right">Qty</th>
+                            <th class="text-right">Harga Satuan</th>
                             <th>Satuan</th>
                             <th>Lokasi</th>
                             <th>Batch</th>
@@ -103,6 +104,10 @@
                                 <td>
                                     <input type="number" min="1" wire:model="items.{{ $index }}.quantity" class="app-input w-20 px-2 py-2 text-right text-sm">
                                     @error("items.{$index}.quantity") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                                </td>
+                                <td>
+                                    <input type="number" min="0" step="0.01" wire:model="items.{{ $index }}.unit_cost" class="app-input w-28 px-2 py-2 text-right text-sm" placeholder="0">
+                                    @error("items.{$index}.unit_cost") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                                 </td>
                                 <td>
                                     <select wire:model="items.{{ $index }}.unit_id" class="app-select w-32 px-2 py-2 text-sm">

@@ -46,7 +46,8 @@ class InventoryService
                     0,
                     $item->batch_number,
                     $expiryDate,
-                    $item->notes
+                    $item->notes,
+                    $item->unit_cost !== null ? (float) $item->unit_cost : null
                 );
             }
 

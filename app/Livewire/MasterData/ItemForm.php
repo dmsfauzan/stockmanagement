@@ -36,6 +36,8 @@ class ItemForm extends Component
 
     public int $maximum_stock = 0;
 
+    public float $cost = 0;
+
     public string $primary_supplier_id = '';
 
     public string $status = 'active';
@@ -57,6 +59,7 @@ class ItemForm extends Component
             $this->description = (string) ($model->description ?? '');
             $this->minimum_stock = (int) $model->minimum_stock;
             $this->maximum_stock = (int) $model->maximum_stock;
+            $this->cost = (float) $model->cost;
             $this->primary_supplier_id = $model->primary_supplier_id ? (string) $model->primary_supplier_id : '';
             $this->status = (string) $model->status;
         } else {
@@ -76,6 +79,7 @@ class ItemForm extends Component
             'description' => ['nullable', 'string'],
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'maximum_stock' => ['required', 'integer', 'gte:minimum_stock'],
+            'cost' => ['nullable', 'numeric', 'min:0'],
             'primary_supplier_id' => ['nullable', 'exists:suppliers,id'],
             'status' => ['required', 'in:active,inactive'],
         ];
@@ -94,6 +98,7 @@ class ItemForm extends Component
         $data['brand'] = $data['brand'] !== '' ? $data['brand'] : null;
         $data['description'] = $data['description'] !== '' ? $data['description'] : null;
         $data['primary_supplier_id'] = $data['primary_supplier_id'] !== '' ? $data['primary_supplier_id'] : null;
+        $data['cost'] = $data['cost'] ?? 0;
 
         if ($this->itemId) {
             $item = Item::findOrFail($this->itemId);

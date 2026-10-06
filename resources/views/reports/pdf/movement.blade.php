@@ -11,6 +11,8 @@
             <th class="right">Qty In</th>
             <th class="right">Qty Out</th>
             <th class="right">Balance</th>
+            <th class="right">Unit Cost</th>
+            <th class="right">Total Cost</th>
             <th>User</th>
         </tr>
     </thead>
@@ -27,10 +29,12 @@
                 <td class="right">{{ (int) ($r['quantity_in'] ?? 0) ?: '-' }}</td>
                 <td class="right">{{ (int) ($r['quantity_out'] ?? 0) ?: '-' }}</td>
                 <td class="right">{{ (int) ($r['balance_after'] ?? 0) }}</td>
+                <td class="right">{{ number_format((float) ($r['unit_cost'] ?? 0), 2) }}</td>
+                <td class="right">{{ number_format((float) ($r['total_cost'] ?? 0), 2) }}</td>
                 <td>{{ $r['user_name'] ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="10" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="12" class="empty">Tidak ada data.</td></tr>
         @endforelse
     </tbody>
 </table>
