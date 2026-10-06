@@ -128,6 +128,10 @@ class DashboardIndex extends Component
         $expiringSoon = ExpiryService::rows('expiring_30', null, $wid)->limit(5)->get();
         $expiredCount = $wid === null ? (ExpiryService::counts()['expired'] ?? 0) : (int) ExpiryService::rows('expired', null, $wid)->count();
 
+        $inventoryValue = (float) DB::table('inventory_valuations')
+            ->when($wid !== null, fn ($q) => $q->where('warehouse_id', $wid))
+            ->sum('total_value');
+
         $activeWarehouseName = $wid !== null ? Warehouse::whereKey($wid)->value('name') : null;
 
         return view('livewire.dashboard.dashboard-index', [
@@ -146,6 +150,7 @@ class DashboardIndex extends Component
             'expiringSoon' => $expiringSoon,
             'expiredCount' => $expiredCount,
             'activeWarehouseName' => $activeWarehouseName,
+            'inventoryValue' => $inventoryValue,
         ]);
     }
 

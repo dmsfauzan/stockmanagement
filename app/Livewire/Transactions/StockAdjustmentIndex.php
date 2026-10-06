@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Stock Adjustment')]
@@ -87,6 +88,32 @@ class StockAdjustmentIndex extends Component
             ->when($this->warehouseFilter !== '', fn (Builder $query) => $query->where('warehouse_id', $this->warehouseFilter))
             ->when($this->dateFrom !== '', fn (Builder $query) => $query->whereDate('transaction_date', '>=', $this->dateFrom))
             ->when($this->dateTo !== '', fn (Builder $query) => $query->whereDate('transaction_date', '<=', $this->dateTo));
+    }
+
+    public function export(): StreamedResponse
+    {
+        $this->authorize('viewAny', StockAdjustment::class);
+
+        $rows = $this->baseQuery()->orderBy('transaction_date', $this->sortDirection)->orderByDesc('id')->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Number', 'Date', 'Warehouse', 'Location', 'Reason', 'Items', 'Status']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->number,
+                    $row->transaction_date?->format('Y-m-d'),
+                    $row->warehouse?->name,
+                    $row->location?->fullPath() ?? $row->location?->code,
+                    $row->reason,
+                    $row->items_count,
+                    $row->status,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'stock-adjustments-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()

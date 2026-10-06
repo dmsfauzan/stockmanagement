@@ -18,6 +18,7 @@ use App\Livewire\MasterData\LocationIndex;
 use App\Livewire\MasterData\SupplierIndex;
 use App\Livewire\MasterData\UnitIndex;
 use App\Livewire\MasterData\WarehouseIndex;
+use App\Livewire\NotificationsIndex;
 use App\Livewire\Reports\ExpiryReport;
 use App\Livewire\Reports\CogsReport;
 use App\Livewire\Reports\IncomingReport;
@@ -74,6 +75,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('permission:items.view')->get('/units', UnitIndex::class)->name('units.index');
     Route::middleware('permission:items.view')->get('/suppliers', SupplierIndex::class)->name('suppliers.index');
     Route::middleware('permission:items.view')->get('/customers', CustomerIndex::class)->name('customers.index');
+
+    Route::get('/notifications', NotificationsIndex::class)->name('notifications.index');
 
     Route::middleware('permission:warehouse.view')->get('/warehouses', WarehouseIndex::class)->name('warehouses.index');
     Route::middleware('permission:location.view')->get('/locations', LocationIndex::class)->name('locations.index');

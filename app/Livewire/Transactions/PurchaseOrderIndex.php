@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Purchase Order')]
@@ -89,6 +90,33 @@ class PurchaseOrderIndex extends Component
             ->when($this->warehouseFilter !== '', fn (Builder $query) => $query->where('warehouse_id', $this->warehouseFilter))
             ->when($this->dateFrom !== '', fn (Builder $query) => $query->whereDate('order_date', '>=', $this->dateFrom))
             ->when($this->dateTo !== '', fn (Builder $query) => $query->whereDate('order_date', '<=', $this->dateTo));
+    }
+
+    public function export(): StreamedResponse
+    {
+        $this->authorize('viewAny', PurchaseOrder::class);
+
+        $rows = $this->baseQuery()->orderBy('order_date', $this->sortDirection)->orderByDesc('id')->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Number', 'Date', 'Supplier', 'Warehouse', 'Items', 'Received', 'Total', 'Status']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->number,
+                    $row->order_date?->format('Y-m-d'),
+                    $row->supplier?->name,
+                    $row->warehouse?->name,
+                    $row->items_count,
+                    (int) ($row->total_received ?? 0),
+                    (int) ($row->total_quantity ?? 0),
+                    $row->status,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'purchase-orders-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()

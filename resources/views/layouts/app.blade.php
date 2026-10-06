@@ -326,12 +326,9 @@
 
             <livewire:layout.warehouse-switcher />
 
-            <form action="{{ route('items.index') }}" method="GET" class="ml-auto hidden max-w-sm flex-1 md:flex">
-                <label class="relative flex w-full items-center">
-                    <svg class="pointer-events-none absolute left-3 h-4 w-4 text-app-muted" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.3-4.3M10 18a8 8 0 110-16 8 8 0 010 16z"/></svg>
-                    <input type="search" name="search" value="{{ request('search') }}" placeholder="Search SKU / barcode..." class="app-input py-2 pl-9 pr-3" />
-                </label>
-            </form>
+            <div class="ml-auto hidden max-w-sm flex-1 md:flex">
+                <livewire:layout.global-search />
+            </div>
 
             <div class="ml-auto flex items-center gap-1 md:ml-0">
                 <button

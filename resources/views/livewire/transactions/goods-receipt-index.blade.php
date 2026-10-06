@@ -1,6 +1,10 @@
 <div>
     <x-ui.page-header title="Barang Masuk" subtitle="Daftar transaksi penerimaan barang">
         <x-slot:actions>
+            <button type="button" wire:click="export" class="app-btn app-btn-secondary gap-2">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                Export
+            </button>
             @can('create', App\Models\GoodsReceipt::class)
                 <a href="{{ route('goods-receipts.create') }}" class="app-btn app-btn-primary">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>

@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Transfer Barang')]
@@ -87,6 +88,33 @@ class StockTransferIndex extends Component
             ->when($this->warehouseFromFilter !== '', fn (Builder $query) => $query->where('from_warehouse_id', $this->warehouseFromFilter))
             ->when($this->dateFrom !== '', fn (Builder $query) => $query->whereDate('transfer_date', '>=', $this->dateFrom))
             ->when($this->dateTo !== '', fn (Builder $query) => $query->whereDate('transfer_date', '<=', $this->dateTo));
+    }
+
+    public function export(): StreamedResponse
+    {
+        $this->authorize('viewAny', StockTransfer::class);
+
+        $rows = $this->baseQuery()->orderBy('transfer_date', $this->sortDirection)->orderByDesc('id')->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Number', 'Date', 'From Warehouse', 'From Location', 'To Warehouse', 'To Location', 'Items', 'Status']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->number,
+                    $row->transfer_date?->format('Y-m-d'),
+                    $row->fromWarehouse?->name,
+                    $row->fromLocation?->fullPath() ?? $row->fromLocation?->code,
+                    $row->toWarehouse?->name,
+                    $row->toLocation?->fullPath() ?? $row->toLocation?->code,
+                    $row->items_count,
+                    $row->status,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'stock-transfers-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()
