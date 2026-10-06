@@ -9,6 +9,7 @@
 [![Livewire](https://img.shields.io/badge/Livewire-4-4E56A8)](https://livewire.laravel.com)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
+[![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
 [![Tests](https://img.shields.io/badge/tests-80_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
@@ -52,7 +53,7 @@ flowchart LR
 | Barang Keluar (`GI-YYYYMMDD-XXXX`) | Alur sama + pengecekan stok sebelum posting |
 | Stock On Hand / Movement / Low Stock | `Available = On Hand − Reserved`, otomatis |
 | Dashboard | KPI, grafik movement, distribusi kategori, low stock, aktivitas terkini |
-| Reports | Stock / Incoming / Outgoing / Movement / Expiry → CSV, Excel, PDF |
+| Reports | Stock / Incoming / Outgoing / Movement / Expiry / Opname / Adjustment / Transfer → CSV, Excel, PDF |
 | RBAC | 43 permission granular, 4 peran |
 | Audit trail | Siapa, apa, kapan, nilai lama → baru |
 

@@ -21,7 +21,10 @@ use App\Livewire\MasterData\WarehouseIndex;
 use App\Livewire\Reports\ExpiryReport;
 use App\Livewire\Reports\IncomingReport;
 use App\Livewire\Reports\MovementReport;
+use App\Livewire\Reports\AdjustmentReport;
+use App\Livewire\Reports\OpnameReport;
 use App\Livewire\Reports\OutgoingReport;
+use App\Livewire\Reports\TransferReport;
 use App\Http\Controllers\LabelController;
 use App\Livewire\Reports\StockReport;
 use App\Livewire\Scanning\ScanIndex;
@@ -104,6 +107,9 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('permission:reports.view')->get('/reports/outgoing', OutgoingReport::class)->name('reports.outgoing');
     Route::middleware('permission:reports.view')->get('/reports/movement', MovementReport::class)->name('reports.movement');
     Route::middleware('permission:reports.view')->get('/reports/expiry', ExpiryReport::class)->name('reports.expiry');
+    Route::middleware('permission:reports.view')->get('/reports/opname', OpnameReport::class)->name('reports.opname');
+    Route::middleware('permission:reports.view')->get('/reports/adjustment', AdjustmentReport::class)->name('reports.adjustment');
+    Route::middleware('permission:reports.view')->get('/reports/transfer', TransferReport::class)->name('reports.transfer');
 
     Route::middleware('permission:users.manage')->get('/admin/users', UserIndex::class)->name('admin.users');
     Route::middleware('permission:roles.manage')->get('/admin/roles', RoleIndex::class)->name('admin.roles');

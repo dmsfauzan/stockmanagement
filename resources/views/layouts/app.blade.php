@@ -22,6 +22,9 @@
         request()->routeIs('reports.outgoing') => 'Laporan Barang Keluar',
         request()->routeIs('reports.movement') => 'Laporan Movement',
         request()->routeIs('reports.expiry') => 'Laporan Kedaluwarsa',
+        request()->routeIs('reports.opname') => 'Laporan Opname',
+        request()->routeIs('reports.adjustment') => 'Laporan Adjustment',
+        request()->routeIs('reports.transfer') => 'Laporan Transfer',
         request()->routeIs('admin.users') => 'Users',
         request()->routeIs('admin.roles') => 'Roles & Permissions',
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
@@ -227,8 +230,24 @@
                     <span x-show="!collapsed" class="truncate">Movement</span>
                 </a>
                 <a href="{{ route('reports.expiry') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.expiry'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.expiry')])>
-                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l3 3"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8l4 4-4 4M8 12h8"/></svg>
+                    <span x-show="!collapsed" class="truncate">Movement</span>
+                </a>
+                <a href="{{ route('reports.expiry') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.expiry'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.expiry')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v1m0 0V6m0 2a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12"/></svg>
                     <span x-show="!collapsed" class="truncate">Kedaluwarsa</span>
+                </a>
+                <a href="{{ route('reports.opname') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.opname'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.opname')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h6M9 8h6M5 5a2 2 0 012-2h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5z"/></svg>
+                    <span x-show="!collapsed" class="truncate">Opname</span>
+                </a>
+                <a href="{{ route('reports.adjustment') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.adjustment'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.adjustment')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v12M9 15h6M12 3v1.5"/></svg>
+                    <span x-show="!collapsed" class="truncate">Adjustment</span>
+                </a>
+                <a href="{{ route('reports.transfer') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.transfer'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.transfer')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12h16M3 12l3 3 3-3"/><path stroke-linecap="round" stroke-linejoin="round" d="M17 12H3"/></svg>
+                    <span x-show="!collapsed" class="truncate">Transfer</span>
                 </a>
             </x-sidebar-group>
             @endcan
