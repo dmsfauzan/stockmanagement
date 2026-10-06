@@ -25,6 +25,7 @@ use App\Livewire\Reports\AdjustmentReport;
 use App\Livewire\Reports\OpnameReport;
 use App\Livewire\Reports\OutgoingReport;
 use App\Livewire\Reports\TransferReport;
+use App\Livewire\Reports\WarehouseComparisonReport;
 use App\Http\Controllers\LabelController;
 use App\Livewire\Reports\StockReport;
 use App\Livewire\Scanning\ScanIndex;
@@ -118,6 +119,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('permission:reports.view')->get('/reports/opname', OpnameReport::class)->name('reports.opname');
     Route::middleware('permission:reports.view')->get('/reports/adjustment', AdjustmentReport::class)->name('reports.adjustment');
     Route::middleware('permission:reports.view')->get('/reports/transfer', TransferReport::class)->name('reports.transfer');
+    Route::middleware('permission:reports.view')->get('/reports/warehouse-comparison', WarehouseComparisonReport::class)->name('reports.warehouse-comparison');
 
     Route::middleware('permission:users.manage')->get('/admin/users', UserIndex::class)->name('admin.users');
     Route::middleware('permission:roles.manage')->get('/admin/roles', RoleIndex::class)->name('admin.roles');

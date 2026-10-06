@@ -18,6 +18,16 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    @if($warehouseFilter !== null)
+        <div class="mb-4 flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21V7a2 2 0 012-2h2.5a1 1 0 011 1v1.5A1 1 0 009 8.5H15a1 1 0 001-1V6a1 1 0 011-1H19a2 2 0 012 2v14M3.75 21h16.5"/></svg>
+                Filtered: Warehouse {{ $activeWarehouseName ?? ('#'.$warehouseFilter) }}
+                <button wire:click="clearWarehouseFilter" class="ml-1 rounded-full px-1.5 font-bold hover:bg-primary-100 dark:hover:bg-primary-900/50" title="Clear filter">×</button>
+            </span>
+        </div>
+    @endif
+
     <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
         <x-ui.stat-card label="Total Items" :value="number_format($totalItems)" tone="indigo" hint="Item aktif">
             <x-slot:icon><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4 8 4 8-4zm-8 4v10M4 7v10l8 4 8-4V7"/></svg></x-slot:icon>

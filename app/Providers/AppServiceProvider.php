@@ -72,19 +72,31 @@ class AppServiceProvider extends ServiceProvider
             $outOfStockCount = 0;
 
             try {
-                $row = DB::table('stock_balances')
+                $activeWarehouseId = null;
+                try {
+                    $activeWarehouseId = session()->get('active_warehouse_id');
+                    if ($activeWarehouseId === '' || $activeWarehouseId === 0 || $activeWarehouseId === '0') {
+                        $activeWarehouseId = null;
+                    }
+                } catch (Throwable) {
+                }
+
+                $q = DB::table('stock_balances')
                     ->join('items', 'items.id', '=', 'stock_balances.item_id')
-                    ->whereNull('items.deleted_at')
-                    ->selectRaw(
-                        'SUM(CASE WHEN stock_balances.quantity_on_hand <= items.minimum_stock THEN 1 ELSE 0 END) as low,'
-                        .' SUM(CASE WHEN stock_balances.quantity_on_hand <= 0 THEN 1 ELSE 0 END) as out'
-                    )
-                    ->first();
+                    ->whereNull('items.deleted_at');
+
+                if ($activeWarehouseId !== null) {
+                    $q->where('stock_balances.warehouse_id', (int) $activeWarehouseId);
+                }
+
+                $row = $q->selectRaw(
+                    'SUM(CASE WHEN stock_balances.quantity_on_hand <= items.minimum_stock THEN 1 ELSE 0 END) as low,'
+                    .' SUM(CASE WHEN stock_balances.quantity_on_hand <= 0 THEN 1 ELSE 0 END) as out'
+                )->first();
 
                 $lowStockCount = (int) ($row->low ?? 0);
                 $outOfStockCount = (int) ($row->out ?? 0);
             } catch (Throwable) {
-                // Database not ready yet; render badges at zero.
             }
 
             $view->with('lowStockCount', $lowStockCount)

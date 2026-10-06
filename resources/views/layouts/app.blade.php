@@ -26,6 +26,7 @@
         request()->routeIs('reports.opname') => 'Laporan Opname',
         request()->routeIs('reports.adjustment') => 'Laporan Adjustment',
         request()->routeIs('reports.transfer') => 'Laporan Transfer',
+        request()->routeIs('reports.warehouse-comparison') => 'Perbandingan Gudang',
         request()->routeIs('admin.users') => 'Users',
         request()->routeIs('admin.roles') => 'Roles & Permissions',
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
@@ -256,6 +257,10 @@
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12h16M3 12l3 3 3-3"/><path stroke-linecap="round" stroke-linejoin="round" d="M17 12H3"/></svg>
                     <span x-show="!collapsed" class="truncate">Transfer</span>
                 </a>
+                <a href="{{ route('reports.warehouse-comparison') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.warehouse-comparison'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.warehouse-comparison')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21V7a2 2 0 012-2h2.5a1 1 0 011 1v1.5A1 1 0 009 8.5H15a1 1 0 001-1V6a1 1 0 011-1H19a2 2 0 012 2v14M3.75 21h16.5"/></svg>
+                    <span x-show="!collapsed" class="truncate">Warehouse Comparison</span>
+                </a>
             </x-sidebar-group>
             @endcan
 
@@ -312,6 +317,8 @@
                 <h1 class="truncate text-sm font-semibold text-app-text">{{ $title ?? $routeTitle }}</h1>
                 <p class="hidden truncate text-xs text-app-muted sm:block">Warehouse Stock Management</p>
             </div>
+
+            <livewire:layout.warehouse-switcher />
 
             <form action="{{ route('items.index') }}" method="GET" class="ml-auto hidden max-w-sm flex-1 md:flex">
                 <label class="relative flex w-full items-center">
