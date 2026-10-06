@@ -54,6 +54,21 @@ use App\Livewire\Transactions\StockTransferIndex;
 use App\Livewire\Transactions\StockTransferShow;
 use Illuminate\Support\Facades\Route;
 
+Route::view('/offline', 'offline')->name('offline');
+
+Route::get('/manifest.webmanifest', function () {
+    return response(file_get_contents(public_path('manifest.webmanifest')), 200, [
+        'Content-Type' => 'application/manifest+json; charset=UTF-8',
+    ]);
+})->name('pwa.manifest');
+
+Route::get('/sw.js', function () {
+    return response(file_get_contents(public_path('sw.js')), 200, [
+        'Content-Type' => 'application/javascript; charset=UTF-8',
+        'Service-Worker-Allowed' => '/',
+    ]);
+})->name('pwa.sw');
+
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('dashboard')

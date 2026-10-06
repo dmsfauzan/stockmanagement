@@ -1,0 +1,29 @@
+{
+  "name": "Warehouse Stock Management",
+  "short_name": "WSM",
+  "description": "Warehouse Stock Management — scan, kelola transaksi, dan monitor stok gudang.",
+  "id": "/",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "categories": ["business", "productivity"],
+  "lang": "id-ID",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Scan", "url": "/scan", "description": "Scan barcode/QR", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Barang Masuk", "url": "/goods-receipts/create", "description": "Buat transaksi masuk" },
+    { "name": "Barang Keluar", "url": "/goods-issues/create", "description": "Buat transaksi keluar" }
+  ],
+  "screenshots": []
+}
