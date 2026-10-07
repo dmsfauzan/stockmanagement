@@ -15,6 +15,7 @@ use App\Models\Location;
 use App\Models\Rack;
 use App\Models\StockBalance;
 use App\Models\StockMovement;
+use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -31,9 +32,13 @@ class InventoryBusinessTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Location $location;
+
     private Item $item;
+
     private Unit $unit;
 
     protected function setUp(): void
@@ -115,7 +120,7 @@ class InventoryBusinessTest extends TestCase
     {
         $receipt = GoodsReceipt::create([
             'number' => DocumentNumberService::generate('GR'), 'transaction_date' => today(),
-            'supplier_id' => \App\Models\Supplier::create(['code' => 'SUP-T1', 'name' => 'Supplier Test', 'status' => 'active'])->id,
+            'supplier_id' => Supplier::create(['code' => 'SUP-T1', 'name' => 'Supplier Test', 'status' => 'active'])->id,
             'warehouse_id' => $this->warehouse->id, 'status' => 'approved',
             'created_by' => $this->admin->id, 'approved_by' => $this->admin->id, 'approved_at' => now(),
         ]);

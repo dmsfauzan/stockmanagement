@@ -9,8 +9,6 @@ use App\Models\InventoryValuation;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\Rack;
-use App\Models\StockBalance;
-use App\Models\StockMovement;
 use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -26,9 +24,13 @@ class ValuationTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Location $location;
+
     private Item $item;
+
     private Unit $unit;
 
     protected function setUp(): void

@@ -3,17 +3,20 @@
 namespace Database\Seeders;
 
 use App\Enums\TransactionType;
+use App\Models\Customer;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\Notification;
 use App\Models\PurchaseOrder;
+use App\Models\Setting;
 use App\Models\StockAdjustment;
 use App\Models\StockBalance;
 use App\Models\StockMovement;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
+use App\Models\Supplier;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\Inventory\InventoryService;
@@ -98,6 +101,7 @@ class DemoDataSeeder extends Seeder
                     ['item_id' => $item->id, 'warehouse_id' => $warehouseJkt->id, 'location_id' => $location->id],
                     ['quantity_on_hand' => 0, 'quantity_reserved' => 0]
                 );
+
                 continue;
             }
 
@@ -121,10 +125,10 @@ class DemoDataSeeder extends Seeder
             }
         }
 
-        $supplierJkt = \App\Models\Supplier::where('code', 'SUP001')->first();
-        $supplierMedia = \App\Models\Supplier::where('code', 'SUP002')->first();
-        $supplierPackaging = \App\Models\Supplier::where('code', 'SUP003')->first();
-        $customerRetail = \App\Models\Customer::where('code', 'CUST001')->first();
+        $supplierJkt = Supplier::where('code', 'SUP001')->first();
+        $supplierMedia = Supplier::where('code', 'SUP002')->first();
+        $supplierPackaging = Supplier::where('code', 'SUP003')->first();
+        $customerRetail = Customer::where('code', 'CUST001')->first();
 
         $supplierAdvanced = [
             'SUP001' => ['contact_person' => 'Budi Santoso', 'phone' => '021-5550101', 'email' => 'sales@sumberelektronik.test', 'region' => 'Jakarta', 'lead_time_days' => 7, 'payment_terms' => 'NET 30'],
@@ -146,7 +150,7 @@ class DemoDataSeeder extends Seeder
         ];
 
         foreach ($priceSeed as $row) {
-            $sup = \App\Models\Supplier::where('code', $row['supplier'])->first();
+            $sup = Supplier::where('code', $row['supplier'])->first();
             $itm = Item::where('sku', $row['sku'])->first();
 
             if (! $sup || ! $itm) {
@@ -367,7 +371,10 @@ class DemoDataSeeder extends Seeder
                 'approved_by' => $supervisor->id, 'approved_at' => Carbon::now()->subDays(1),
             ]);
             $adjPosted->items()->create(['item_id' => $adjItem->id, 'system_quantity' => $adjQty, 'actual_quantity' => max(0, $adjQty - 2), 'difference' => -2, 'notes' => $adjItem->name.' kurang 2 (demo)']);
-            try { InventoryService::postStockAdjustment($adjPosted); } catch (\Throwable $e) {}
+            try {
+                InventoryService::postStockAdjustment($adjPosted);
+            } catch (\Throwable $e) {
+            }
         }
 
         if ($whJkt && $defaultLoc && ! StockOpname::where('number', 'OPN-DEMO-001')->exists()) {
@@ -416,7 +423,7 @@ class DemoDataSeeder extends Seeder
 
         if (! PurchaseOrder::where('number', 'PO-DEMO-001')->exists()) {
             $poWh = $warehouseJkt ?? Warehouse::where('code', 'WH-JKT')->first();
-            $poSup = \App\Models\Supplier::where('code', 'SUP001')->first();
+            $poSup = Supplier::where('code', 'SUP001')->first();
             $poItem1 = Item::where('sku', 'BRG-001')->first();
             $poItem2 = Item::where('sku', 'BRG-002')->first();
 
@@ -447,18 +454,18 @@ class DemoDataSeeder extends Seeder
         }
 
         try {
-            \App\Models\Setting::updateOrCreate(['key' => 'expiry.warn_days'], ['value' => '30', 'group' => 'expiry']);
-            \App\Models\Setting::updateOrCreate(['key' => 'expiry.critical_days'], ['value' => '7', 'group' => 'expiry']);
+            Setting::updateOrCreate(['key' => 'expiry.warn_days'], ['value' => '30', 'group' => 'expiry']);
+            Setting::updateOrCreate(['key' => 'expiry.critical_days'], ['value' => '7', 'group' => 'expiry']);
         } catch (\Throwable $e) {
         }
 
         try {
-            \App\Models\Setting::set('account.inventory', '1300', 'accounting');
-            \App\Models\Setting::set('account.cogs', '5100', 'accounting');
-            \App\Models\Setting::set('account.adjustment_gain', '4210', 'accounting');
-            \App\Models\Setting::set('account.adjustment_loss', '5210', 'accounting');
-            \App\Models\Setting::set('account.transfer_clearing', '1310', 'accounting');
-            \App\Models\Setting::set('account.goods_receipt_clearing', '2000', 'accounting');
+            Setting::set('account.inventory', '1300', 'accounting');
+            Setting::set('account.cogs', '5100', 'accounting');
+            Setting::set('account.adjustment_gain', '4210', 'accounting');
+            Setting::set('account.adjustment_loss', '5210', 'accounting');
+            Setting::set('account.transfer_clearing', '1310', 'accounting');
+            Setting::set('account.goods_receipt_clearing', '2000', 'accounting');
         } catch (\Throwable $e) {
         }
 

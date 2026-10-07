@@ -101,7 +101,7 @@ class UserIndex extends Component
     public function save(): void
     {
         $isEdit = $this->editingId !== null;
-        $userModel = $isEdit ? User::findOrFail($this->editingId) : new User();
+        $userModel = $isEdit ? User::findOrFail($this->editingId) : new User;
 
         $this->authorize($isEdit ? 'update' : 'create', $isEdit ? $userModel : User::class);
 

@@ -13,7 +13,7 @@ class DailyDigestMail extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @param array<int, array{title:string, message:string, type:string}> $items
+     * @param  array<int, array{title:string, message:string, type:string}>  $items
      */
     public function __construct(
         public array $items,

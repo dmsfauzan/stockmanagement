@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\Item;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -25,8 +27,8 @@ class ItemImageTest extends TestCase
     {
         $admin = User::where('email', 'admin@stock.test')->firstOrFail();
 
-        $category = \App\Models\Category::firstOrFail();
-        $unit = \App\Models\Unit::firstOrFail();
+        $category = Category::firstOrFail();
+        $unit = Unit::firstOrFail();
 
         Livewire::actingAs($admin)->test('master-data.item-form', ['item' => null])
             ->set('sku', 'BRG-IMG-1')

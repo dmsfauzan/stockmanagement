@@ -2,14 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Category;
 use App\Models\Item;
 use App\Models\Location;
-use App\Models\Rack;
-use App\Models\Unit;
 use App\Models\User;
-use App\Models\Warehouse;
-use App\Models\Zone;
 use App\Services\Barcode\LabelService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;

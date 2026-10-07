@@ -28,7 +28,7 @@ class EnsurePermission
                 ], 403);
             }
 
-            abort(403, 'Unauthorized. Missing permission: ' . $required);
+            abort(403, 'Unauthorized. Missing permission: '.$required);
         }
 
         return $next($request);

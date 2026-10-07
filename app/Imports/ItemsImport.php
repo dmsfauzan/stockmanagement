@@ -29,6 +29,7 @@ class ItemsImport implements ToCollection, WithHeadingRow
 
             if ($sku === '' || $name === '') {
                 $this->errors[] = "Baris {$line}: SKU dan Nama wajib diisi.";
+
                 continue;
             }
 
@@ -37,6 +38,7 @@ class ItemsImport implements ToCollection, WithHeadingRow
 
             if (! $category || ! $unit) {
                 $this->errors[] = "Baris {$line}: kategori/unit (code) tidak ditemukan.";
+
                 continue;
             }
 
@@ -46,6 +48,7 @@ class ItemsImport implements ToCollection, WithHeadingRow
                 $supplier = Supplier::where('code', $supplierCode)->first();
                 if (! $supplier) {
                     $this->errors[] = "Baris {$line}: supplier {$supplierCode} tidak ditemukan.";
+
                     continue;
                 }
             }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Support\ImageService;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -49,11 +50,11 @@ class Item extends Model
 
     public function imageUrl(): ?string
     {
-        return app(\App\Services\Support\ImageService::class)->url($this->image_path);
+        return app(ImageService::class)->url($this->image_path);
     }
 
     public function thumbUrl(): ?string
     {
-        return app(\App\Services\Support\ImageService::class)->thumbUrl($this->image_path);
+        return app(ImageService::class)->thumbUrl($this->image_path);
     }
 }

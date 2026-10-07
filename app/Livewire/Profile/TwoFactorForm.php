@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Profile;
 
+use App\Services\Barcode\LabelService;
 use App\Services\Support\TwoFactorService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -59,7 +60,7 @@ class TwoFactorForm extends Component
             $this->secret,
         );
 
-        $this->qrSvg = app(\App\Services\Barcode\LabelService::class)->qrSvg($url, 200);
+        $this->qrSvg = app(LabelService::class)->qrSvg($url, 200);
     }
 
     public function confirmEnable(TwoFactorService $twoFactor): void

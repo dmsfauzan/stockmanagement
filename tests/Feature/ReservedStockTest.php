@@ -20,6 +20,7 @@ use App\Services\Inventory\LedgerService;
 use App\Services\Inventory\ReservationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class ReservedStockTest extends TestCase
@@ -27,9 +28,13 @@ class ReservedStockTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Location $location;
+
     private Item $item;
+
     private Unit $unit;
 
     protected function setUp(): void
@@ -127,7 +132,7 @@ class ReservedStockTest extends TestCase
             'quantity' => 10, 'unit_id' => $this->unit->id, 'location_id' => $this->location->id,
         ]);
 
-        $comp = \Livewire\Livewire::actingAs($this->admin)->test('transactions.goods-issue-show', ['issue' => $issue->id]);
+        $comp = Livewire::actingAs($this->admin)->test('transactions.goods-issue-show', ['issue' => $issue->id]);
         $comp->call('submit');
         $this->assertEquals(10, StockBalance::first()->quantity_reserved);
         $this->assertSame(TransactionStatus::Submitted, $issue->fresh()->statusEnum());

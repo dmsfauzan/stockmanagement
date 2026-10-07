@@ -5,6 +5,7 @@ namespace App\Livewire\Transactions;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
 use App\Models\Location;
+use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
@@ -94,7 +95,7 @@ class GoodsReceiptForm extends Component
 
     protected function applyPurchaseOrderPrefill(string $poId): void
     {
-        $order = \App\Models\PurchaseOrder::with('items')->find($poId);
+        $order = PurchaseOrder::with('items')->find($poId);
 
         if (! $order || ! in_array($order->status, ['approved', 'partial'], true)) {
             return;

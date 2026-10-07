@@ -11,9 +11,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class WarehouseComparisonExport implements FromCollection, WithHeadings
 {
-    public function __construct(protected array $filters = [])
-    {
-    }
+    public function __construct(protected array $filters = []) {}
 
     public function headings(): array
     {

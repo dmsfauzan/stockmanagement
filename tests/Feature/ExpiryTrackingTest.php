@@ -24,9 +24,13 @@ class ExpiryTrackingTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Location $location;
+
     private Unit $unit;
+
     private Category $category;
 
     protected function setUp(): void

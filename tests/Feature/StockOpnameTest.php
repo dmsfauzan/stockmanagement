@@ -27,9 +27,13 @@ class StockOpnameTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Location $location;
+
     private Item $item;
+
     private Unit $unit;
 
     protected function setUp(): void

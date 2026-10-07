@@ -10,6 +10,7 @@ use App\Models\Item;
 use App\Models\Location;
 use App\Models\Rack;
 use App\Models\Setting;
+use App\Models\StockAdjustment;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\User;
@@ -27,10 +28,15 @@ class AccountingTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Warehouse $otherWarehouse;
+
     private Location $location;
+
     private Item $item;
+
     private Unit $unit;
 
     protected function setUp(): void
@@ -147,7 +153,7 @@ class AccountingTest extends TestCase
 
         $this->makePostedReceipt(50, 10);
 
-        $adj = \App\Models\StockAdjustment::create([
+        $adj = StockAdjustment::create([
             'number' => 'ADJ-ACC-'.time().'-'.mt_rand(1000, 9999),
             'transaction_date' => today(),
             'warehouse_id' => $this->warehouse->id,

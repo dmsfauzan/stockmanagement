@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\SendDailyDigestJob;
 use App\Mail\DailyDigestMail;
 use App\Models\Setting;
 use App\Models\User;
@@ -27,7 +28,7 @@ class DailyDigestTest extends TestCase
 
         $this->artisan('inventory:digest')->assertSuccessful();
 
-        Queue::assertPushed(\App\Jobs\SendDailyDigestJob::class);
+        Queue::assertPushed(SendDailyDigestJob::class);
     }
 
     public function test_digest_email_sent_to_admin_with_mail_fake(): void

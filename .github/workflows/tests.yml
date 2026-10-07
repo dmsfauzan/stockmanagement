@@ -50,5 +50,8 @@ jobs:
           npm ci
           npm run build
 
+      - name: Check code style
+        run: vendor/bin/pint --test
+
       - name: Run tests
         run: php artisan test

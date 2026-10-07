@@ -4,13 +4,12 @@ namespace Tests\Feature;
 
 use App\Enums\TransactionStatus;
 use App\Enums\TransactionType;
-use App\Livewire\Transactions\GoodsIssueShow;
 use App\Livewire\Transactions\GoodsReceiptShow;
 use App\Models\Category;
 use App\Models\GoodsIssue;
+use App\Models\GoodsIssueItem;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
-use App\Models\GoodsIssueItem;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\Rack;
@@ -32,10 +31,15 @@ class ReversalTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Location $location;
+
     private Item $item;
+
     private Unit $unit;
+
     private Supplier $supplier;
 
     protected function setUp(): void

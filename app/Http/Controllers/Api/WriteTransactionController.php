@@ -18,7 +18,6 @@ use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
 use App\Models\StockAdjustment;
-use App\Models\StockBalance;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
 use App\Services\Support\AuditLogger;
@@ -198,7 +197,7 @@ class WriteTransactionController extends ApiController
             'created_by' => auth()->id(),
         ];
 
-        $rows = array_map(function ($row) use ($data): array {
+        $rows = array_map(function ($row): array {
             $system = (int) ($row['system_quantity'] ?? 0);
             $actual = (int) $row['actual_quantity'];
 

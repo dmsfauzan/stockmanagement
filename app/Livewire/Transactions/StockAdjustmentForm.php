@@ -10,7 +10,6 @@ use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;

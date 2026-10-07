@@ -90,7 +90,7 @@ class RoleIndex extends Component
     public function save(): void
     {
         $isEdit = $this->editingId !== null;
-        $roleModel = $isEdit ? Role::findOrFail($this->editingId) : new Role();
+        $roleModel = $isEdit ? Role::findOrFail($this->editingId) : new Role;
 
         $this->authorize($isEdit ? 'update' : 'create', $isEdit ? $roleModel : Role::class);
 

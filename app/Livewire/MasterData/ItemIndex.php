@@ -7,13 +7,13 @@ use App\Jobs\ImportItemsJob;
 use App\Models\Category;
 use App\Models\Item;
 use App\Services\Support\AuditLogger;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
@@ -141,7 +141,7 @@ class ItemIndex extends Component
         foreach (Item::whereIn('id', $this->selectedIds)->get() as $item) {
             try {
                 $this->authorize('delete', $item);
-            } catch (\Illuminate\Auth\Access\AuthorizationException) {
+            } catch (AuthorizationException) {
                 $skipped++;
 
                 continue;
@@ -181,7 +181,7 @@ class ItemIndex extends Component
         foreach (Item::whereIn('id', $this->selectedIds)->get() as $item) {
             try {
                 $this->authorize('update', $item);
-            } catch (\Illuminate\Auth\Access\AuthorizationException) {
+            } catch (AuthorizationException) {
                 continue;
             }
 

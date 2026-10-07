@@ -24,7 +24,7 @@ class ExpiryService
         $driver = DB::connection()->getDriverName();
         $daysExpr = $driver === 'sqlite'
             ? "CAST(julianday(stock_movements.expiry_date) - julianday('now') AS INTEGER) as days_left"
-            : "DATEDIFF(stock_movements.expiry_date, CURDATE()) as days_left";
+            : 'DATEDIFF(stock_movements.expiry_date, CURDATE()) as days_left';
 
         return DB::table('stock_movements')
             ->join('items', 'stock_movements.item_id', '=', 'items.id')

@@ -18,6 +18,7 @@ class ApiTokenCommand extends Command
 
         if (! $user) {
             $this->error("User {$this->argument('email')} not found.");
+
             return 1;
         }
 

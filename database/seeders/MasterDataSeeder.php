@@ -129,7 +129,7 @@ class MasterDataSeeder extends Seeder
             $unit = Unit::where('code', $data['unit'])->firstOrFail();
             $supplier = Supplier::where('code', $data['supplier'])->first();
 
-            $barcode = '899' . str_pad((string) ($index + 1), 10, '0', STR_PAD_LEFT);
+            $barcode = '899'.str_pad((string) ($index + 1), 10, '0', STR_PAD_LEFT);
 
             Item::updateOrCreate(
                 ['sku' => $data['sku']],

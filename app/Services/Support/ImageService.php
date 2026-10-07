@@ -99,6 +99,7 @@ class ImageService
 
         if ($width <= 0 || $height <= 0) {
             imagedestroy($source);
+
             return;
         }
 

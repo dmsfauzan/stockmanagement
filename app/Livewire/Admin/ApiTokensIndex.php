@@ -4,8 +4,8 @@ namespace App\Livewire\Admin;
 
 use App\Models\Permission;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use Laravel\Sanctum\PersonalAccessToken;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -76,7 +76,7 @@ class ApiTokensIndex extends Component
         $user = User::findOrFail($this->selectedUserId);
 
         $abilities = $this->abilities === [] ? $user->permissionSlugs() : $this->abilities;
-        $expiresAt = $this->expiresAt ? \Illuminate\Support\Carbon::parse($this->expiresAt) : null;
+        $expiresAt = $this->expiresAt ? Carbon::parse($this->expiresAt) : null;
 
         $token = $user->createToken($this->tokenName, $abilities, $expiresAt);
 
@@ -90,13 +90,13 @@ class ApiTokensIndex extends Component
     {
         abort_unless(auth()->user()->hasPermission('settings.manage'), 403);
 
-        \Laravel\Sanctum\PersonalAccessToken::whereKey($id)->delete();
+        PersonalAccessToken::whereKey($id)->delete();
         $this->dispatch('toast', type: 'success', message: 'Token dihapus.');
     }
 
     public function render()
     {
-        $tokens = \Laravel\Sanctum\PersonalAccessToken::query()
+        $tokens = PersonalAccessToken::query()
             ->with('tokenable')
             ->when($this->search !== '', function ($query): void {
                 $term = '%'.$this->search.'%';

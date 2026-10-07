@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class UserSeeder extends Seeder
 {
@@ -26,7 +27,7 @@ class UserSeeder extends Seeder
             $role = Role::where('slug', $data['role'])->first();
 
             if ($role) {
-                \Illuminate\Support\Facades\DB::table('user_role')->updateOrInsert(
+                DB::table('user_role')->updateOrInsert(
                     ['user_id' => $user->id, 'role_id' => $role->id],
                     []
                 );

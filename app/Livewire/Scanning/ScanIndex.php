@@ -36,6 +36,7 @@ class ScanIndex extends Component
 
         if ($code === '') {
             $this->dispatch('toast', type: 'error', message: 'Masukkan barcode / SKU.');
+
             return;
         }
 
@@ -71,6 +72,7 @@ class ScanIndex extends Component
             ];
             $this->locationResult = null;
             $this->pushRecent($code);
+
             return;
         }
 
@@ -88,6 +90,7 @@ class ScanIndex extends Component
             ];
             $this->result = null;
             $this->pushRecent($code);
+
             return;
         }
 

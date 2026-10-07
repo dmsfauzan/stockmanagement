@@ -19,6 +19,7 @@ use App\Services\Inventory\ReplenishmentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\TestCase;
 
 class ReplenishmentTest extends TestCase
@@ -26,12 +27,19 @@ class ReplenishmentTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Location $location;
+
     private Supplier $supplier;
+
     private Item $lowItem;
+
     private Item $healthyItem;
+
     private Unit $unit;
+
     private Category $category;
 
     protected function setUp(): void
@@ -217,7 +225,7 @@ class ReplenishmentTest extends TestCase
         $component = Livewire::test(ReplenishmentReport::class);
 
         $response = $component->instance()->exportCsv();
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+        $this->assertInstanceOf(StreamedResponse::class, $response);
 
         ob_start();
         $response->sendContent();

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\Support\ImageService;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -86,7 +87,7 @@ class User extends Authenticatable
 
     public function avatarUrl(): ?string
     {
-        return app(\App\Services\Support\ImageService::class)->thumbUrl($this->avatar_path);
+        return app(ImageService::class)->thumbUrl($this->avatar_path);
     }
 
     public function hasTwoFactorEnabled(): bool

@@ -3,9 +3,8 @@
 namespace Tests\Feature;
 
 use App\Enums\PurchaseOrderStatus;
-use App\Enums\TransactionStatus;
-use App\Enums\TransactionType;
 use App\Models\Category;
+use App\Models\GoodsReceipt;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\PurchaseOrder;
@@ -17,7 +16,7 @@ use App\Models\Warehouse;
 use App\Models\Zone;
 use App\Services\Inventory\InventoryService;
 use App\Services\Support\DocumentNumberService;
-use App\Services\Inventory\LedgerService;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -27,11 +26,17 @@ class PurchaseOrderTest extends TestCase
     use RefreshDatabase;
 
     private User $admin;
+
     private Warehouse $warehouse;
+
     private Location $location;
+
     private Supplier $supplier;
+
     private Item $item1;
+
     private Item $item2;
+
     private Unit $unit;
 
     protected function setUp(): void
@@ -100,7 +105,7 @@ class PurchaseOrderTest extends TestCase
 
     private function makePostedReceipt(PurchaseOrder $order, int $qty1, int $qty2): void
     {
-        $receipt = \App\Models\GoodsReceipt::create([
+        $receipt = GoodsReceipt::create([
             'number' => 'GR-'.time().'-'.mt_rand(1000, 9999),
             'transaction_date' => today(),
             'supplier_id' => $this->supplier->id,
@@ -212,7 +217,7 @@ class PurchaseOrderTest extends TestCase
     public function test_purchase_order_items_unique_constraint(): void
     {
         $order = $this->makePurchaseOrder('draft');
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
         $order->items()->create([
             'item_id' => $this->item1->id,
             'quantity' => 3,

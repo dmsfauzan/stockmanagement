@@ -3,6 +3,7 @@
 namespace App\Livewire\Profile;
 
 use App\Services\Support\AuditLogger;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -38,7 +39,7 @@ class SessionsIndex extends Component
                     'current' => $row->id === session()->getId(),
                     'ip' => $row->ip_address,
                     'agent' => $row->user_agent ?? '—',
-                    'last' => \Illuminate\Support\Carbon::createFromTimestamp((int) $row->last_activity),
+                    'last' => Carbon::createFromTimestamp((int) $row->last_activity),
                 ];
             });
 

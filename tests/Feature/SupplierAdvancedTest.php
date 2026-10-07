@@ -5,14 +5,15 @@ namespace Tests\Feature;
 use App\Livewire\MasterData\SupplierIndex;
 use App\Livewire\MasterData\SupplierShow;
 use App\Models\Category;
+use App\Models\GoodsReceipt;
 use App\Models\Item;
+use App\Models\Location;
 use App\Models\PurchaseOrder;
+use App\Models\Supplier;
 use App\Models\SupplierItemPrice;
 use App\Models\Unit;
+use App\Models\User;
 use App\Models\Warehouse;
-use App\Models\Zone;
-use App\Models\Rack;
-use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
@@ -28,9 +29,9 @@ class SupplierAdvancedTest extends TestCase
         $this->seed();
     }
 
-    private function admin(): \App\Models\User
+    private function admin(): User
     {
-        return \App\Models\User::where('email', 'admin@stock.test')->firstOrFail();
+        return User::where('email', 'admin@stock.test')->firstOrFail();
     }
 
     public function test_create_supplier_via_livewire_index_with_advanced_fields(): void
@@ -59,7 +60,7 @@ class SupplierAdvancedTest extends TestCase
     public function test_add_price_list_entry_via_supplier_show(): void
     {
         $admin = $this->admin();
-        $supplier = \App\Models\Supplier::where('code', 'SUP001')->firstOrFail();
+        $supplier = Supplier::where('code', 'SUP001')->firstOrFail();
         $item = Item::where('sku', 'BRG-002')->firstOrFail();
 
         SupplierItemPrice::where('supplier_id', $supplier->id)->where('item_id', $item->id)->delete();
@@ -83,7 +84,7 @@ class SupplierAdvancedTest extends TestCase
     public function test_duplicate_price_entry_validation_fails_unique(): void
     {
         $admin = $this->admin();
-        $supplier = \App\Models\Supplier::where('code', 'SUP001')->firstOrFail();
+        $supplier = Supplier::where('code', 'SUP001')->firstOrFail();
         $item = Item::where('sku', 'BRG-001')->firstOrFail();
 
         SupplierItemPrice::updateOrCreate(
@@ -102,7 +103,7 @@ class SupplierAdvancedTest extends TestCase
     public function test_performance_score_on_time_vs_late_between_0_and_100(): void
     {
         $admin = $this->admin();
-        $supplier = \App\Models\Supplier::create([
+        $supplier = Supplier::create([
             'code' => 'SUP-PERF',
             'name' => 'Supplier Perf',
             'status' => 'active',
@@ -147,7 +148,7 @@ class SupplierAdvancedTest extends TestCase
         $onTime->items()->create([
             'item_id' => $item->id, 'quantity' => 10, 'received_quantity' => 0, 'unit_id' => $unit->id, 'unit_price' => 10000,
         ]);
-        $grOn = \App\Models\GoodsReceipt::create([
+        $grOn = GoodsReceipt::create([
             'number' => 'GR-PERF-ON-'.time(),
             'transaction_date' => Carbon::now()->toDateString(),
             'supplier_id' => $supplier->id,
@@ -175,7 +176,7 @@ class SupplierAdvancedTest extends TestCase
         $late->items()->create([
             'item_id' => $item->id, 'quantity' => 5, 'received_quantity' => 0, 'unit_id' => $unit->id, 'unit_price' => 11000,
         ]);
-        $grLate = \App\Models\GoodsReceipt::create([
+        $grLate = GoodsReceipt::create([
             'number' => 'GR-PERF-LA-'.time(),
             'transaction_date' => Carbon::now()->toDateString(),
             'supplier_id' => $supplier->id,
@@ -194,7 +195,7 @@ class SupplierAdvancedTest extends TestCase
         $viewData = $component->viewData('performance');
         if ($viewData === null) {
             $componentInstance = $component->instance();
-            $supplierFresh = \App\Models\Supplier::withCount('primaryItems')->findOrFail($supplier->id);
+            $supplierFresh = Supplier::withCount('primaryItems')->findOrFail($supplier->id);
             $orders = PurchaseOrder::where('supplier_id', $supplierFresh->id)->with(['goodsReceipts', 'items'])->get();
             $ref = new \ReflectionMethod($componentInstance, 'computePerformance');
             $ref->setAccessible(true);

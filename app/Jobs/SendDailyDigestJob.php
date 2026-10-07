@@ -21,7 +21,7 @@ class SendDailyDigestJob implements ShouldQueue
     public int $backoff = 60;
 
     /**
-     * @param array<int, array{title:string, message:string, type:string}> $items
+     * @param  array<int, array{title:string, message:string, type:string}>  $items
      */
     public function __construct(
         public int $userId,

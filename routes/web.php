@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\HealthController;
+use App\Http\Controllers\LabelController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\Admin\ApiTokensIndex;
 use App\Livewire\Admin\AuditLogIndex;
@@ -21,20 +23,23 @@ use App\Livewire\MasterData\SupplierShow;
 use App\Livewire\MasterData\UnitIndex;
 use App\Livewire\MasterData\WarehouseIndex;
 use App\Livewire\NotificationsIndex;
-use App\Livewire\Reports\ExpiryReport;
+use App\Livewire\Profile\AvatarForm;
+use App\Livewire\Profile\NotificationPreferences;
+use App\Livewire\Profile\SessionsIndex;
+use App\Livewire\Profile\TwoFactorForm;
+use App\Livewire\Reports\AdjustmentReport;
 use App\Livewire\Reports\CogsReport;
+use App\Livewire\Reports\ExpiryReport;
 use App\Livewire\Reports\IncomingReport;
 use App\Livewire\Reports\JournalReport;
-use App\Livewire\Reports\ValuationReport;
 use App\Livewire\Reports\MovementReport;
-use App\Livewire\Reports\AdjustmentReport;
 use App\Livewire\Reports\OpnameReport;
 use App\Livewire\Reports\OutgoingReport;
 use App\Livewire\Reports\ReplenishmentReport;
-use App\Livewire\Reports\TransferReport;
-use App\Livewire\Reports\WarehouseComparisonReport;
-use App\Http\Controllers\LabelController;
 use App\Livewire\Reports\StockReport;
+use App\Livewire\Reports\TransferReport;
+use App\Livewire\Reports\ValuationReport;
+use App\Livewire\Reports\WarehouseComparisonReport;
 use App\Livewire\Scanning\ScanIndex;
 use App\Livewire\Transactions\GoodsIssueForm;
 use App\Livewire\Transactions\GoodsIssueIndex;
@@ -42,6 +47,9 @@ use App\Livewire\Transactions\GoodsIssueShow;
 use App\Livewire\Transactions\GoodsReceiptForm;
 use App\Livewire\Transactions\GoodsReceiptIndex;
 use App\Livewire\Transactions\GoodsReceiptShow;
+use App\Livewire\Transactions\PurchaseOrderForm;
+use App\Livewire\Transactions\PurchaseOrderIndex;
+use App\Livewire\Transactions\PurchaseOrderShow;
 use App\Livewire\Transactions\StockAdjustmentForm;
 use App\Livewire\Transactions\StockAdjustmentIndex;
 use App\Livewire\Transactions\StockAdjustmentShow;
@@ -49,15 +57,12 @@ use App\Livewire\Transactions\StockOpnameCount;
 use App\Livewire\Transactions\StockOpnameForm;
 use App\Livewire\Transactions\StockOpnameIndex;
 use App\Livewire\Transactions\StockOpnameShow;
-use App\Livewire\Transactions\PurchaseOrderForm;
-use App\Livewire\Transactions\PurchaseOrderIndex;
-use App\Livewire\Transactions\PurchaseOrderShow;
 use App\Livewire\Transactions\StockTransferForm;
 use App\Livewire\Transactions\StockTransferIndex;
 use App\Livewire\Transactions\StockTransferShow;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/health', [\App\Http\Controllers\HealthController::class, 'public'])->name('health.public');
+Route::get('/health', [HealthController::class, 'public'])->name('health.public');
 Route::view('/offline', 'offline')->name('offline');
 
 Route::get('/manifest.webmanifest', function () {
@@ -85,10 +90,10 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/profile/notifications', \App\Livewire\Profile\NotificationPreferences::class)->name('profile.notifications');
-    Route::get('/profile/avatar', \App\Livewire\Profile\AvatarForm::class)->name('profile.avatar');
-    Route::get('/profile/two-factor', \App\Livewire\Profile\TwoFactorForm::class)->name('profile.two-factor');
-    Route::get('/profile/sessions', \App\Livewire\Profile\SessionsIndex::class)->name('profile.sessions');
+    Route::get('/profile/notifications', NotificationPreferences::class)->name('profile.notifications');
+    Route::get('/profile/avatar', AvatarForm::class)->name('profile.avatar');
+    Route::get('/profile/two-factor', TwoFactorForm::class)->name('profile.two-factor');
+    Route::get('/profile/sessions', SessionsIndex::class)->name('profile.sessions');
 
     Route::middleware('permission:items.view')->get('/items', ItemIndex::class)->name('items.index');
     Route::middleware('permission:items.create')->get('/items/create', ItemForm::class)->name('items.create');
@@ -160,7 +165,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:audit_logs.view')->get('/admin/audit-logs', AuditLogIndex::class)->name('admin.audit-logs');
     Route::middleware('permission:settings.manage')->get('/admin/api-tokens', ApiTokensIndex::class)->name('admin.api-tokens');
     Route::middleware('permission:settings.manage')->get('/admin/settings', SettingIndex::class)->name('admin.settings');
-    Route::middleware('permission:settings.manage')->get('/admin/health', [\App\Http\Controllers\HealthController::class, 'check'])->name('admin.health');
+    Route::middleware('permission:settings.manage')->get('/admin/health', [HealthController::class, 'check'])->name('admin.health');
 
     Route::middleware('permission:items.view')->get('/scan', ScanIndex::class)->name('scan');
     Route::get('/labels/bulk', [LabelController::class, 'bulk'])->name('labels.bulk');

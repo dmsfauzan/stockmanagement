@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class ReservationService
 {
     /**
-     * @param array<int, array{item_id:int, warehouse_id:int, location_id:int, quantity:int}> $rows
+     * @param  array<int, array{item_id:int, warehouse_id:int, location_id:int, quantity:int}>  $rows
      */
     public static function reserve(string $referenceType, int $referenceId, Collection|array $rows): void
     {

@@ -9,9 +9,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class ValuationExport implements FromCollection, WithHeadings
 {
-    public function __construct(protected array $filters = [])
-    {
-    }
+    public function __construct(protected array $filters = []) {}
 
     public function headings(): array
     {

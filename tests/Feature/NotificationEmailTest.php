@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\SendNotificationEmailJob;
 use App\Mail\NotificationMail;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\Support\NotificationPreferenceService;
 use App\Services\Support\NotificationService;
@@ -27,7 +29,7 @@ class NotificationEmailTest extends TestCase
 
         NotificationService::notifyApprovers('approval.request', 'Butuh Approval', 'Tolong setujui');
 
-        Queue::assertPushed(\App\Jobs\SendNotificationEmailJob::class);
+        Queue::assertPushed(SendNotificationEmailJob::class);
     }
 
     public function test_email_sent_with_mail_fake_and_sync_queue(): void
@@ -60,7 +62,7 @@ class NotificationEmailTest extends TestCase
         Mail::fake();
 
         $supervisor = User::where('email', 'supervisor@stock.test')->firstOrFail();
-        \App\Models\Setting::set('notifications.email_enabled', '0', 'notifications');
+        Setting::set('notifications.email_enabled', '0', 'notifications');
 
         NotificationService::notify($supervisor->id, 'stock.low', 'Stok Rendah', 'BRG kurang');
 

@@ -4,6 +4,7 @@ namespace App\Livewire\Transactions;
 
 use App\Enums\OpnameStatus;
 use App\Models\StockOpname;
+use App\Models\StockOpnameItem;
 use App\Services\Support\AuditLogger;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -125,7 +126,7 @@ class StockOpnameCount extends Component
                 $system = (int) $row['system_quantity'];
                 $physical = (int) $row['physical_quantity'];
 
-                \App\Models\StockOpnameItem::whereKey($row['id'])->update([
+                StockOpnameItem::whereKey($row['id'])->update([
                     'physical_quantity' => $physical,
                     'difference' => $physical - $system,
                     'reason' => $row['reason'] !== '' ? $row['reason'] : null,

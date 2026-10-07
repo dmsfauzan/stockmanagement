@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Middleware\EnsureAccountActive;
+use App\Http\Middleware\EnsurePermission;
+use App\Http\Middleware\EnsureTwoFactorForAdmin;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,12 +19,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'permission' => \App\Http\Middleware\EnsurePermission::class,
-            'active' => \App\Http\Middleware\EnsureAccountActive::class,
-            'twofactor.admin' => \App\Http\Middleware\EnsureTwoFactorForAdmin::class,
+            'permission' => EnsurePermission::class,
+            'active' => EnsureAccountActive::class,
+            'twofactor.admin' => EnsureTwoFactorForAdmin::class,
         ]);
         $middleware->throttleApi();
-        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

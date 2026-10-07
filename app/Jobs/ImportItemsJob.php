@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ImportItemsJob implements ShouldQueue
@@ -38,7 +39,7 @@ class ImportItemsJob implements ShouldQueue
             throw $e;
         } finally {
             try {
-                \Illuminate\Support\Facades\Storage::disk($this->disk)->delete($this->filePath);
+                Storage::disk($this->disk)->delete($this->filePath);
             } catch (\Throwable $e) {
             }
         }

@@ -8,6 +8,9 @@ use App\Enums\TransactionType;
 use App\Enums\TransferStatus;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
+use App\Models\Item;
+use App\Models\Location;
+use App\Models\Setting;
 use App\Models\StockAdjustment;
 use App\Models\StockBalance;
 use App\Models\StockMovement;
@@ -16,6 +19,7 @@ use App\Models\StockTransfer;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
 use App\Services\Support\NotificationService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class InventoryService
@@ -76,10 +80,10 @@ class InventoryService
                     $exp = $item->expiry_date;
                     $expStr = $exp instanceof \DateTimeInterface ? $exp->format('Y-m-d') : ($exp !== null ? (string) $exp : null);
                     if ($expStr !== null && $expStr !== '') {
-                        $critical = (int) (\App\Models\Setting::get('expiry.critical_days', 7) ?? 7);
-                        $days = (int) \Illuminate\Support\Carbon::today()->diffInDays(\Illuminate\Support\Carbon::parse($expStr), false);
+                        $critical = (int) (Setting::get('expiry.critical_days', 7) ?? 7);
+                        $days = (int) Carbon::today()->diffInDays(Carbon::parse($expStr), false);
                         if ($days <= $critical) {
-                            $sku = \App\Models\Item::whereKey($item->item_id)->value('sku') ?? $item->item_id;
+                            $sku = Item::whereKey($item->item_id)->value('sku') ?? $item->item_id;
                             $label = $days < 0 ? 'lewat '.abs($days).' hari' : 'H-'.$days;
                             NotificationService::notifyApprovers('stock.expiring', 'Batch hampir kedaluwarsa', $sku.' batch '.$item->batch_number.' '.$label.' ('.$expStr.')', GoodsReceipt::class, (int) $locked->id);
                         }
@@ -238,7 +242,7 @@ class InventoryService
                 'number' => DocumentNumberService::generate('ADJ'),
                 'transaction_date' => $locked->opname_date,
                 'warehouse_id' => $locked->warehouse_id,
-                'location_id' => $locked->location_id ?? \App\Models\Location::whereHas('rack.zone', fn ($q) => $q->where('warehouse_id', $locked->warehouse_id))->value('id'),
+                'location_id' => $locked->location_id ?? Location::whereHas('rack.zone', fn ($q) => $q->where('warehouse_id', $locked->warehouse_id))->value('id'),
                 'reason' => 'Opname Adjustment',
                 'status' => TransactionStatus::Approved->value,
                 'created_by' => $locked->approved_by ?? $locked->submitted_by ?? $locked->created_by,

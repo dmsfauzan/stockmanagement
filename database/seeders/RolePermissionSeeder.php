@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class RolePermissionSeeder extends Seeder
@@ -137,14 +138,14 @@ class RolePermissionSeeder extends Seeder
 
     private function syncPermissions(int $roleId, array $permissionIds): void
     {
-        \Illuminate\Support\Facades\DB::table('role_permission')->where('role_id', $roleId)->delete();
+        DB::table('role_permission')->where('role_id', $roleId)->delete();
 
         $rows = collect($permissionIds)
             ->map(fn ($id) => ['role_id' => $roleId, 'permission_id' => $id])
             ->all();
 
         if ($rows !== []) {
-            \Illuminate\Support\Facades\DB::table('role_permission')->insert($rows);
+            DB::table('role_permission')->insert($rows);
         }
     }
 }

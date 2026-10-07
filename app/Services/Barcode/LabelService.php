@@ -10,7 +10,7 @@ class LabelService
 {
     public function qrSvg(string $data, int $size = 160): string
     {
-        $builder = new Builder(writer: new SvgWriter(), size: $size, margin: 0, data: $data);
+        $builder = new Builder(writer: new SvgWriter, size: $size, margin: 0, data: $data);
 
         return $builder->build()->getString();
     }
