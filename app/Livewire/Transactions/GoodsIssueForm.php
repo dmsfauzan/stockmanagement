@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\GoodsIssue;
 use App\Models\Item;
 use App\Models\Location;
+use App\Models\SalesOrder;
 use App\Models\StockBalance;
 use App\Models\Unit;
 use App\Models\Warehouse;
@@ -40,6 +41,8 @@ class GoodsIssueForm extends Component
 
     public string $barcodeInput = '';
 
+    public ?int $salesOrderLink = null;
+
     public function mount($issue = null): void
     {
         $this->transaction_date = now()->format('Y-m-d');
@@ -58,6 +61,7 @@ class GoodsIssueForm extends Component
             $this->customer_id = $model->customer_id ? (string) $model->customer_id : '';
             $this->destination = (string) $model->destination;
             $this->sales_order_number = (string) ($model->sales_order_number ?? '');
+            $this->salesOrderLink = $model->sales_order_id ? (int) $model->sales_order_id : null;
             $this->warehouse_id = (string) $model->warehouse_id;
             $this->issued_by = (string) ($model->issued_by ?? '');
             $this->notes = (string) ($model->notes ?? '');
@@ -80,6 +84,42 @@ class GoodsIssueForm extends Component
                     $this->addByBarcode();
                 }
             }
+
+            if (! empty(request()->query('so'))) {
+                $this->applySalesOrderPrefill((string) request()->query('so'));
+            }
+        }
+    }
+
+    protected function applySalesOrderPrefill(string $soId): void
+    {
+        $order = SalesOrder::with('items')->find($soId);
+
+        if (! $order || ! in_array($order->status, ['approved', 'partial'], true)) {
+            return;
+        }
+
+        if (! auth()->user()?->can('view', $order)) {
+            return;
+        }
+
+        $this->salesOrderLink = $order->id;
+        $this->customer_id = $order->customer_id ? (string) $order->customer_id : '';
+        $this->warehouse_id = (string) $order->warehouse_id;
+        $this->sales_order_number = (string) $order->number;
+
+        $rows = $order->items
+            ->filter(fn ($item) => ((int) $item->quantity - (int) $item->fulfilled_quantity) > 0)
+            ->map(fn ($item) => [
+                'item_id' => (string) $item->item_id,
+                'quantity' => (int) $item->quantity - (int) $item->fulfilled_quantity,
+                'unit_id' => (string) $item->unit_id,
+                'location_id' => '',
+                'notes' => 'Dari '.$order->number,
+            ])->values()->all();
+
+        if ($rows !== []) {
+            $this->items = $rows;
         }
     }
 
@@ -201,6 +241,7 @@ class GoodsIssueForm extends Component
             'customer_id' => $data['customer_id'] !== '' ? $data['customer_id'] : null,
             'destination' => $data['destination'],
             'sales_order_number' => $data['sales_order_number'] !== '' ? $data['sales_order_number'] : null,
+            'sales_order_id' => $this->salesOrderLink,
             'warehouse_id' => $data['warehouse_id'],
             'issued_by' => $data['issued_by'] !== '' ? $data['issued_by'] : null,
             'notes' => $data['notes'] !== '' ? $data['notes'] : null,

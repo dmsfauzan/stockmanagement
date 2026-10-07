@@ -127,6 +127,8 @@ class InventoryService
                 'posted_at' => now(),
             ]);
 
+            SalesOrderService::registerFulfillment($locked);
+
             AuditLogger::log('POST', 'goods_issue', $locked);
 
             foreach ($locked->issueItems as $item) {
@@ -439,6 +441,8 @@ class InventoryService
                 'reversed_by' => auth()->id(),
                 'reversal_reason' => $reason,
             ]);
+
+            SalesOrderService::revertFulfillment($locked);
 
             AuditLogger::log('REVERSE', 'goods_issue', $locked);
         });

@@ -50,6 +50,9 @@ use App\Livewire\Transactions\GoodsReceiptShow;
 use App\Livewire\Transactions\PurchaseOrderForm;
 use App\Livewire\Transactions\PurchaseOrderIndex;
 use App\Livewire\Transactions\PurchaseOrderShow;
+use App\Livewire\Transactions\SalesOrderForm;
+use App\Livewire\Transactions\SalesOrderIndex;
+use App\Livewire\Transactions\SalesOrderShow;
 use App\Livewire\Transactions\StockAdjustmentForm;
 use App\Livewire\Transactions\StockAdjustmentIndex;
 use App\Livewire\Transactions\StockAdjustmentShow;
@@ -115,6 +118,11 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:purchase_order.create')->get('/purchase-orders/create', PurchaseOrderForm::class)->name('purchase-orders.create');
     Route::middleware('permission:purchase_order.view')->get('/purchase-orders/{purchaseOrder}', PurchaseOrderShow::class)->name('purchase-orders.show');
     Route::middleware('permission:purchase_order.update')->get('/purchase-orders/{purchaseOrder}/edit', PurchaseOrderForm::class)->name('purchase-orders.edit');
+
+    Route::middleware('permission:sales_order.view')->get('/sales-orders', SalesOrderIndex::class)->name('sales-orders.index');
+    Route::middleware('permission:sales_order.create')->get('/sales-orders/create', SalesOrderForm::class)->name('sales-orders.create');
+    Route::middleware('permission:sales_order.view')->get('/sales-orders/{salesOrder}', SalesOrderShow::class)->name('sales-orders.show');
+    Route::middleware('permission:sales_order.update')->get('/sales-orders/{salesOrder}/edit', SalesOrderForm::class)->name('sales-orders.edit');
 
     Route::middleware('permission:goods_receipt.view')->get('/goods-receipts', GoodsReceiptIndex::class)->name('goods-receipts.index');
     Route::middleware('permission:goods_receipt.create')->get('/goods-receipts/create', GoodsReceiptForm::class)->name('goods-receipts.create');

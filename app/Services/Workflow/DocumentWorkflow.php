@@ -4,11 +4,13 @@ namespace App\Services\Workflow;
 
 use App\Enums\OpnameStatus;
 use App\Enums\PurchaseOrderStatus;
+use App\Enums\SalesOrderStatus;
 use App\Enums\TransactionStatus;
 use App\Enums\TransferStatus;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
+use App\Models\SalesOrder;
 use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
@@ -481,5 +483,73 @@ class DocumentWorkflow
         ]);
 
         AuditLogger::log('CLOSE', 'purchase_order', $order);
+    }
+
+    public static function submitSo(int $id): void
+    {
+        $order = SalesOrder::findOrFail($id);
+
+        static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Submitted));
+
+        $order->update([
+            'status' => SalesOrderStatus::Submitted->value,
+            'submitted_by' => auth()->id(),
+            'submitted_at' => now(),
+        ]);
+
+        AuditLogger::log('SUBMIT', 'sales_order', $order);
+
+        static::notifyApprovers('approval.request', 'Approval Sales Order', $order->number.' menunggu persetujuan', SalesOrder::class, $order->id);
+    }
+
+    public static function approveSo(int $id): void
+    {
+        $order = SalesOrder::findOrFail($id);
+
+        static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Approved));
+
+        $order->update([
+            'status' => SalesOrderStatus::Approved->value,
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+
+        AuditLogger::log('APPROVE', 'sales_order', $order);
+
+        static::notifyUser($order->created_by, 'approval.result', 'Sales Order disetujui', $order->number.' telah disetujui. Silakan buat Barang Keluar dari SO ini.', SalesOrder::class, $order->id);
+    }
+
+    public static function rejectSo(int $id, string $reason): void
+    {
+        $order = SalesOrder::findOrFail($id);
+
+        static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Rejected));
+        static::ensureReason($reason);
+
+        $order->update([
+            'status' => SalesOrderStatus::Rejected->value,
+            'rejected_by' => auth()->id(),
+            'rejected_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
+
+        AuditLogger::log('REJECT', 'sales_order', $order);
+
+        static::notifyUser($order->created_by, 'approval.result', 'Sales Order ditolak', $order->number.' ditolak: '.$reason, SalesOrder::class, $order->id);
+    }
+
+    public static function closeSo(int $id): void
+    {
+        $order = SalesOrder::findOrFail($id);
+
+        static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Closed));
+
+        $order->update([
+            'status' => SalesOrderStatus::Closed->value,
+            'closed_by' => auth()->id(),
+            'closed_at' => now(),
+        ]);
+
+        AuditLogger::log('CLOSE', 'sales_order', $order);
     }
 }
