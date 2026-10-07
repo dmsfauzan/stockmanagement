@@ -4,6 +4,7 @@ namespace App\Livewire\MasterData;
 
 use App\Models\Customer;
 use App\Services\Support\AuditLogger;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,6 +23,8 @@ class CustomerIndex extends Component
     public string $typeFilter = '';
 
     public string $statusFilter = '';
+
+    public string $trashedFilter = '';
 
     public int $perPage = 10;
 
@@ -59,6 +62,11 @@ class CustomerIndex extends Component
         $this->resetPage();
     }
 
+    public function updatedTrashedFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatedSelectedIds(): void
     {
         if ($this->selectedIds === []) {
@@ -80,6 +88,8 @@ class CustomerIndex extends Component
         }
 
         $this->selectedIds = Customer::query()
+            ->when($this->trashedFilter === 'trashed', fn ($q) => $q->onlyTrashed())
+            ->when($this->trashedFilter === 'all', fn ($q) => $q->withTrashed())
             ->when($this->search !== '', function ($query): void {
                 $term = '%'.$this->search.'%';
                 $query->where(fn ($inner) => $inner->where('code', 'like', $term)
@@ -143,6 +153,12 @@ class CustomerIndex extends Component
     {
         $permission = $this->editingId ? 'items.update' : 'items.create';
         abort_unless(auth()->user()->hasPermission($permission), 403);
+
+        if (! $this->editingId && $this->trashedConflict('customers', $this->code)) {
+            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+
+            return;
+        }
 
         $data = $this->validate([
             'code' => ['required', 'string', 'max:50', Rule::unique('customers', 'code')->ignore($this->editingId)],
@@ -208,6 +224,46 @@ class CustomerIndex extends Component
         $this->reset('selectedIds', 'selectAll');
 
         $this->dispatch('toast', type: 'success', message: "Hapus {$deleted} customer.");
+    }
+
+    public function restore(int $id): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        $customer = Customer::withTrashed()->findOrFail($id);
+        $customer->restore();
+
+        AuditLogger::logModel('restore', $customer, null, $customer->fresh()->toArray());
+
+        $this->dispatch('toast', type: 'success', message: 'Customer dipulihkan.');
+    }
+
+    public function bulkRestore(): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Customer::withTrashed()->whereIn('id', $this->selectedIds)->get() as $customer) {
+            $customer->restore();
+            AuditLogger::logModel('restore', $customer, null, $customer->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} data.");
+    }
+
+    private function trashedConflict(string $table, string $code): bool
+    {
+        return DB::table($table)->where('code', trim($code))->whereNotNull('deleted_at')->exists();
     }
 
     public function bulkActivate(): void
@@ -285,6 +341,8 @@ class CustomerIndex extends Component
     {
         return view('livewire.master-data.customer-index', [
             'customers' => Customer::query()
+                ->when($this->trashedFilter === 'trashed', fn ($q) => $q->onlyTrashed())
+                ->when($this->trashedFilter === 'all', fn ($q) => $q->withTrashed())
                 ->when($this->search !== '', function ($query): void {
                     $term = '%'.$this->search.'%';
                     $query->where(fn ($inner) => $inner->where('code', 'like', $term)

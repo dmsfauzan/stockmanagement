@@ -4,6 +4,7 @@ namespace App\Livewire\MasterData;
 
 use App\Models\Category;
 use App\Services\Support\AuditLogger;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -18,6 +19,8 @@ class CategoryIndex extends Component
     use WithPagination;
 
     public string $search = '';
+
+    public string $trashedFilter = '';
 
     public int $perPage = 10;
 
@@ -47,6 +50,11 @@ class CategoryIndex extends Component
         $this->resetPage();
     }
 
+    public function updatedTrashedFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatedSelectedIds(): void
     {
         if ($this->selectedIds === []) {
@@ -68,6 +76,8 @@ class CategoryIndex extends Component
         }
 
         $this->selectedIds = Category::query()
+            ->when($this->trashedFilter === 'trashed', fn ($q) => $q->onlyTrashed())
+            ->when($this->trashedFilter === 'all', fn ($q) => $q->withTrashed())
             ->when($this->search !== '', function ($query): void {
                 $term = '%'.$this->search.'%';
                 $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
@@ -114,6 +124,12 @@ class CategoryIndex extends Component
     {
         $permission = $this->editingId ? 'items.update' : 'items.create';
         abort_unless(auth()->user()->hasPermission($permission), 403);
+
+        if (! $this->editingId && $this->trashedConflict('categories', $this->code)) {
+            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+
+            return;
+        }
 
         $data = $this->validate([
             'code' => ['required', 'string', 'max:50', Rule::unique('categories', 'code')->ignore($this->editingId)],
@@ -189,6 +205,46 @@ class CategoryIndex extends Component
         $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} kategori, {$skipped} dilewati.");
     }
 
+    public function restore(int $id): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        $category = Category::withTrashed()->findOrFail($id);
+        $category->restore();
+
+        AuditLogger::logModel('restore', $category, null, $category->fresh()->toArray());
+
+        $this->dispatch('toast', type: 'success', message: 'Kategori dipulihkan.');
+    }
+
+    public function bulkRestore(): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Category::withTrashed()->whereIn('id', $this->selectedIds)->get() as $category) {
+            $category->restore();
+            AuditLogger::logModel('restore', $category, null, $category->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} data.");
+    }
+
+    private function trashedConflict(string $table, string $code): bool
+    {
+        return DB::table($table)->where('code', trim($code))->whereNotNull('deleted_at')->exists();
+    }
+
     public function bulkActivate(): void
     {
         $this->bulkSetStatus('active');
@@ -259,6 +315,8 @@ class CategoryIndex extends Component
         return view('livewire.master-data.category-index', [
             'categories' => Category::query()
                 ->withCount('items')
+                ->when($this->trashedFilter === 'trashed', fn ($q) => $q->onlyTrashed())
+                ->when($this->trashedFilter === 'all', fn ($q) => $q->withTrashed())
                 ->when($this->search !== '', function ($query): void {
                     $term = '%'.$this->search.'%';
                     $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));

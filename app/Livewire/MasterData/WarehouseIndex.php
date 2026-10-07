@@ -4,6 +4,7 @@ namespace App\Livewire\MasterData;
 
 use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -20,6 +21,8 @@ class WarehouseIndex extends Component
     public string $search = '';
 
     public string $statusFilter = '';
+
+    public string $trashedFilter = '';
 
     public int $perPage = 10;
 
@@ -49,6 +52,11 @@ class WarehouseIndex extends Component
         $this->resetPage();
     }
 
+    public function updatedTrashedFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatedSelectedIds(): void
     {
         if ($this->selectedIds === []) {
@@ -70,6 +78,8 @@ class WarehouseIndex extends Component
         }
 
         $this->selectedIds = Warehouse::query()
+            ->when($this->trashedFilter === 'trashed', fn ($q) => $q->onlyTrashed())
+            ->when($this->trashedFilter === 'all', fn ($q) => $q->withTrashed())
             ->when($this->search !== '', function ($query): void {
                 $term = '%'.$this->search.'%';
                 $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
@@ -120,6 +130,12 @@ class WarehouseIndex extends Component
         $permission = $this->editingId ? 'update' : 'create';
         $target = $this->editingId ? Warehouse::findOrFail($this->editingId) : Warehouse::class;
         $this->authorize($permission, $target);
+
+        if (! $this->editingId && $this->trashedConflict('warehouses', $this->code)) {
+            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+
+            return;
+        }
 
         $data = $this->validate([
             'code' => ['required', 'string', 'max:50', Rule::unique('warehouses', 'code')->ignore($this->editingId)],
@@ -186,6 +202,45 @@ class WarehouseIndex extends Component
         $this->reset('selectedIds', 'selectAll');
 
         $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} warehouse, {$skipped} dilewati.");
+    }
+
+    public function restore(int $id): void
+    {
+        $warehouse = Warehouse::withTrashed()->findOrFail($id);
+        $this->authorize('update', $warehouse);
+        $warehouse->restore();
+
+        AuditLogger::logModel('restore', $warehouse, null, $warehouse->fresh()->toArray());
+
+        $this->dispatch('toast', type: 'success', message: 'Warehouse dipulihkan.');
+    }
+
+    public function bulkRestore(): void
+    {
+        abort_unless(auth()->user()->hasPermission('warehouse.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Warehouse::withTrashed()->whereIn('id', $this->selectedIds)->get() as $warehouse) {
+            $warehouse->restore();
+            AuditLogger::logModel('restore', $warehouse, null, $warehouse->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} data.");
+    }
+
+    private function trashedConflict(string $table, string $code): bool
+    {
+        return DB::table($table)->where('code', trim($code))->whereNotNull('deleted_at')->exists();
     }
 
     public function bulkActivate(): void
@@ -265,6 +320,8 @@ class WarehouseIndex extends Component
                 ->withCount('zones')
                 ->withCount(['zones as racks_count' => fn ($q) => $q->join('racks', 'racks.zone_id', '=', 'zones.id')])
                 ->withCount(['zones as locations_count' => fn ($q) => $q->join('racks', 'racks.zone_id', '=', 'zones.id')->join('locations', 'locations.rack_id', '=', 'racks.id')])
+                ->when($this->trashedFilter === 'trashed', fn ($q) => $q->onlyTrashed())
+                ->when($this->trashedFilter === 'all', fn ($q) => $q->withTrashed())
                 ->when($this->search !== '', function ($query): void {
                     $term = '%'.$this->search.'%';
                     $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));

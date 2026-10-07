@@ -32,6 +32,11 @@
                             <option value="{{ $zone->id }}">{{ $zone->name }} ({{ $zone->code }})</option>
                         @endforeach
                     </select>
+                    <select wire:model.live="trashedFilter" class="app-select w-full sm:w-auto">
+                        <option value="">Aktif</option>
+                        <option value="trashed">Terhapus</option>
+                        <option value="all">Semua</option>
+                    </select>
                 </div>
                 <select wire:model.live="perPage" class="app-select w-24">
                     @foreach ([10, 25, 50] as $size)
@@ -45,6 +50,7 @@
             <div class="flex flex-wrap items-center gap-2 border-b border-app-border px-4 py-3">
                 <span class="text-xs font-medium text-app-text">{{ count($selectedIds) }} dipilih</span>
                 <x-ui.confirm action="bulkDelete" title="Hapus massal" :message="'Hapus '.count($selectedIds).' lokasi terpilih?'" confirm-label="Hapus" variant="danger" class="app-btn app-btn-danger app-btn-sm">Hapus</x-ui.confirm>
+                <x-ui.confirm action="bulkRestore" title="Pulihkan massal" :message="'Pulihkan '.count($selectedIds).' lokasi terpilih?'" confirm-label="Pulihkan" class="app-btn app-btn-secondary app-btn-sm">Pulihkan</x-ui.confirm>
             </div>
         @endif
 
@@ -68,10 +74,15 @@
                             <td class="text-app-muted">{{ $location->fullPath() }}</td>
                             <td class="whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end gap-1">
-                                    <button type="button" wire:click="openEdit({{ $location->id }})" class="app-btn app-btn-ghost !p-1.5" title="Edit">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
-                                    </button>
-                                    <x-ui.confirm action="delete" :params="[$location->id]" title="Hapus Location" :message="'Hapus ' . $location->code . '?'" confirm-label="Hapus" variant="danger" aria-label="Delete" class="app-btn app-btn-ghost !p-1.5 hover:!text-rose-600 dark:hover:!text-rose-400"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></x-ui.confirm>
+                                    @if ($location->trashed())
+                                        <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 ring-1 ring-inset ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-600">Terhapus</span>
+                                        <x-ui.confirm action="restore" :params="[$location->id]" title="Pulihkan Data" message="Pulihkan data ini?" confirm-label="Pulihkan" class="app-btn app-btn-ghost app-btn-sm">Pulihkan</x-ui.confirm>
+                                    @else
+                                        <button type="button" wire:click="openEdit({{ $location->id }})" class="app-btn app-btn-ghost !p-1.5" title="Edit">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
+                                        </button>
+                                        <x-ui.confirm action="delete" :params="[$location->id]" title="Hapus Location" :message="'Hapus ' . $location->code . '?'" confirm-label="Hapus" variant="danger" aria-label="Delete" class="app-btn app-btn-ghost !p-1.5 hover:!text-rose-600 dark:hover:!text-rose-400"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></x-ui.confirm>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

@@ -7,6 +7,7 @@ use App\Models\Rack;
 use App\Models\Warehouse;
 use App\Models\Zone;
 use App\Services\Support\AuditLogger;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -25,6 +26,8 @@ class LocationIndex extends Component
     public string $warehouseFilter = '';
 
     public string $zoneFilter = '';
+
+    public string $trashedFilter = '';
 
     public int $perPage = 10;
 
@@ -56,6 +59,11 @@ class LocationIndex extends Component
         $this->resetPage();
     }
 
+    public function updatedTrashedFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatedSelectedIds(): void
     {
         if ($this->selectedIds === []) {
@@ -77,6 +85,8 @@ class LocationIndex extends Component
         }
 
         $this->selectedIds = Location::query()
+            ->when($this->trashedFilter === 'trashed', fn ($q) => $q->onlyTrashed())
+            ->when($this->trashedFilter === 'all', fn ($q) => $q->withTrashed())
             ->when($this->search !== '', function ($query): void {
                 $term = '%'.$this->search.'%';
                 $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
@@ -153,6 +163,12 @@ class LocationIndex extends Component
         $permission = $this->editingId ? 'update' : 'create';
         $target = $this->editingId ? Location::findOrFail($this->editingId) : Location::class;
         $this->authorize($permission, $target);
+
+        if (! $this->editingId && $this->trashedConflict('locations', $this->code)) {
+            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+
+            return;
+        }
 
         $this->validate([
             'warehouse_id' => ['required', 'exists:warehouses,id'],
@@ -240,6 +256,45 @@ class LocationIndex extends Component
         $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} lokasi, {$skipped} dilewati.");
     }
 
+    public function restore(int $id): void
+    {
+        $location = Location::withTrashed()->findOrFail($id);
+        $this->authorize('update', $location);
+        $location->restore();
+
+        AuditLogger::logModel('restore', $location, null, $location->fresh()->toArray());
+
+        $this->dispatch('toast', type: 'success', message: 'Location dipulihkan.');
+    }
+
+    public function bulkRestore(): void
+    {
+        abort_unless(auth()->user()->hasPermission('location.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Location::withTrashed()->whereIn('id', $this->selectedIds)->get() as $location) {
+            $location->restore();
+            AuditLogger::logModel('restore', $location, null, $location->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} data.");
+    }
+
+    private function trashedConflict(string $table, string $code): bool
+    {
+        return DB::table($table)->where('code', trim($code))->whereNotNull('deleted_at')->exists();
+    }
+
     public function export(): StreamedResponse
     {
         $this->authorize('viewAny', Location::class);
@@ -283,6 +338,8 @@ class LocationIndex extends Component
         return view('livewire.master-data.location-index', [
             'locations' => Location::query()
                 ->with(['rack.zone.warehouse'])
+                ->when($this->trashedFilter === 'trashed', fn ($q) => $q->onlyTrashed())
+                ->when($this->trashedFilter === 'all', fn ($q) => $q->withTrashed())
                 ->when($this->search !== '', function ($query): void {
                     $term = '%'.$this->search.'%';
                     $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
