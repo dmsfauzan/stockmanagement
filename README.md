@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-80_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-147_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -53,7 +53,7 @@ flowchart LR
 | Barang Keluar (`GI-YYYYMMDD-XXXX`) | Alur sama + pengecekan stok sebelum posting |
 | Stock On Hand / Movement / Low Stock | `Available = On Hand − Reserved`, otomatis |
 | Dashboard | KPI, grafik movement, distribusi kategori, low stock, aktivitas terkini |
-| Reports | Stock / Incoming / Outgoing / Movement / Expiry / Opname / Adjustment / Transfer → CSV, Excel, PDF |
+| Reports | Stock / Incoming / Outgoing / Movement / Expiry / Opname / Adjustment / Transfer / Warehouse Comparison / Valuation / COGS / Journal / Replenishment → CSV, Excel, PDF |
 | RBAC | 43 permission granular, 4 peran |
 | Audit trail | Siapa, apa, kapan, nilai lama → baru |
 
@@ -84,6 +84,10 @@ flowchart LR
 | Purchase Order | PO → Barang Masuk dengan penerimaan sebagian (partial/full), `PO-...` |
 | Multi-Warehouse | Switcher gudang global (session), dashboard per gudang, report perbandingan gudang |
 | Valuation / COGS | Harga pokok rata-rata bergerak (moving average), COGS, report valuasi & COGS |
+| **REST API** | Sanctum token, 68 endpoint (read + write workflow), permission-aware, rate-limited, format konsisten — lihat [`API.md`](API.md) |
+| Advanced Supplier | Lead time, termin, price list, skor on-time & variasi harga |
+| Replenishment | Saran beli dari min/max + buat PO sekali klik |
+| PWA | Installable, app-shell offline, scan kamera di HP |
 
 </details>
 
@@ -198,7 +202,11 @@ php artisan test
 php artisan test --filter="StockOpnameTest|StockTransferTest|BarcodeQrTest"
 ```
 
-Cakupan: kalkulasi stok, insufficient stock, low/out status, adjustment, transfer antar gudang, posting atomik & anti double-post, permission per peran, import, reversal, reserved stock, expiry, notifikasi, smoke-render seluruh halaman.
+Cakupan: kalkulasi stok, insufficient stock, low/out status, adjustment, transfer antar gudang, posting atomik & anti double-post, permission per peran, import, reversal, reserved stock, expiry, notifikasi, REST API (read+write), smoke-render seluruh halaman.
+
+## Integrasi API
+
+Ekstrak [API.md](API.md) untuk endpoint, otentikasi, dan contoh. Token dibuat lewat **Admin → API Tokens** atau `php artisan api:token admin@stock.test`.
 
 ## Build & Deploy
 
@@ -213,8 +221,9 @@ php artisan storage:link # lampiran adjustment
 - [x] Phase 2 — adjustment, opname, transfer, notifikasi
 - [x] Phase 3 — barcode/QR, reserved stock, batch & expiry, import, reversal
 - [x] Purchase Order & Multi-Warehouse (switcher + comparison report)
-- [x] Valuation (moving average) & COGS
-- [ ] Mobile/PWA, integrasi ERP/Accounting
+- [x] Valuation (moving average) & COGS, accounting journal, replenishment
+- [x] PWA & REST API (Sanctum, 68 endpoint, workflow dari API)
+- [ ] Integrasi ERP/Accounting eksternal
 
 ## Berkontribusi & Lisensi
 
