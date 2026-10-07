@@ -25,9 +25,13 @@ use App\Policies\StockOpnamePolicy;
 use App\Policies\StockTransferPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WarehousePolicy;
+use App\Services\Support\AuditLogger;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
@@ -57,6 +61,14 @@ class AppServiceProvider extends ServiceProvider
         Password::defaults(fn () => app()->isProduction()
             ? Password::min(12)->letters()->mixedCase()->numbers()->symbols()
             : Password::min(8)->letters()->numbers());
+
+        Event::listen(Login::class, function (Login $event): void {
+            AuditLogger::log('LOGIN', 'auth', $event->user);
+        });
+
+        Event::listen(Logout::class, function (Logout $event): void {
+            AuditLogger::log('LOGOUT', 'auth', $event->user);
+        });
 
         Gate::before(function (?User $user, string $ability): ?bool {
             if ($user && str_contains($ability, '.') && $user->hasPermission($ability)) {

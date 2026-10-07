@@ -88,6 +88,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::get('/profile/notifications', \App\Livewire\Profile\NotificationPreferences::class)->name('profile.notifications');
     Route::get('/profile/avatar', \App\Livewire\Profile\AvatarForm::class)->name('profile.avatar');
     Route::get('/profile/two-factor', \App\Livewire\Profile\TwoFactorForm::class)->name('profile.two-factor');
+    Route::get('/profile/sessions', \App\Livewire\Profile\SessionsIndex::class)->name('profile.sessions');
 
     Route::middleware('permission:items.view')->get('/items', ItemIndex::class)->name('items.index');
     Route::middleware('permission:items.create')->get('/items/create', ItemForm::class)->name('items.create');
