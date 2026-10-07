@@ -4,9 +4,11 @@ namespace App\Livewire\Transactions;
 
 use App\Enums\OpnameStatus;
 use App\Models\Location;
+use App\Models\Rack;
 use App\Models\StockBalance;
 use App\Models\StockOpname;
 use App\Models\Warehouse;
+use App\Models\Zone;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +27,12 @@ class StockOpnameForm extends Component
     public string $warehouse_id = '';
 
     public string $location_id = '';
+
+    public string $type = 'full';
+
+    public string $zone_id = '';
+
+    public string $rack_id = '';
 
     public string $notes = '';
 
@@ -45,6 +53,9 @@ class StockOpnameForm extends Component
             $this->opname_date = $model->opname_date?->format('Y-m-d') ?? now()->format('Y-m-d');
             $this->warehouse_id = (string) $model->warehouse_id;
             $this->location_id = (string) ($model->location_id ?? '');
+            $this->type = (string) ($model->type ?? 'full');
+            $this->zone_id = $model->zone_id ? (string) $model->zone_id : '';
+            $this->rack_id = $model->rack_id ? (string) $model->rack_id : '';
             $this->notes = (string) ($model->notes ?? '');
         } else {
             $this->authorize('create', StockOpname::class);
@@ -57,6 +68,9 @@ class StockOpnameForm extends Component
             'opname_date' => ['required', 'date'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'location_id' => ['nullable', 'exists:locations,id'],
+            'type' => ['required', 'in:full,cycle'],
+            'zone_id' => ['nullable', 'exists:zones,id'],
+            'rack_id' => ['nullable', 'exists:racks,id'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
@@ -79,8 +93,19 @@ class StockOpnameForm extends Component
 
         $existingItemIds = $opname->items()->pluck('item_id')->all();
 
+        $scopeLocationIds = null;
+
+        if (! $opname->location_id && $opname->type === 'cycle') {
+            if ($opname->rack_id) {
+                $scopeLocationIds = Location::where('rack_id', $opname->rack_id)->pluck('id')->all();
+            } elseif ($opname->zone_id) {
+                $scopeLocationIds = Location::whereHas('rack', fn ($q) => $q->where('zone_id', $opname->zone_id))->pluck('id')->all();
+            }
+        }
+
         $totals = StockBalance::where('warehouse_id', $opname->warehouse_id)
             ->when($opname->location_id, fn ($q) => $q->where('location_id', $opname->location_id))
+            ->when($scopeLocationIds !== null, fn ($q) => $q->whereIn('location_id', $scopeLocationIds))
             ->get(['item_id', 'quantity_on_hand'])
             ->groupBy('item_id')
             ->map(fn ($rows) => (int) $rows->sum('quantity_on_hand'));
@@ -140,7 +165,15 @@ class StockOpnameForm extends Component
             }
         }
 
-        $opname = DB::transaction(function () use ($data): StockOpname {
+        $isCycle = $data['type'] === 'cycle';
+
+        $scope = [
+            'type' => $data['type'],
+            'zone_id' => $isCycle && $data['zone_id'] !== '' && $data['zone_id'] !== null ? $data['zone_id'] : null,
+            'rack_id' => $isCycle && $data['rack_id'] !== '' && $data['rack_id'] !== null ? $data['rack_id'] : null,
+        ];
+
+        $opname = DB::transaction(function () use ($data, $scope): StockOpname {
             if ($this->opnameId) {
                 $opname = StockOpname::findOrFail($this->opnameId);
                 $old = $opname->toArray();
@@ -148,6 +181,9 @@ class StockOpnameForm extends Component
                     'opname_date' => $data['opname_date'],
                     'warehouse_id' => $data['warehouse_id'],
                     'location_id' => $data['location_id'] !== '' ? $data['location_id'] : null,
+                    'type' => $scope['type'],
+                    'zone_id' => $scope['zone_id'],
+                    'rack_id' => $scope['rack_id'],
                     'notes' => $data['notes'] !== '' && $data['notes'] !== null ? $data['notes'] : null,
                 ]);
                 AuditLogger::logModel('update', $opname, $old, $opname->fresh()->toArray());
@@ -160,6 +196,9 @@ class StockOpnameForm extends Component
                 'opname_date' => $data['opname_date'],
                 'warehouse_id' => $data['warehouse_id'],
                 'location_id' => $data['location_id'] !== '' ? $data['location_id'] : null,
+                'type' => $scope['type'],
+                'zone_id' => $scope['zone_id'],
+                'rack_id' => $scope['rack_id'],
                 'notes' => $data['notes'] !== '' && $data['notes'] !== null ? $data['notes'] : null,
                 'status' => OpnameStatus::Draft->value,
                 'created_by' => auth()->id(),
@@ -185,9 +224,24 @@ class StockOpnameForm extends Component
 
         $opname = $this->opnameId ? StockOpname::withCount('items')->find($this->opnameId) : null;
 
+        $zones = Zone::query()
+            ->with('warehouse:id,name')
+            ->when($this->warehouse_id !== '', fn ($query) => $query->where('warehouse_id', $this->warehouse_id))
+            ->orderBy('name')
+            ->get(['id', 'name', 'warehouse_id']);
+
+        $racks = Rack::query()
+            ->with('zone:id,name')
+            ->when($this->warehouse_id !== '', fn ($query) => $query->whereHas('zone', fn ($inner) => $inner->where('warehouse_id', $this->warehouse_id)))
+            ->when($this->zone_id !== '', fn ($query) => $query->where('zone_id', $this->zone_id))
+            ->orderBy('name')
+            ->get(['id', 'name', 'zone_id']);
+
         return view('livewire.transactions.stock-opname-form', [
             'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
             'locations' => $locations,
+            'zones' => $zones,
+            'racks' => $racks,
             'opname' => $opname,
         ]);
     }

@@ -10,6 +10,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('inventory:alerts')->dailyAt('07:00');
 Schedule::command('inventory:digest')->dailyAt('07:05');
+Schedule::command('inventory:cycle-count')->weeklyOn(1, '08:00');
 Schedule::command('backup:run --only-db')->dailyAt('01:00');
 Schedule::command('backup:clean')->dailyAt('02:00');
 Schedule::command('backup:monitor')->dailyAt('01:30');

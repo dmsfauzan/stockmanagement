@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'opname_date', 'warehouse_id', 'location_id', 'status', 'notes', 'created_by', 'submitted_by', 'approved_by', 'rejected_by', 'submitted_at', 'approved_at', 'rejected_at', 'rejection_reason', 'stock_adjustment_id'])]
+#[Fillable(['number', 'opname_date', 'warehouse_id', 'location_id', 'type', 'zone_id', 'rack_id', 'scheduled_date', 'status', 'notes', 'created_by', 'submitted_by', 'approved_by', 'rejected_by', 'submitted_at', 'approved_at', 'rejected_at', 'rejection_reason', 'stock_adjustment_id'])]
 class StockOpname extends Model
 {
     use HasFactory;
@@ -19,6 +19,7 @@ class StockOpname extends Model
     {
         return [
             'opname_date' => 'date',
+            'scheduled_date' => 'date',
             'submitted_at' => 'datetime',
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',
@@ -33,6 +34,21 @@ class StockOpname extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
+    }
+
+    public function zone(): BelongsTo
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
+    public function rack(): BelongsTo
+    {
+        return $this->belongsTo(Rack::class);
+    }
+
+    public function isCycle(): bool
+    {
+        return $this->type === 'cycle';
     }
 
     public function items(): HasMany

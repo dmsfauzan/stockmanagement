@@ -34,6 +34,38 @@
                     </select>
                     @error('location_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
+                <div>
+                    <label for="type" class="app-label mb-1.5">Tipe</label>
+                    <select id="type" wire:model.live="type" class="app-select">
+                        <option value="full">Full (semua di warehouse/lokasi)</option>
+                        <option value="cycle">Cycle Count (per zona/rak)</option>
+                    </select>
+                    @error('type') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                @if($type === 'cycle')
+                    <div class="grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-2">
+                        <div>
+                            <label for="zone_id" class="app-label mb-1.5">Zona (opsional)</label>
+                            <select id="zone_id" wire:model.live="zone_id" class="app-select">
+                                <option value="">-- Semua Zona --</option>
+                                @foreach (($zones ?? []) as $zone)
+                                    <option value="{{ $zone->id }}">{{ $zone->name }} ({{ $zone->warehouse?->name }})</option>
+                                @endforeach
+                            </select>
+                            @error('zone_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="rack_id" class="app-label mb-1.5">Rak (opsional)</label>
+                            <select id="rack_id" wire:model.live="rack_id" class="app-select">
+                                <option value="">-- Semua Rak --</option>
+                                @foreach (($racks ?? []) as $rack)
+                                    <option value="{{ $rack->id }}">{{ $rack->name }} ({{ $rack->zone?->name }})</option>
+                                @endforeach
+                            </select>
+                            @error('rack_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                @endif
                 <div class="sm:col-span-2 lg:col-span-3">
                     <label for="notes" class="app-label mb-1.5">Catatan</label>
                     <textarea id="notes" wire:model="notes" rows="2" class="app-textarea" placeholder="Catatan opname..."></textarea>

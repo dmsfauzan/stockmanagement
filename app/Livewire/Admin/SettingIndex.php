@@ -29,6 +29,7 @@ class SettingIndex extends Component
             'low_stock_notification' => ['key' => 'low_stock.notification', 'label' => 'Low Stock Notification', 'type' => 'select', 'options' => ['enabled' => 'Enabled', 'disabled' => 'Disabled']],
             'default_minimum_stock' => ['key' => 'inventory.default_minimum', 'label' => 'Default Minimum Stock', 'type' => 'number'],
             'default_maximum_stock' => ['key' => 'inventory.default_maximum', 'label' => 'Default Maximum Stock', 'type' => 'number'],
+            'cycle_count_enabled' => ['key' => 'inventory.cycle_count_enabled', 'label' => 'Cycle Counting (mingguan)', 'type' => 'select', 'options' => ['1' => 'Enabled', '0' => 'Disabled']],
         ],
         'accounting' => [
             'account_inventory' => ['key' => 'account.inventory', 'label' => 'Akun Persediaan', 'type' => 'text'],
@@ -77,6 +78,7 @@ class SettingIndex extends Component
             'low_stock_notification' => 'enabled',
             'default_minimum_stock' => '0',
             'default_maximum_stock' => '0',
+            'cycle_count_enabled' => '0',
             'account_inventory' => '1300',
             'account_cogs' => '5100',
             'account_adjustment_gain' => '4210',
@@ -102,6 +104,7 @@ class SettingIndex extends Component
             'values.low_stock_notification' => ['required', 'in:enabled,disabled'],
             'values.default_minimum_stock' => ['required', 'integer', 'min:0'],
             'values.default_maximum_stock' => ['required', 'integer', 'min:0'],
+            'values.cycle_count_enabled' => ['required', 'in:0,1'],
             'values.account_inventory' => ['nullable', 'string', 'max:20'],
             'values.account_cogs' => ['nullable', 'string', 'max:20'],
             'values.account_adjustment_gain' => ['nullable', 'string', 'max:20'],
