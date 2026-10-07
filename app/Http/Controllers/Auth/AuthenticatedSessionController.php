@@ -26,6 +26,18 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        $user = $request->user();
+
+        if ($user && method_exists($user, 'hasTwoFactorEnabled') && $user->hasTwoFactorEnabled()) {
+            $request->session()->put('login.id', $user->id);
+            $request->session()->put('login.remember', $request->boolean('remember'));
+
+            Auth::guard('web')->logout();
+            $request->session()->regenerate(true);
+
+            return redirect()->route('two-factor.challenge');
+        }
+
         $request->session()->regenerate();
 
         $request->user()?->forceFill(['last_login_at' => now()])->save();

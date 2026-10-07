@@ -403,6 +403,7 @@
                         <div class="my-1 border-t border-app-border"></div>
                         <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Profile</a>
                         <a href="{{ route('profile.avatar') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Avatar</a>
+                        <a href="{{ route('profile.two-factor') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Two-Factor</a>
                         <a href="{{ route('profile.notifications') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Preferensi Notifikasi</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

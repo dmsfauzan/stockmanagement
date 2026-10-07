@@ -43,6 +43,9 @@ class SettingIndex extends Component
             'notifications_digest_enabled' => ['key' => 'notifications.digest_enabled', 'label' => 'Daily Digest (email ringkasan)', 'type' => 'select', 'options' => ['1' => 'Enabled', '0' => 'Disabled']],
             'notifications_digest_time' => ['key' => 'notifications.digest_time', 'label' => 'Jam kirim Digest (HH:MM)', 'type' => 'text'],
         ],
+        'security' => [
+            'security_require_2fa_admin' => ['key' => 'security.require_2fa_admin', 'label' => 'Wajibkan 2FA untuk Admin', 'type' => 'select', 'options' => ['1' => 'Ya', '0' => 'Tidak']],
+        ],
     ];
 
     /** @var array<string, string> */
@@ -83,6 +86,7 @@ class SettingIndex extends Component
             'notifications_email_enabled' => '1',
             'notifications_digest_enabled' => '1',
             'notifications_digest_time' => '07:05',
+            'security_require_2fa_admin' => '0',
             default => '',
         };
     }
@@ -107,6 +111,7 @@ class SettingIndex extends Component
             'values.notifications_email_enabled' => ['required', 'in:0,1'],
             'values.notifications_digest_enabled' => ['required', 'in:0,1'],
             'values.notifications_digest_time' => ['required', 'regex:/^\d{2}:\d{2}$/'],
+            'values.security_require_2fa_admin' => ['required', 'in:0,1'],
         ];
 
         $validated = $this->validate($rules)['values'];

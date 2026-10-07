@@ -17,6 +17,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => \App\Http\Middleware\EnsurePermission::class,
             'active' => \App\Http\Middleware\EnsureAccountActive::class,
+            'twofactor.admin' => \App\Http\Middleware\EnsureTwoFactorForAdmin::class,
         ]);
         $middleware->throttleApi();
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
