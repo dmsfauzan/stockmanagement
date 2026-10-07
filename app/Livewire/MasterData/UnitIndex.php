@@ -2,6 +2,8 @@
 
 namespace App\Livewire\MasterData;
 
+use App\Imports\UnitImport;
+use App\Livewire\Concerns\ImportsMasterData;
 use App\Models\Unit;
 use App\Services\Support\AuditLogger;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Unit')]
 class UnitIndex extends Component
 {
-    use WithPagination;
+    use ImportsMasterData, WithPagination;
 
     public string $search = '';
 
@@ -258,6 +260,31 @@ class UnitIndex extends Component
 
             fclose($handle);
         }, 'units-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    protected function importClass(): string
+    {
+        return UnitImport::class;
+    }
+
+    protected function importLabelText(): string
+    {
+        return 'Satuan';
+    }
+
+    protected function importModule(): string
+    {
+        return 'units';
+    }
+
+    protected function importPermission(): string
+    {
+        return 'items.create';
+    }
+
+    protected function importSampleRow(): array
+    {
+        return ['PCS', 'Pieces'];
     }
 
     public function render()

@@ -2,6 +2,8 @@
 
 namespace App\Livewire\MasterData;
 
+use App\Imports\LocationImport;
+use App\Livewire\Concerns\ImportsMasterData;
 use App\Models\Location;
 use App\Models\Rack;
 use App\Models\Warehouse;
@@ -19,7 +21,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Location / Rack')]
 class LocationIndex extends Component
 {
-    use WithPagination;
+    use ImportsMasterData, WithPagination;
 
     public string $search = '';
 
@@ -331,6 +333,31 @@ class LocationIndex extends Component
 
             fclose($handle);
         }, 'locations-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    protected function importClass(): string
+    {
+        return LocationImport::class;
+    }
+
+    protected function importLabelText(): string
+    {
+        return 'Location';
+    }
+
+    protected function importModule(): string
+    {
+        return 'locations';
+    }
+
+    protected function importPermission(): string
+    {
+        return 'location.create';
+    }
+
+    protected function importSampleRow(): array
+    {
+        return ['WH01', 'Z01', 'R01', 'L01', 'Rak 1 Level 1'];
     }
 
     public function render()

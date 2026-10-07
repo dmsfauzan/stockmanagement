@@ -2,6 +2,8 @@
 
 namespace App\Livewire\MasterData;
 
+use App\Imports\CustomerImport;
+use App\Livewire\Concerns\ImportsMasterData;
 use App\Models\Customer;
 use App\Services\Support\AuditLogger;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Customer / Department')]
 class CustomerIndex extends Component
 {
-    use WithPagination;
+    use ImportsMasterData, WithPagination;
 
     public string $search = '';
 
@@ -335,6 +337,31 @@ class CustomerIndex extends Component
 
             fclose($handle);
         }, 'customers-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    protected function importClass(): string
+    {
+        return CustomerImport::class;
+    }
+
+    protected function importLabelText(): string
+    {
+        return 'Customer';
+    }
+
+    protected function importModule(): string
+    {
+        return 'customers';
+    }
+
+    protected function importPermission(): string
+    {
+        return 'items.create';
+    }
+
+    protected function importSampleRow(): array
+    {
+        return ['CUST001', 'PT Pelanggan', 'customer', 'Ani', '08129876543', 'ani@pelanggan.com', 'Bandung', 'active'];
     }
 
     public function render()

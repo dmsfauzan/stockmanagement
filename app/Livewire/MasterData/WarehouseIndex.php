@@ -2,6 +2,8 @@
 
 namespace App\Livewire\MasterData;
 
+use App\Imports\WarehouseImport;
+use App\Livewire\Concerns\ImportsMasterData;
 use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Warehouse')]
 class WarehouseIndex extends Component
 {
-    use WithPagination;
+    use ImportsMasterData, WithPagination;
 
     public string $search = '';
 
@@ -311,6 +313,31 @@ class WarehouseIndex extends Component
 
             fclose($handle);
         }, 'warehouses-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    protected function importClass(): string
+    {
+        return WarehouseImport::class;
+    }
+
+    protected function importLabelText(): string
+    {
+        return 'Warehouse';
+    }
+
+    protected function importModule(): string
+    {
+        return 'warehouses';
+    }
+
+    protected function importPermission(): string
+    {
+        return 'warehouse.create';
+    }
+
+    protected function importSampleRow(): array
+    {
+        return ['WH01', 'Gudang Utama', 'Jl. Industri 1', 'active'];
     }
 
     public function render()

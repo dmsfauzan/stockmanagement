@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-218_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-225_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -85,6 +85,7 @@ flowchart LR
 | FEFO Picking | Barang Keluar pilih lot/serial otomatis dari expiry terdekat (`applyFefo`) |
 | ERP / Accounting | Outbound **webhook** bertanda-tangan HMAC + **ekspor jurnal terjadwal** (CSV/XLSX) + API `/api/accounting/*` |
 | Import Barang | Excel/CSV dengan template, validasi per baris, upsert by SKU (diproses di latar belakang) |
+| Import Master | Excel/CSV untuk **Kategori, Satuan, Supplier, Customer, Warehouse, Location** — template, validasi per baris, upsert by code, notifikasi hasil |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
 | Purchase Order | PO (`PO-...`) → Barang Masuk (penerimaan sebagian), progres penerimaan |
 | Sales Order | SO (`SO-...`): Draft→Submitted→Approved→Partial→Fulfilled→Closed, fulfilment via Barang Keluar |

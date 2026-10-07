@@ -2,6 +2,8 @@
 
 namespace App\Livewire\MasterData;
 
+use App\Imports\CategoryImport;
+use App\Livewire\Concerns\ImportsMasterData;
 use App\Models\Category;
 use App\Services\Support\AuditLogger;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Kategori')]
 class CategoryIndex extends Component
 {
-    use WithPagination;
+    use ImportsMasterData, WithPagination;
 
     public string $search = '';
 
@@ -308,6 +310,31 @@ class CategoryIndex extends Component
 
             fclose($handle);
         }, 'categories-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    protected function importClass(): string
+    {
+        return CategoryImport::class;
+    }
+
+    protected function importLabelText(): string
+    {
+        return 'Kategori';
+    }
+
+    protected function importModule(): string
+    {
+        return 'categories';
+    }
+
+    protected function importPermission(): string
+    {
+        return 'items.create';
+    }
+
+    protected function importSampleRow(): array
+    {
+        return ['ELEC', 'Elektronik', 'Barang elektronik', 'active'];
     }
 
     public function render()

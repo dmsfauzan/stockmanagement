@@ -2,6 +2,8 @@
 
 namespace App\Livewire\MasterData;
 
+use App\Imports\SupplierImport;
+use App\Livewire\Concerns\ImportsMasterData;
 use App\Models\Supplier;
 use App\Services\Support\AuditLogger;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Supplier')]
 class SupplierIndex extends Component
 {
-    use WithPagination;
+    use ImportsMasterData, WithPagination;
 
     public string $search = '';
 
@@ -355,6 +357,31 @@ class SupplierIndex extends Component
 
             fclose($handle);
         }, 'suppliers-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
+    }
+
+    protected function importClass(): string
+    {
+        return SupplierImport::class;
+    }
+
+    protected function importLabelText(): string
+    {
+        return 'Supplier';
+    }
+
+    protected function importModule(): string
+    {
+        return 'suppliers';
+    }
+
+    protected function importPermission(): string
+    {
+        return 'items.create';
+    }
+
+    protected function importSampleRow(): array
+    {
+        return ['SUP001', 'PT Contoh', 'Budi', '08123456789', 'budi@contoh.com', 'Jakarta', 'active', 7, 'NET 30', 'Jakarta'];
     }
 
     public function render()
