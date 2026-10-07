@@ -160,6 +160,7 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::middleware('permission:items.view')->get('/scan', ScanIndex::class)->name('scan');
     Route::get('/labels/bulk', [LabelController::class, 'bulk'])->name('labels.bulk');
+    Route::get('/labels/print', [LabelController::class, 'print'])->name('labels.print');
     Route::get('/labels/items/{item}', [LabelController::class, 'item'])->name('labels.item');
     Route::get('/labels/locations/{location}', [LabelController::class, 'location'])->name('labels.location');
 });

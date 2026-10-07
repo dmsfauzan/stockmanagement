@@ -70,10 +70,14 @@
                 <div class="flex flex-wrap items-center gap-2">
                     @can('items.view')
                         <div class="flex items-center gap-1">
-                            <button type="button" @click="openBulk('qr')" :disabled="selectedCount === 0" :class="selectedCount === 0 ? 'opacity-50 cursor-not-allowed' : ''" class="app-btn app-btn-secondary gap-1.5 text-xs">
+                            <button type="button" @click="openBulk('qr')" :disabled="selectedCount === 0" :class="selectedCount === 0 ? 'opacity-50 cursor-not-allowed' : ''" class="app-btn app-btn-secondary gap-1.5 text-xs" title="Cetak label barang terpilih">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3.75H3.75v2.25h3V3.75zM6.75 17.25H3.75v2.25h3v-2.25zM17.25 3.75h-2.25v2.25h2.25V3.75zM17.25 14.25h-5.25v5.25h5.25v-5.25zM10.5 3.75H7.5v2.25h3V3.75zM10.5 6H7.5v2.25h3V6zM13.5 10.5h2.25V12H13.5z"/></svg>
                                 Cetak Label
                             </button>
+                            <a href="{{ route('labels.print') }}" target="_blank" class="app-btn app-btn-secondary gap-1.5 text-xs" title="Cetak massal dengan filter/pencarian">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.9 12h10.2M6.9 12L9.75 9M6.9 12l2.85 3M9 21H6a2 2 0 01-2-2V6a2 2 0 012-2h9l5 5v10a2 2 0 01-2 2h-3"/></svg>
+                                Cetak per Filter
+                            </a>
                         </div>
                     @endcan
                     <span class="text-xs text-app-muted">Per halaman</span>
