@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Item;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -66,6 +67,59 @@ class SoftDeleteRestoreTest extends TestCase
 
         $this->assertNotSoftDeleted('suppliers', ['id' => $first->id]);
         $this->assertNotSoftDeleted('suppliers', ['id' => $second->id]);
+    }
+
+    public function test_item_delete_is_soft_and_restorable(): void
+    {
+        $admin = User::where('email', 'admin@stock.test')->firstOrFail();
+        $base = Item::query()->firstOrFail();
+
+        $item = Item::create([
+            'sku' => 'BRG-REST-'.uniqid(),
+            'name' => 'Item Restore',
+            'category_id' => $base->category_id,
+            'unit_id' => $base->unit_id,
+            'minimum_stock' => 0,
+            'maximum_stock' => 0,
+            'status' => 'active',
+        ]);
+
+        Livewire::actingAs($admin)->test('master-data.item-index')
+            ->call('deleteItem', $item->id)
+            ->assertDispatched('toast');
+
+        $this->assertSoftDeleted('items', ['id' => $item->id]);
+
+        Livewire::actingAs($admin)->test('master-data.item-index')
+            ->call('restore', $item->id)
+            ->assertDispatched('toast');
+
+        $this->assertNotSoftDeleted('items', ['id' => $item->id]);
+    }
+
+    public function test_item_bulk_restore(): void
+    {
+        $admin = User::where('email', 'admin@stock.test')->firstOrFail();
+        $base = Item::query()->firstOrFail();
+
+        $first = Item::create(['sku' => 'BRG-BR-1', 'name' => 'Bulk 1', 'category_id' => $base->category_id, 'unit_id' => $base->unit_id, 'status' => 'active']);
+        $second = Item::create(['sku' => 'BRG-BR-2', 'name' => 'Bulk 2', 'category_id' => $base->category_id, 'unit_id' => $base->unit_id, 'status' => 'active']);
+
+        Livewire::actingAs($admin)->test('master-data.item-index')
+            ->set('selectedIds', [$first->id, $second->id])
+            ->call('bulkDelete')
+            ->assertDispatched('toast');
+
+        $this->assertSoftDeleted('items', ['id' => $first->id]);
+        $this->assertSoftDeleted('items', ['id' => $second->id]);
+
+        Livewire::actingAs($admin)->test('master-data.item-index')
+            ->set('selectedIds', [$first->id, $second->id])
+            ->call('bulkRestore')
+            ->assertDispatched('toast');
+
+        $this->assertNotSoftDeleted('items', ['id' => $first->id]);
+        $this->assertNotSoftDeleted('items', ['id' => $second->id]);
     }
 
     public function test_create_conflicts_when_code_is_trashed(): void

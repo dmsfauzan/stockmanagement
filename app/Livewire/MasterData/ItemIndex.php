@@ -28,6 +28,8 @@ class ItemIndex extends Component
 
     public string $statusFilter = '';
 
+    public string $trashedFilter = '';
+
     public string $sortField = 'created_at';
 
     public string $sortDirection = 'desc';
@@ -65,6 +67,11 @@ class ItemIndex extends Component
     }
 
     public function updatedStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedTrashedFilter(): void
     {
         $this->resetPage();
     }
@@ -156,6 +163,41 @@ class ItemIndex extends Component
         $this->reset('selectedIds', 'selectAll');
 
         $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} barang, {$skipped} dilewati.");
+    }
+
+    public function restore(int $id): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        $item = Item::withTrashed()->findOrFail($id);
+        $item->restore();
+
+        AuditLogger::logModel('restore', $item, null, $item->fresh()->toArray());
+
+        $this->dispatch('toast', type: 'success', message: 'Barang dipulihkan.');
+    }
+
+    public function bulkRestore(): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Item::withTrashed()->whereIn('id', $this->selectedIds)->get() as $item) {
+            $item->restore();
+            AuditLogger::logModel('restore', $item, null, $item->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} barang.");
     }
 
     public function bulkActivate(): void
@@ -284,7 +326,9 @@ class ItemIndex extends Component
                 });
             })
             ->when($this->categoryFilter !== '', fn (Builder $query) => $query->where('category_id', $this->categoryFilter))
-            ->when($this->statusFilter !== '', fn (Builder $query) => $query->where('status', $this->statusFilter));
+            ->when($this->statusFilter !== '', fn (Builder $query) => $query->where('status', $this->statusFilter))
+            ->when($this->trashedFilter === 'trashed', fn (Builder $query) => $query->onlyTrashed())
+            ->when($this->trashedFilter === 'all', fn (Builder $query) => $query->withTrashed());
     }
 
     public function render()
