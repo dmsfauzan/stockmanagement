@@ -133,6 +133,14 @@
                                 <td>
                                     <input type="text" wire:model="items.{{ $index }}.batch_number" class="app-input w-28 px-2 py-2 text-sm">
                                     @error("items.{$index}.batch_number") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                                    @if (($lotMap[$index] ?? collect())->isNotEmpty())
+                                        <button type="button" wire:click="applyFefo({{ $index }})" class="mt-1 rounded bg-primary-50 px-2 py-0.5 text-[11px] font-medium text-primary-700 hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-300">FEFO</button>
+                                        <div class="mt-1 space-y-0.5 text-[10px] text-app-muted">
+                                            @foreach ($lotMap[$index]->take(3) as $lot)
+                                                <div>{{ $lot->batch_number ?? $lot->serial_number ?? '-' }} · {{ $lot->expiry_date?->format('d/m/y') ?? '-' }} · {{ (int) $lot->quantity }}</div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>
                                     <input type="text" wire:model="items.{{ $index }}.serial_number" class="app-input w-28 px-2 py-2 text-sm">

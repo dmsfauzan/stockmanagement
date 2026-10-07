@@ -11,6 +11,7 @@ use App\Models\SalesOrder;
 use App\Models\StockBalance;
 use App\Models\Unit;
 use App\Models\Warehouse;
+use App\Services\Inventory\LotService;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
 use Illuminate\Support\Facades\DB;
@@ -187,6 +188,37 @@ class GoodsIssueForm extends Component
         }
     }
 
+    public function applyFefo(int $index): void
+    {
+        $row = $this->items[$index] ?? null;
+
+        if (! $row || $row['item_id'] === '' || $row['location_id'] === '' || $this->warehouse_id === '') {
+            $this->dispatch('toast', type: 'error', message: 'Pilih item dan lokasi dulu.');
+
+            return;
+        }
+
+        $lots = LotService::availableLots((int) $row['item_id'], (int) $this->warehouse_id, (int) $row['location_id']);
+
+        if ($lots->isEmpty()) {
+            $this->dispatch('toast', type: 'warning', message: 'Tidak ada lot tersedia untuk item ini.');
+
+            return;
+        }
+
+        $first = $lots->first();
+
+        // For serial-tracked items, take the earliest serial; for batch, earliest batch.
+        if ($first->serial_number) {
+            $this->items[$index]['serial_number'] = (string) $first->serial_number;
+            $this->items[$index]['batch_number'] = (string) ($first->batch_number ?? '');
+        } else {
+            $this->items[$index]['batch_number'] = (string) $first->batch_number;
+        }
+
+        $this->dispatch('toast', type: 'success', message: 'FEFO: menggunakan lot '.($first->batch_number ?? $first->serial_number).' (expiry '.($first->expiry_date?->format('d M Y') ?? '-').').');
+    }
+
     public function addByBarcode(): void
     {
         $code = trim($this->barcodeInput);
@@ -351,6 +383,21 @@ class GoodsIssueForm extends Component
             }
         }
 
+        $lotMap = [];
+        if ($this->warehouse_id !== '') {
+            foreach ($this->items as $index => $row) {
+                if ($row['item_id'] === '' || $row['location_id'] === '') {
+                    continue;
+                }
+
+                if (! LotService::tracksLots((int) $row['item_id'])) {
+                    continue;
+                }
+
+                $lotMap[$index] = LotService::availableLots((int) $row['item_id'], (int) $this->warehouse_id, (int) $row['location_id'])->take(8);
+            }
+        }
+
         return view('livewire.transactions.goods-issue-form', [
             'customers' => Customer::where('status', 'active')->orderBy('name')->get(['id', 'name']),
             'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
@@ -358,6 +405,7 @@ class GoodsIssueForm extends Component
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name']),
             'locations' => $locations,
             'stockMap' => $stockMap,
+            'lotMap' => $lotMap,
         ]);
     }
 }

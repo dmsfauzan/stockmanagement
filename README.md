@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-209_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-210_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -82,6 +82,7 @@ flowchart LR
 | Lot / Serial | `tracking_type` per item (none/batch/serial), tabel `stock_lots`, stok per lot/serial, FEFO |
 | Cycle Counting | Opname parsial per zona/rak (`type=cycle`), command `inventory:cycle-count` terjadwal mingguan |
 | Landed Cost | Biaya kirim/lainnya pada Barang Masuk dialokasikan (by value/qty) ke average cost |
+| FEFO Picking | Barang Keluar pilih lot/serial otomatis dari expiry terdekat (`applyFefo`) |
 | Import Barang | Excel/CSV dengan template, validasi per baris, upsert by SKU (diproses di latar belakang) |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
 | Purchase Order | PO (`PO-...`) → Barang Masuk (penerimaan sebagian), progres penerimaan |
@@ -245,7 +246,8 @@ Penerima notifikasi diatur via `BACKUP_MAIL_TO` (default `MAIL_FROM_ADDRESS`). J
 - [x] UX & Data — gambar barang/avatar, template label, saved filter & pilih kolom report
 - [x] Security & Ops — soft-delete/restore, 2FA, security headers, health, backup terjadwal
 - [x] Sales Order — SO → Barang Keluar (fulfilment), report & REST API
-- [ ] Advanced Inventory (lot/serial, cycle count, landed cost), integrasi ERP/Accounting eksternal
+- [x] Advanced Inventory — Lot/Serial, Cycle Counting, Landed Cost, FEFO
+- [ ] Integrasi ERP/Accounting eksternal (webhook & ekspor terjadwal)
 
 ## Berkontribusi & Lisensi
 
