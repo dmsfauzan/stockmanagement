@@ -34,6 +34,7 @@
         request()->routeIs('admin.users') => 'Users',
         request()->routeIs('admin.roles') => 'Roles & Permissions',
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
+        request()->routeIs('admin.api-tokens') => 'API Tokens',
         request()->routeIs('admin.settings') => 'Settings',
         request()->routeIs('profile.*') => 'Profile',
         default => 'Warehouse',
@@ -312,6 +313,12 @@
                 @can('settings.manage')
                 <a href="{{ route('admin.settings') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.settings'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.settings')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM10.5 12a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM10.5 18a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h4M16 6h4M4 12h4M16 12h4M4 18h4M16 18h4"/></svg>
+                    <span x-show="!collapsed" class="truncate">API Tokens</span>
+                </a>
+                @endcan
+                @can('settings.manage')
+                <a href="{{ route('admin.settings') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.settings'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.settings')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v8h16V4"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 16h6"/></svg>
                     <span x-show="!collapsed" class="truncate">Settings</span>
                 </a>
                 @endcan

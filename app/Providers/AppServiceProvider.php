@@ -25,8 +25,11 @@ use App\Policies\StockOpnamePolicy;
 use App\Policies\StockTransferPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WarehousePolicy;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
@@ -46,6 +49,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('api', function (Request $request): Limit {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
         Gate::before(function (?User $user, string $ability): ?bool {
             if ($user && str_contains($ability, '.') && $user->hasPermission($ability)) {
                 return true;

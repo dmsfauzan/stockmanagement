@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Livewire\Admin\ApiTokensIndex;
 use App\Livewire\Admin\AuditLogIndex;
 use App\Livewire\Admin\RoleIndex;
 use App\Livewire\Admin\SettingIndex;
@@ -152,6 +153,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('permission:users.manage')->get('/admin/users', UserIndex::class)->name('admin.users');
     Route::middleware('permission:roles.manage')->get('/admin/roles', RoleIndex::class)->name('admin.roles');
     Route::middleware('permission:audit_logs.view')->get('/admin/audit-logs', AuditLogIndex::class)->name('admin.audit-logs');
+    Route::middleware('permission:settings.manage')->get('/admin/api-tokens', ApiTokensIndex::class)->name('admin.api-tokens');
     Route::middleware('permission:settings.manage')->get('/admin/settings', SettingIndex::class)->name('admin.settings');
 
     Route::middleware('permission:items.view')->get('/scan', ScanIndex::class)->name('scan');
