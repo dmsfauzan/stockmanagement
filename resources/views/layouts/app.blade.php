@@ -29,6 +29,7 @@
         request()->routeIs('reports.transfer') => 'Laporan Transfer',
         request()->routeIs('reports.warehouse-comparison') => 'Perbandingan Gudang',
         request()->routeIs('reports.replenishment') => 'Replenishment',
+        request()->routeIs('reports.sales-order') => 'Laporan Sales Order',
         request()->routeIs('reports.valuation') => 'Valuasi Persediaan',
         request()->routeIs('reports.cogs') => 'Laporan COGS',
         request()->routeIs('reports.journal') => 'Jurnal Akuntansi',
@@ -295,6 +296,10 @@
                 <a href="{{ route('reports.replenishment') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.replenishment'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.replenishment')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6M9 17h4"/></svg>
                     <span x-show="!collapsed" class="truncate">Replenishment</span>
+                </a>
+                <a href="{{ route('reports.sales-order') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.sales-order'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.sales-order')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6M9 17h4"/></svg>
+                    <span x-show="!collapsed" class="truncate">Sales Order</span>
                 </a>
             </x-sidebar-group>
             @endcan

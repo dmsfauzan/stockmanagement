@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\Api\GoodsIssueResource;
 use App\Http\Resources\Api\GoodsReceiptResource;
 use App\Http\Resources\Api\PurchaseOrderResource;
+use App\Http\Resources\Api\SalesOrderResource;
 use App\Http\Resources\Api\StockAdjustmentResource;
 use App\Http\Resources\Api\StockOpnameResource;
 use App\Http\Resources\Api\StockTransferResource;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
+use App\Models\SalesOrder;
 use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
@@ -137,5 +139,22 @@ class TransactionController extends ApiController
         $purchaseOrder->loadMissing(['supplier:id,name', 'warehouse:id,name', 'items.item:id,sku,name']);
 
         return $this->ok(new PurchaseOrderResource($purchaseOrder));
+    }
+
+    public function salesOrders(Request $request): JsonResponse
+    {
+        $query = $this->applyCommon(
+            SalesOrder::query()->with(['customer:id,name', 'warehouse:id,name', 'items.item:id,sku,name']),
+            $request
+        )->orderByDesc('order_date')->orderByDesc('id');
+
+        return $this->paginated(SalesOrderResource::collection($query->paginate($this->perPage($request))->withQueryString()));
+    }
+
+    public function salesOrder(SalesOrder $salesOrder): JsonResponse
+    {
+        $salesOrder->loadMissing(['customer:id,name', 'warehouse:id,name', 'items.item:id,sku,name']);
+
+        return $this->ok(new SalesOrderResource($salesOrder));
     }
 }

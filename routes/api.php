@@ -75,6 +75,11 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active'])->group(function ()
         Route::get('/purchase-orders/{purchaseOrder}', [TransactionController::class, 'purchaseOrder'])->name('api.purchase-orders.show');
     });
 
+    Route::middleware('permission:sales_order.view')->group(function (): void {
+        Route::get('/sales-orders', [TransactionController::class, 'salesOrders'])->name('api.sales-orders.index');
+        Route::get('/sales-orders/{salesOrder}', [TransactionController::class, 'salesOrder'])->name('api.sales-orders.show');
+    });
+
     Route::middleware('permission:reports.view')->group(function (): void {
         Route::get('/reports/stock', [ReportController::class, 'stock'])->name('api.reports.stock');
         Route::get('/reports/incoming', [ReportController::class, 'incoming'])->name('api.reports.incoming');
@@ -142,5 +147,13 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active'])->group(function ()
         Route::post('/{id}/approve', [WriteTransactionController::class, 'approvePurchaseOrder'])->middleware('permission:purchase_order.approve')->name('api.purchase-orders.approve');
         Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectPurchaseOrder'])->middleware('permission:purchase_order.approve')->name('api.purchase-orders.reject');
         Route::post('/{id}/close', [WriteTransactionController::class, 'closePurchaseOrder'])->middleware('permission:purchase_order.approve')->name('api.purchase-orders.close');
+    });
+
+    Route::prefix('sales-orders')->group(function (): void {
+        Route::post('/', [WriteTransactionController::class, 'storeSalesOrder'])->middleware('permission:sales_order.create')->name('api.sales-orders.store');
+        Route::post('/{id}/submit', [WriteTransactionController::class, 'submitSalesOrder'])->middleware('permission:sales_order.submit')->name('api.sales-orders.submit');
+        Route::post('/{id}/approve', [WriteTransactionController::class, 'approveSalesOrder'])->middleware('permission:sales_order.approve')->name('api.sales-orders.approve');
+        Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectSalesOrder'])->middleware('permission:sales_order.approve')->name('api.sales-orders.reject');
+        Route::post('/{id}/close', [WriteTransactionController::class, 'closeSalesOrder'])->middleware('permission:sales_order.approve')->name('api.sales-orders.close');
     });
 });

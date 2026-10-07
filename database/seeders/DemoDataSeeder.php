@@ -10,6 +10,7 @@ use App\Models\Item;
 use App\Models\Location;
 use App\Models\Notification;
 use App\Models\PurchaseOrder;
+use App\Models\SalesOrder;
 use App\Models\Setting;
 use App\Models\StockAdjustment;
 use App\Models\StockBalance;
@@ -447,6 +448,38 @@ class DemoDataSeeder extends Seeder
                     $po->items()->createMany([
                         ['item_id' => $poItem1->id, 'quantity' => 10, 'received_quantity' => 0, 'unit_id' => $poItem1->unit_id, 'unit_price' => 15000],
                         ['item_id' => $poItem2->id, 'quantity' => 5, 'received_quantity' => 0, 'unit_id' => $poItem2->unit_id, 'unit_price' => 50000],
+                    ]);
+                } catch (\Throwable $e) {
+                }
+            }
+        }
+
+        if (! SalesOrder::where('number', 'SO-DEMO-001')->exists()) {
+            $soWh = $warehouseJkt ?? Warehouse::where('code', 'WH-JKT')->first();
+            $soCust = Customer::where('code', 'CUST001')->first();
+            $soItem1 = Item::where('sku', 'BRG-001')->first();
+            $soItem2 = Item::where('sku', 'BRG-002')->first();
+
+            if ($soWh && $soCust && $soItem1 && $soItem2) {
+                try {
+                    $so = SalesOrder::create([
+                        'number' => 'SO-DEMO-001',
+                        'order_date' => Carbon::now()->subDays(1)->toDateString(),
+                        'expected_date' => Carbon::now()->addDays(7)->toDateString(),
+                        'customer_id' => $soCust->id,
+                        'warehouse_id' => $soWh->id,
+                        'status' => 'approved',
+                        'notes' => 'Demo SO — approved',
+                        'created_by' => $staff->id,
+                        'submitted_by' => $staff->id,
+                        'submitted_at' => Carbon::now()->subDays(1),
+                        'approved_by' => $supervisor->id,
+                        'approved_at' => Carbon::now()->subHours(12),
+                    ]);
+
+                    $so->items()->createMany([
+                        ['item_id' => $soItem1->id, 'quantity' => 10, 'fulfilled_quantity' => 0, 'unit_id' => $soItem1->unit_id, 'unit_price' => 20000],
+                        ['item_id' => $soItem2->id, 'quantity' => 5, 'fulfilled_quantity' => 0, 'unit_id' => $soItem2->unit_id, 'unit_price' => 75000],
                     ]);
                 } catch (\Throwable $e) {
                 }

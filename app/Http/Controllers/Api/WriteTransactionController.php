@@ -5,18 +5,21 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Api\StoreGoodsIssueRequest;
 use App\Http\Requests\Api\StoreGoodsReceiptRequest;
 use App\Http\Requests\Api\StorePurchaseOrderRequest;
+use App\Http\Requests\Api\StoreSalesOrderRequest;
 use App\Http\Requests\Api\StoreStockAdjustmentRequest;
 use App\Http\Requests\Api\StoreStockOpnameRequest;
 use App\Http\Requests\Api\StoreStockTransferRequest;
 use App\Http\Resources\Api\GoodsIssueResource;
 use App\Http\Resources\Api\GoodsReceiptResource;
 use App\Http\Resources\Api\PurchaseOrderResource;
+use App\Http\Resources\Api\SalesOrderResource;
 use App\Http\Resources\Api\StockAdjustmentResource;
 use App\Http\Resources\Api\StockOpnameResource;
 use App\Http\Resources\Api\StockTransferResource;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
+use App\Models\SalesOrder;
 use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
@@ -433,5 +436,65 @@ class WriteTransactionController extends ApiController
     public function closePurchaseOrder(int $id): JsonResponse
     {
         return $this->run(fn () => DocumentWorkflow::closePo($id));
+    }
+
+    public function storeSalesOrder(StoreSalesOrderRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+
+        $header = [
+            'order_date' => $data['order_date'],
+            'expected_date' => $this->nullableString($data['expected_date'] ?? null),
+            'customer_id' => $data['customer_id'],
+            'warehouse_id' => $data['warehouse_id'],
+            'notes' => $this->nullableString($data['notes'] ?? null),
+            'number' => DocumentNumberService::generate('SO'),
+            'status' => 'draft',
+            'created_by' => auth()->id(),
+        ];
+
+        $rows = array_map(fn ($row) => [
+            'item_id' => $row['item_id'],
+            'quantity' => (int) $row['quantity'],
+            'unit_id' => $row['unit_id'],
+            'unit_price' => $row['unit_price'],
+            'notes' => $this->nullableString($row['notes'] ?? null),
+            'fulfilled_quantity' => 0,
+        ], $data['items']);
+
+        $order = DB::transaction(function () use ($header, $rows): SalesOrder {
+            $order = SalesOrder::create($header);
+            $order->items()->createMany($rows);
+
+            AuditLogger::logModel('create', $order, null, $order->fresh('items')->toArray());
+
+            return $order;
+        });
+
+        $order->load(['customer:id,name', 'warehouse:id,name', 'items.item:id,sku,name']);
+
+        return $this->created(new SalesOrderResource($order), 'Sales order tersimpan.');
+    }
+
+    public function submitSalesOrder(int $id): JsonResponse
+    {
+        return $this->run(fn () => DocumentWorkflow::submitSo($id));
+    }
+
+    public function approveSalesOrder(int $id): JsonResponse
+    {
+        return $this->run(fn () => DocumentWorkflow::approveSo($id));
+    }
+
+    public function rejectSalesOrder(Request $request, int $id): JsonResponse
+    {
+        $reason = $this->reason($request);
+
+        return $this->run(fn () => DocumentWorkflow::rejectSo($id, $reason));
+    }
+
+    public function closeSalesOrder(int $id): JsonResponse
+    {
+        return $this->run(fn () => DocumentWorkflow::closeSo($id));
     }
 }

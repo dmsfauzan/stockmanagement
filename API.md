@@ -60,6 +60,7 @@ Query umum untuk endpoint list: `?page=`, `?per_page=` (maks 100), plus filter s
 | GET | `/stock-opnames` · `/{id}` | `stock_opname.view` | `status`, `warehouse_id` |
 | GET | `/stock-transfers` · `/{id}` | `transfer.view` | `status`, `warehouse_id` |
 | GET | `/purchase-orders` · `/{id}` | `purchase_order.view` | `status`, `supplier_id`, `warehouse_id` |
+| GET | `/sales-orders` · `/{id}` | `sales_order.view` | `status`, `customer_id`, `warehouse_id` |
 | GET | `/reports/stock` | `reports.view` | `warehouse_id`, `category_id`, `status` |
 | GET | `/reports/incoming` | `reports.view` | `date_from`, `date_to`, `supplier_id`, `warehouse_id` |
 | GET | `/reports/outgoing` | `reports.view` | `date_from`, `date_to`, `warehouse_id` |
@@ -88,6 +89,7 @@ Pola: buat dokumen (status `draft`) lalu jalankan workflow. Semua posting memaka
 | Buat/Workflow Opname | `POST /stock-opnames` · `/{id}/{start\|submit\|approve\|reject}` | `stock_opname.create` / `.submit` / `.approve` |
 | Buat/Workflow Transfer | `POST /stock-transfers` · `/{id}/{request\|approve\|reject\|dispatch\|receive\|complete}` | `transfer.create` / `.approve` / `.receive` |
 | Buat/Workflow PO | `POST /purchase-orders` · `/{id}/{submit\|approve\|reject\|close}` | `purchase_order.create` / `.submit` / `.approve` |
+| Buat/Workflow Sales Order | `POST /sales-orders` · `/{id}/{submit\|approve\|reject\|close}` | `sales_order.create` / `.submit` / `.approve` |
 
 `reject` memerlukan body `{ "reason": "..." }`.
 

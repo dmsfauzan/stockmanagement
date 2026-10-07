@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-147_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-200_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -53,7 +53,7 @@ flowchart LR
 | Barang Keluar (`GI-YYYYMMDD-XXXX`) | Alur sama + pengecekan stok sebelum posting |
 | Stock On Hand / Movement / Low Stock | `Available = On Hand − Reserved`, otomatis |
 | Dashboard | KPI, grafik movement, distribusi kategori, low stock, aktivitas terkini |
-| Reports | Stock / Incoming / Outgoing / Movement / Expiry / Opname / Adjustment / Transfer / Warehouse Comparison / Valuation / COGS / Journal / Replenishment → CSV, Excel, PDF |
+| Reports | Stock / Incoming / Outgoing / Movement / Expiry / Opname / Adjustment / Transfer / Warehouse Comparison / Valuation / COGS / Journal / Replenishment / Sales Order → CSV, Excel, PDF |
 | RBAC | 43 permission granular, 4 peran |
 | Audit trail | Siapa, apa, kapan, nilai lama → baru |
 
@@ -241,7 +241,8 @@ Penerima notifikasi diatur via `BACKUP_MAIL_TO` (default `MAIL_FROM_ADDRESS`). J
 - [x] PWA & REST API (Sanctum, 68 endpoint, workflow dari API)
 - [x] UX & Data — gambar barang/avatar, template label, saved filter & pilih kolom report
 - [x] Security & Ops — soft-delete/restore, 2FA, security headers, health, backup terjadwal
-- [ ] Sales Order, Advanced Inventory (lot/serial, cycle count), integrasi ERP/Accounting eksternal
+- [x] Sales Order — SO → Barang Keluar (fulfilment), report & REST API
+- [ ] Advanced Inventory (lot/serial, cycle count, landed cost), integrasi ERP/Accounting eksternal
 
 ## Berkontribusi & Lisensi
 
