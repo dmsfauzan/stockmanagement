@@ -21,6 +21,13 @@ class EnsurePermission
         $user = $request->user();
 
         if (! $user || ! $user->hasPermission($required)) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized. Missing permission: '.$required,
+                ], 403);
+            }
+
             abort(403, 'Unauthorized. Missing permission: ' . $required);
         }
 

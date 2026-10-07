@@ -2,10 +2,8 @@
 
 namespace App\Livewire\Transactions;
 
-use App\Enums\PurchaseOrderStatus;
 use App\Models\PurchaseOrder;
-use App\Services\Support\AuditLogger;
-use App\Services\Support\NotificationService;
+use App\Services\Workflow\DocumentWorkflow;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -30,29 +28,9 @@ class PurchaseOrderShow extends Component
     public function submit(): void
     {
         $order = PurchaseOrder::findOrFail($this->purchaseOrderId);
-
         $this->authorize('submit', $order);
-
-        if (! $order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Submitted)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
-
-            return;
-        }
-
         try {
-            $order->update([
-                'status' => PurchaseOrderStatus::Submitted->value,
-                'submitted_by' => auth()->id(),
-                'submitted_at' => now(),
-            ]);
-
-            AuditLogger::log('SUBMIT', 'purchase_order', $order);
-
-            try {
-                NotificationService::notifyApprovers('approval.request', 'Approval Purchase Order', $order->number.' menunggu persetujuan', PurchaseOrder::class, $order->id);
-            } catch (\Throwable $e) {
-            }
-
+            DocumentWorkflow::submitPo($this->purchaseOrderId);
             $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
@@ -62,29 +40,9 @@ class PurchaseOrderShow extends Component
     public function approve(): void
     {
         $order = PurchaseOrder::findOrFail($this->purchaseOrderId);
-
         $this->authorize('approve', $order);
-
-        if (! $order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Approved)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
-
-            return;
-        }
-
         try {
-            $order->update([
-                'status' => PurchaseOrderStatus::Approved->value,
-                'approved_by' => auth()->id(),
-                'approved_at' => now(),
-            ]);
-
-            AuditLogger::log('APPROVE', 'purchase_order', $order);
-
-            try {
-                NotificationService::notify($order->created_by, 'approval.result', 'Purchase Order disetujui', $order->number.' telah disetujui', PurchaseOrder::class, $order->id);
-            } catch (\Throwable $e) {
-            }
-
+            DocumentWorkflow::approvePo($this->purchaseOrderId);
             $this->dispatch('toast', type: 'success', message: 'Berhasil disetujui.');
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
@@ -94,34 +52,12 @@ class PurchaseOrderShow extends Component
     public function reject(): void
     {
         $order = PurchaseOrder::findOrFail($this->purchaseOrderId);
-
         $this->authorize('approve', $order);
-
-        if (! $order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Rejected)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
-
-            return;
-        }
-
         $this->validate([
             'rejectionReason' => ['required', 'string', 'min:3', 'max:1000'],
         ]);
-
         try {
-            $order->update([
-                'status' => PurchaseOrderStatus::Rejected->value,
-                'rejected_by' => auth()->id(),
-                'rejected_at' => now(),
-                'rejection_reason' => $this->rejectionReason,
-            ]);
-
-            AuditLogger::log('REJECT', 'purchase_order', $order);
-
-            try {
-                NotificationService::notify($order->created_by, 'approval.result', 'Purchase Order ditolak', $order->number.' ditolak: '.$this->rejectionReason, PurchaseOrder::class, $order->id);
-            } catch (\Throwable $e) {
-            }
-
+            DocumentWorkflow::rejectPo($this->purchaseOrderId, $this->rejectionReason);
             $this->rejectionReason = '';
             $this->dispatch('toast', type: 'success', message: 'Ditolak.');
         } catch (\Throwable $e) {
@@ -132,23 +68,9 @@ class PurchaseOrderShow extends Component
     public function close(): void
     {
         $order = PurchaseOrder::findOrFail($this->purchaseOrderId);
-
         $this->authorize('close', $order);
-
-        if (! $order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Closed)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
-
-            return;
-        }
-
         try {
-            $order->update([
-                'status' => PurchaseOrderStatus::Closed->value,
-                'closed_by' => auth()->id(),
-                'closed_at' => now(),
-            ]);
-
-            AuditLogger::log('CLOSE', 'purchase_order', $order);
+            DocumentWorkflow::closePo($this->purchaseOrderId);
             $this->dispatch('toast', type: 'success', message: 'Purchase order ditutup.');
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());

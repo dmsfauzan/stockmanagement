@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\TransactionController;
+use App\Http\Controllers\Api\WriteTransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['throttle:api', 'auth:sanctum', 'active'])->group(function (): void {
@@ -88,5 +89,58 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active'])->group(function ()
         Route::get('/reports/cogs', [ReportController::class, 'cogs'])->name('api.reports.cogs');
         Route::get('/reports/journal', [ReportController::class, 'journal'])->name('api.reports.journal');
         Route::get('/reports/replenishment', [ReportController::class, 'replenishment'])->name('api.reports.replenishment');
+    });
+
+    // ---------------------------------------------------------------------
+    // WRITE (create + workflow). Permission middleware mirrors the policy.
+    // ---------------------------------------------------------------------
+    Route::prefix('goods-receipts')->group(function (): void {
+        Route::post('/', [WriteTransactionController::class, 'storeReceipt'])->middleware('permission:goods_receipt.create')->name('api.goods-receipts.store');
+        Route::post('/{id}/submit', [WriteTransactionController::class, 'submitReceipt'])->middleware('permission:goods_receipt.submit')->name('api.goods-receipts.submit');
+        Route::post('/{id}/approve', [WriteTransactionController::class, 'approveReceipt'])->middleware('permission:goods_receipt.approve')->name('api.goods-receipts.approve');
+        Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectReceipt'])->middleware('permission:goods_receipt.approve')->name('api.goods-receipts.reject');
+        Route::post('/{id}/post', [WriteTransactionController::class, 'postReceipt'])->middleware('permission:goods_receipt.post')->name('api.goods-receipts.post');
+    });
+
+    Route::prefix('goods-issues')->group(function (): void {
+        Route::post('/', [WriteTransactionController::class, 'storeIssue'])->middleware('permission:goods_issue.create')->name('api.goods-issues.store');
+        Route::post('/{id}/submit', [WriteTransactionController::class, 'submitIssue'])->middleware('permission:goods_issue.submit')->name('api.goods-issues.submit');
+        Route::post('/{id}/approve', [WriteTransactionController::class, 'approveIssue'])->middleware('permission:goods_issue.approve')->name('api.goods-issues.approve');
+        Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectIssue'])->middleware('permission:goods_issue.approve')->name('api.goods-issues.reject');
+        Route::post('/{id}/post', [WriteTransactionController::class, 'postIssue'])->middleware('permission:goods_issue.post')->name('api.goods-issues.post');
+    });
+
+    Route::prefix('stock-adjustments')->group(function (): void {
+        Route::post('/', [WriteTransactionController::class, 'storeAdjustment'])->middleware('permission:stock.adjustment')->name('api.stock-adjustments.store');
+        Route::post('/{id}/submit', [WriteTransactionController::class, 'submitAdjustment'])->middleware('permission:stock.adjustment')->name('api.stock-adjustments.submit');
+        Route::post('/{id}/approve', [WriteTransactionController::class, 'approveAdjustment'])->middleware('permission:stock.adjustment.approve')->name('api.stock-adjustments.approve');
+        Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectAdjustment'])->middleware('permission:stock.adjustment.approve')->name('api.stock-adjustments.reject');
+        Route::post('/{id}/post', [WriteTransactionController::class, 'postAdjustment'])->middleware('permission:stock.adjustment.approve')->name('api.stock-adjustments.post');
+    });
+
+    Route::prefix('stock-opnames')->group(function (): void {
+        Route::post('/', [WriteTransactionController::class, 'storeOpname'])->middleware('permission:stock_opname.create')->name('api.stock-opnames.store');
+        Route::post('/{id}/start', [WriteTransactionController::class, 'startOpname'])->middleware('permission:stock_opname.create')->name('api.stock-opnames.start');
+        Route::post('/{id}/submit', [WriteTransactionController::class, 'submitOpname'])->middleware('permission:stock_opname.submit')->name('api.stock-opnames.submit');
+        Route::post('/{id}/approve', [WriteTransactionController::class, 'approveOpname'])->middleware('permission:stock_opname.approve')->name('api.stock-opnames.approve');
+        Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectOpname'])->middleware('permission:stock_opname.approve')->name('api.stock-opnames.reject');
+    });
+
+    Route::prefix('stock-transfers')->group(function (): void {
+        Route::post('/', [WriteTransactionController::class, 'storeTransfer'])->middleware('permission:transfer.create')->name('api.stock-transfers.store');
+        Route::post('/{id}/request', [WriteTransactionController::class, 'requestTransfer'])->middleware('permission:transfer.create')->name('api.stock-transfers.request');
+        Route::post('/{id}/approve', [WriteTransactionController::class, 'approveTransfer'])->middleware('permission:transfer.approve')->name('api.stock-transfers.approve');
+        Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectTransfer'])->middleware('permission:transfer.approve')->name('api.stock-transfers.reject');
+        Route::post('/{id}/dispatch', [WriteTransactionController::class, 'dispatchTransfer'])->middleware('permission:transfer.approve')->name('api.stock-transfers.dispatch');
+        Route::post('/{id}/receive', [WriteTransactionController::class, 'receiveTransfer'])->middleware('permission:transfer.receive')->name('api.stock-transfers.receive');
+        Route::post('/{id}/complete', [WriteTransactionController::class, 'completeTransfer'])->middleware('permission:transfer.receive')->name('api.stock-transfers.complete');
+    });
+
+    Route::prefix('purchase-orders')->group(function (): void {
+        Route::post('/', [WriteTransactionController::class, 'storePurchaseOrder'])->middleware('permission:purchase_order.create')->name('api.purchase-orders.store');
+        Route::post('/{id}/submit', [WriteTransactionController::class, 'submitPurchaseOrder'])->middleware('permission:purchase_order.submit')->name('api.purchase-orders.submit');
+        Route::post('/{id}/approve', [WriteTransactionController::class, 'approvePurchaseOrder'])->middleware('permission:purchase_order.approve')->name('api.purchase-orders.approve');
+        Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectPurchaseOrder'])->middleware('permission:purchase_order.approve')->name('api.purchase-orders.reject');
+        Route::post('/{id}/close', [WriteTransactionController::class, 'closePurchaseOrder'])->middleware('permission:purchase_order.approve')->name('api.purchase-orders.close');
     });
 });

@@ -2,11 +2,9 @@
 
 namespace App\Livewire\Transactions;
 
-use App\Enums\TransactionStatus;
 use App\Models\StockAdjustment;
 use App\Services\Inventory\InventoryService;
-use App\Services\Support\AuditLogger;
-use App\Services\Support\NotificationService;
+use App\Services\Workflow\DocumentWorkflow;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -33,29 +31,9 @@ class StockAdjustmentShow extends Component
     public function submit(): void
     {
         $adjustment = StockAdjustment::findOrFail($this->adjustmentId);
-
         $this->authorize('submit', $adjustment);
-
-        if (! $adjustment->statusEnum()->canTransitionTo(TransactionStatus::Submitted)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
-
-            return;
-        }
-
         try {
-            $adjustment->update([
-                'status' => TransactionStatus::Submitted->value,
-                'submitted_by' => auth()->id(),
-                'submitted_at' => now(),
-            ]);
-
-            AuditLogger::log('SUBMIT', 'stock_adjustment', $adjustment);
-
-            try {
-                NotificationService::notifyApprovers('approval.request', 'Approval Adjustment', $adjustment->number.' menunggu persetujuan', StockAdjustment::class, $adjustment->id);
-            } catch (\Throwable $e) {
-            }
-
+            DocumentWorkflow::submitAdjustment($this->adjustmentId);
             $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
@@ -65,29 +43,9 @@ class StockAdjustmentShow extends Component
     public function approve(): void
     {
         $adjustment = StockAdjustment::findOrFail($this->adjustmentId);
-
         $this->authorize('approve', $adjustment);
-
-        if (! $adjustment->statusEnum()->canTransitionTo(TransactionStatus::Approved)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
-
-            return;
-        }
-
         try {
-            $adjustment->update([
-                'status' => TransactionStatus::Approved->value,
-                'approved_by' => auth()->id(),
-                'approved_at' => now(),
-            ]);
-
-            AuditLogger::log('APPROVE', 'stock_adjustment', $adjustment);
-
-            try {
-                NotificationService::notify($adjustment->created_by, 'approval.result', 'Adjustment disetujui', $adjustment->number.' telah disetujui', StockAdjustment::class, $adjustment->id);
-            } catch (\Throwable $e) {
-            }
-
+            DocumentWorkflow::approveAdjustment($this->adjustmentId);
             $this->dispatch('toast', type: 'success', message: 'Berhasil disetujui.');
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
@@ -97,34 +55,12 @@ class StockAdjustmentShow extends Component
     public function reject(): void
     {
         $adjustment = StockAdjustment::findOrFail($this->adjustmentId);
-
         $this->authorize('reject', $adjustment);
-
-        if (! $adjustment->statusEnum()->canTransitionTo(TransactionStatus::Rejected)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
-
-            return;
-        }
-
         $this->validate([
             'rejectionReason' => ['required', 'string', 'min:3', 'max:1000'],
         ]);
-
         try {
-            $adjustment->update([
-                'status' => TransactionStatus::Rejected->value,
-                'rejected_by' => auth()->id(),
-                'rejected_at' => now(),
-                'rejection_reason' => $this->rejectionReason,
-            ]);
-
-            AuditLogger::log('REJECT', 'stock_adjustment', $adjustment);
-
-            try {
-                NotificationService::notify($adjustment->created_by, 'approval.result', 'Adjustment ditolak', $adjustment->number.' ditolak: '.$this->rejectionReason, StockAdjustment::class, $adjustment->id);
-            } catch (\Throwable $e) {
-            }
-
+            DocumentWorkflow::rejectAdjustment($this->adjustmentId, $this->rejectionReason);
             $this->rejectionReason = '';
             $this->dispatch('toast', type: 'success', message: 'Ditolak.');
         } catch (\Throwable $e) {
@@ -135,18 +71,10 @@ class StockAdjustmentShow extends Component
     public function post(): void
     {
         $adjustment = StockAdjustment::findOrFail($this->adjustmentId);
-
         $this->authorize('post', $adjustment);
-
-        if (! $adjustment->statusEnum()->canTransitionTo(TransactionStatus::Posted)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
-
-            return;
-        }
-
         try {
-            InventoryService::postStockAdjustment($adjustment);
-            $this->adjustmentId = $adjustment->fresh()->id;
+            DocumentWorkflow::postAdjustment($this->adjustmentId);
+            $this->adjustmentId = StockAdjustment::findOrFail($this->adjustmentId)->id;
             $this->dispatch('toast', type: 'success', message: 'Posting berhasil.');
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
