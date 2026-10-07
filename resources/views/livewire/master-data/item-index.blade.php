@@ -188,20 +188,7 @@
 
                     <div wire:loading wire:target="importFile,import" class="text-xs text-app-muted">Memproses…</div>
 
-                    @if (count($importErrors) > 0)
-                        <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-900/40 dark:bg-amber-900/20 dark:text-amber-200">
-                            <p class="font-semibold">{{ count($importErrors) }} baris gagal:</p>
-                            <ul class="mt-1 list-disc space-y-0.5 pl-4">
-                                @foreach (array_slice($importErrors, 0, 20) as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    @if ($importedCount > 0 || $updatedCount > 0)
-                        <p class="text-sm text-emerald-600 dark:text-emerald-400">Import: {{ $importedCount }} baru, {{ $updatedCount }} diperbarui.</p>
-                    @endif
+                    <p class="text-xs text-app-muted">File akan diproses di latar belakang. Anda akan menerima notifikasi saat selesai (periksa bell notifikasi).</p>
                 </div>
 
                 <div class="mt-6 flex justify-end gap-2">

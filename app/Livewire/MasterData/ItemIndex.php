@@ -3,6 +3,7 @@
 namespace App\Livewire\MasterData;
 
 use App\Imports\ItemsImport;
+use App\Jobs\ImportItemsJob;
 use App\Models\Category;
 use App\Models\Item;
 use App\Services\Support\AuditLogger;
@@ -211,27 +212,24 @@ class ItemIndex extends Component
             'importFile' => ['required', 'file', 'mimes:xlsx,xls,csv,txt', 'max:5120'],
         ]);
 
-        $import = new ItemsImport;
+        $disk = 'local';
+        $fileName = 'imports/'.uniqid('items_', true).'.'.($this->importFile->getClientOriginalExtension() ?: 'xlsx');
+        $storedPath = $this->importFile->storeAs(path: $fileName, options: ['disk' => $disk]);
 
-        Excel::import($import, $this->importFile);
+        if ($storedPath === false || $storedPath === null) {
+            $this->dispatch('toast', type: 'error', message: 'Gagal menyimpan file import.');
 
-        $this->importedCount = $import->imported;
-        $this->updatedCount = $import->updated;
-        $this->importErrors = $import->errors;
+            return;
+        }
 
-        AuditLogger::log('IMPORT', 'items', null, null, [
-            'imported' => $import->imported,
-            'updated' => $import->updated,
-            'failed' => count($import->errors),
-        ]);
+        AuditLogger::log('IMPORT', 'items', null, null, ['queued' => true, 'file' => $storedPath]);
 
-        $this->reset('importFile');
+        ImportItemsJob::dispatch($storedPath, (int) auth()->id(), $disk);
 
-        $this->dispatch(
-            'toast',
-            type: count($import->errors) > 0 ? 'warning' : 'success',
-            message: "Import selesai: {$import->imported} dibuat, {$import->updated} diperbarui, ".count($import->errors).' gagal.'
-        );
+        $this->reset('importFile', 'importErrors', 'importedCount', 'updatedCount');
+        $this->showImportModal = false;
+
+        $this->dispatch('toast', type: 'success', message: 'Import dijadwalkan — Anda akan menerima notifikasi saat selesai.');
     }
 
     public function downloadImportTemplate(): StreamedResponse
