@@ -57,6 +57,7 @@ use App\Livewire\Transactions\StockTransferIndex;
 use App\Livewire\Transactions\StockTransferShow;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/health', [\App\Http\Controllers\HealthController::class, 'public'])->name('health.public');
 Route::view('/offline', 'offline')->name('offline');
 
 Route::get('/manifest.webmanifest', function () {
@@ -157,6 +158,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('permission:audit_logs.view')->get('/admin/audit-logs', AuditLogIndex::class)->name('admin.audit-logs');
     Route::middleware('permission:settings.manage')->get('/admin/api-tokens', ApiTokensIndex::class)->name('admin.api-tokens');
     Route::middleware('permission:settings.manage')->get('/admin/settings', SettingIndex::class)->name('admin.settings');
+    Route::middleware('permission:settings.manage')->get('/admin/health', [\App\Http\Controllers\HealthController::class, 'check'])->name('admin.health');
 
     Route::middleware('permission:items.view')->get('/scan', ScanIndex::class)->name('scan');
     Route::get('/labels/bulk', [LabelController::class, 'bulk'])->name('labels.bulk');

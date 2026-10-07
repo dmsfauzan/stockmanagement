@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 use Throwable;
 
 class AppServiceProvider extends ServiceProvider
@@ -52,6 +53,10 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request): Limit {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        Password::defaults(fn () => app()->isProduction()
+            ? Password::min(12)->letters()->mixedCase()->numbers()->symbols()
+            : Password::min(8)->letters()->numbers());
 
         Gate::before(function (?User $user, string $ability): ?bool {
             if ($user && str_contains($ability, '.') && $user->hasPermission($ability)) {
