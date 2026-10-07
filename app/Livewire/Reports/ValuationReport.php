@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Exports\ValuationExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Category;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Valuasi')]
 class ValuationReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -35,9 +36,24 @@ class ValuationReport extends Component
         return ['search', 'warehouseFilter', 'categoryFilter'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'category' => ['label' => 'Kategori'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'quantity' => ['label' => 'Qty', 'align' => 'right'],
+            'average_cost' => ['label' => 'Harga Rata-rata', 'align' => 'right'],
+            'total_value' => ['label' => 'Total Nilai', 'align' => 'right'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Exports\CogsExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan COGS')]
 class CogsReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -36,9 +37,25 @@ class CogsReport extends Component
         return ['search', 'warehouseFilter', 'fromDate', 'toDate'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'date' => ['label' => 'Tanggal'],
+            'reference' => ['label' => 'Referensi'],
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'quantity_out' => ['label' => 'Qty Out', 'align' => 'right'],
+            'unit_cost' => ['label' => 'Harga Satuan', 'align' => 'right'],
+            'total_cost' => ['label' => 'Total COGS', 'align' => 'right'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

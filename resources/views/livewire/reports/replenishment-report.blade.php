@@ -44,6 +44,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <x-ui.button variant="secondary" wire:click="resetFilters">Reset</x-ui.button>
+                    @include('livewire.reports._report-columns')
                 </div>
             </div>
             <div class="mt-3">
@@ -58,16 +59,16 @@
                         <th class="w-10 text-center">
                             <input type="checkbox" wire:model.live="selectAll" class="rounded border-app-border">
                         </th>
-                        <th>SKU</th>
-                        <th>Barang</th>
-                        <th>Kategori</th>
-                        <th>Warehouse</th>
-                        <th class="text-right">On Hand</th>
-                        <th class="text-right">Min</th>
-                        <th class="text-right">Max</th>
-                        <th class="text-right">Suggested</th>
-                        <th>Primary Supplier</th>
-                        <th class="text-right">Price</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-category">Kategori</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-on_hand text-right">On Hand</th>
+                        <th class="rc-min text-right">Min</th>
+                        <th class="rc-max text-right">Max</th>
+                        <th class="rc-suggested text-right">Suggested</th>
+                        <th class="rc-supplier">Primary Supplier</th>
+                        <th class="rc-price text-right">Price</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,16 +77,16 @@
                             <td class="text-center">
                                 <input type="checkbox" wire:model.live="selected" value="{{ $row['key'] }}" class="rounded border-app-border">
                             </td>
-                            <td class="whitespace-nowrap font-medium">{{ $row['sku'] }}</td>
-                            <td>{{ $row['item_name'] }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row['category_name'] }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row['warehouse_name'] }}</td>
-                            <td class="whitespace-nowrap text-right">{{ number_format((int) $row['on_hand']) }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ number_format((int) $row['min_stock']) }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ number_format((int) $row['max_stock']) }}</td>
-                            <td class="whitespace-nowrap text-right font-bold text-amber-600 dark:text-amber-400">{{ number_format((int) $row['suggestedQty']) }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row['primary_supplier_name'] ?? '—' }}</td>
-                            <td class="whitespace-nowrap text-right">{{ number_format((float) $row['best_price'], 2) }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row['sku'] }}</td>
+                            <td class="rc-item">{{ $row['item_name'] }}</td>
+                            <td class="rc-category whitespace-nowrap text-app-muted">{{ $row['category_name'] }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row['warehouse_name'] }}</td>
+                            <td class="rc-on_hand whitespace-nowrap text-right">{{ number_format((int) $row['on_hand']) }}</td>
+                            <td class="rc-min whitespace-nowrap text-right text-app-muted">{{ number_format((int) $row['min_stock']) }}</td>
+                            <td class="rc-max whitespace-nowrap text-right text-app-muted">{{ number_format((int) $row['max_stock']) }}</td>
+                            <td class="rc-suggested whitespace-nowrap text-right font-bold text-amber-600 dark:text-amber-400">{{ number_format((int) $row['suggestedQty']) }}</td>
+                            <td class="rc-supplier whitespace-nowrap text-app-muted">{{ $row['primary_supplier_name'] ?? '—' }}</td>
+                            <td class="rc-price whitespace-nowrap text-right">{{ number_format((float) $row['best_price'], 2) }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="11"><x-ui.empty-state title="Tidak ada saran replenishment" message="Semua stok masih di atas minimum atau belum ada data yang cocok." /></td></tr>

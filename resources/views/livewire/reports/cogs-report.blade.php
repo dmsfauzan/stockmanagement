@@ -40,9 +40,12 @@
             </div>
             <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
-                <select wire:model.live="perPage" class="app-select w-24">
-                    @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
-                </select>
+                <div class="flex items-center gap-3">
+                    <select wire:model.live="perPage" class="app-select w-24">
+                        @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
+                    </select>
+                    @include('livewire.reports._report-columns')
+                </div>
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -53,27 +56,27 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Tanggal</th>
-                        <th>Referensi</th>
-                        <th>SKU</th>
-                        <th>Barang</th>
-                        <th>Warehouse</th>
-                        <th class="text-right">Qty Out</th>
-                        <th class="text-right">Harga Satuan</th>
-                        <th class="text-right">Total COGS</th>
+                        <th class="rc-date">Tanggal</th>
+                        <th class="rc-reference">Referensi</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-quantity_out text-right">Qty Out</th>
+                        <th class="rc-unit_cost text-right">Harga Satuan</th>
+                        <th class="rc-total_cost text-right">Total COGS</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->created_at }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->reference_type }} #{{ $row->reference_id }}</td>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity_out) }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->unit_cost, 2) }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((float) $row->total_cost, 2) }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ $row->created_at }}</td>
+                            <td class="rc-reference whitespace-nowrap text-app-muted">{{ $row->reference_type }} #{{ $row->reference_id }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-quantity_out whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity_out) }}</td>
+                            <td class="rc-unit_cost whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->unit_cost, 2) }}</td>
+                            <td class="rc-total_cost whitespace-nowrap text-right font-medium">{{ number_format((float) $row->total_cost, 2) }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="8"><x-ui.empty-state title="Tidak ada data COGS" message="Belum ada data yang cocok dengan filter." /></td></tr>

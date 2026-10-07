@@ -43,9 +43,12 @@
             </div>
             <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
-                <select wire:model.live="perPage" class="app-select w-24">
-                    @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
-                </select>
+                <div class="flex items-center gap-3">
+                    <select wire:model.live="perPage" class="app-select w-24">
+                        @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
+                    </select>
+                    @include('livewire.reports._report-columns')
+                </div>
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -56,31 +59,31 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Receipt No</th>
-                        <th>Date</th>
-                        <th>Supplier</th>
-                        <th>Warehouse</th>
-                        <th>SKU</th>
-                        <th>Item</th>
-                        <th class="text-right">Qty</th>
-                        <th>Batch</th>
-                        <th>Expiry</th>
-                        <th>Posted At</th>
+                        <th class="rc-number">Receipt No</th>
+                        <th class="rc-date">Date</th>
+                        <th class="rc-supplier">Supplier</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Item</th>
+                        <th class="rc-quantity text-right">Qty</th>
+                        <th class="rc-batch">Batch</th>
+                        <th class="rc-expiry">Expiry</th>
+                        <th class="rc-posted_at">Posted At</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
-                            <td class="whitespace-nowrap font-medium">{{ $row->receipt_number }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->transaction_date instanceof \Illuminate\Support\Carbon ? $row->transaction_date->format('d M Y') : $row->transaction_date }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->supplier_name ?? '-' }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((int) $row->qty) }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->batch_number ?? '-' }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->expiry_date ?? '-' }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->posted_at ?? '-' }}</td>
+                            <td class="rc-number whitespace-nowrap font-medium">{{ $row->receipt_number }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ $row->transaction_date instanceof \Illuminate\Support\Carbon ? $row->transaction_date->format('d M Y') : $row->transaction_date }}</td>
+                            <td class="rc-supplier whitespace-nowrap text-app-muted">{{ $row->supplier_name ?? '-' }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-quantity whitespace-nowrap text-right font-medium">{{ number_format((int) $row->qty) }}</td>
+                            <td class="rc-batch whitespace-nowrap text-app-muted">{{ $row->batch_number ?? '-' }}</td>
+                            <td class="rc-expiry whitespace-nowrap text-app-muted">{{ $row->expiry_date ?? '-' }}</td>
+                            <td class="rc-posted_at whitespace-nowrap text-app-muted">{{ $row->posted_at ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="10"><x-ui.empty-state title="Tidak ada data barang masuk" message="Belum ada transaksi yang cocok dengan filter." /></td></tr>

@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Exports\TransferExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Transfer')]
 class TransferReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -40,9 +41,25 @@ class TransferReport extends Component
         return ['search', 'statusFilter', 'fromWarehouseFilter', 'toWarehouseFilter', 'dateFrom', 'dateTo'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'number' => ['label' => 'No. Transfer'],
+            'date' => ['label' => 'Tanggal'],
+            'from' => ['label' => 'Dari'],
+            'to' => ['label' => 'Tujuan'],
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'quantity' => ['label' => 'Qty', 'align' => 'right'],
+            'status' => ['label' => 'Status'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

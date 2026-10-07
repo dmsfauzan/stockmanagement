@@ -62,8 +62,9 @@
                     @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
                 </select>
             </div>
-            <div class="mt-3">
+            <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
+                @include('livewire.reports._report-columns')
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -74,27 +75,27 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>No. Transfer</th>
-                        <th>Tanggal</th>
-                        <th>Dari</th>
-                        <th>Tujuan</th>
-                        <th>SKU</th>
-                        <th>Barang</th>
-                        <th class="text-right">Qty</th>
-                        <th>Status</th>
+                        <th class="rc-number">No. Transfer</th>
+                        <th class="rc-date">Tanggal</th>
+                        <th class="rc-from">Dari</th>
+                        <th class="rc-to">Tujuan</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-quantity text-right">Qty</th>
+                        <th class="rc-status">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
-                            <td class="whitespace-nowrap font-medium">{{ $row->tr_number }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->transfer_date)->format('d M Y') }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->from_warehouse }}{{ $row->from_location ? ' / '.$row->from_location : '' }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->to_warehouse }}{{ $row->to_location ? ' / '.$row->to_location : '' }}</td>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-right">{{ number_format((int) $row->quantity) }}</td>
-                            <td class="whitespace-nowrap"><x-ui.status-badge :status="$row->status" /></td>
+                            <td class="rc-number whitespace-nowrap font-medium">{{ $row->tr_number }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->transfer_date)->format('d M Y') }}</td>
+                            <td class="rc-from whitespace-nowrap text-app-muted">{{ $row->from_warehouse }}{{ $row->from_location ? ' / '.$row->from_location : '' }}</td>
+                            <td class="rc-to whitespace-nowrap text-app-muted">{{ $row->to_warehouse }}{{ $row->to_location ? ' / '.$row->to_location : '' }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-quantity whitespace-nowrap text-right">{{ number_format((int) $row->quantity) }}</td>
+                            <td class="rc-status whitespace-nowrap"><x-ui.status-badge :status="$row->status" /></td>
                         </tr>
                     @empty
                         <tr><td colspan="8"><x-ui.empty-state title="Tidak ada data transfer" message="Belum ada data stock transfer yang cocok dengan filter." /></td></tr>

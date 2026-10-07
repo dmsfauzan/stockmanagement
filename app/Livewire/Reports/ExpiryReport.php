@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Exports\ExpiryExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Location;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Kedaluwarsa')]
 class ExpiryReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -44,9 +45,26 @@ class ExpiryReport extends Component
         return ['search', 'statusFilter', 'warehouseFilter', 'locationFilter', 'batchSearch', 'fromDate', 'toDate'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'location' => ['label' => 'Lokasi'],
+            'batch' => ['label' => 'Batch'],
+            'expiry_date' => ['label' => 'Expiry Date'],
+            'days_left' => ['label' => 'Sisa / Lewat', 'align' => 'right'],
+            'quantity_in' => ['label' => 'Qty Masuk', 'align' => 'right'],
+            'reference' => ['label' => 'Referensi'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

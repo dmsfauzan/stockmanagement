@@ -47,8 +47,9 @@
                 <input type="date" wire:model.live="dateFrom" class="app-input">
                 <input type="date" wire:model.live="dateTo" class="app-input">
             </div>
-            <div class="mt-3">
+            <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
+                @include('livewire.reports._report-columns')
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -59,36 +60,36 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Tanggal</th>
-                        <th>Referensi</th>
-                        <th>Tipe</th>
-                        <th>SKU</th>
-                        <th>Barang</th>
-                        <th>Warehouse</th>
-                        <th class="text-right">Qty</th>
-                        <th class="text-right">Harga Satuan</th>
-                        <th class="text-right">Total</th>
-                        <th>Debit</th>
-                        <th>Kredit</th>
-                        <th>Deskripsi</th>
+                        <th class="rc-date">Tanggal</th>
+                        <th class="rc-reference">Referensi</th>
+                        <th class="rc-type">Tipe</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-quantity text-right">Qty</th>
+                        <th class="rc-unit_cost text-right">Harga Satuan</th>
+                        <th class="rc-total text-right">Total</th>
+                        <th class="rc-debit">Debit</th>
+                        <th class="rc-credit">Kredit</th>
+                        <th class="rc-description">Deskripsi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         @php [$debit, $credit] = \App\Services\Accounting\JournalService::mapping($row->transaction_type); @endphp
                         <tr>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->created_at }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->reference_type }} #{{ $row->reference_id }}</td>
-                            <td class="whitespace-nowrap">{{ $row->transaction_type }}</td>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((int) ((int) $row->quantity_in > 0 ? $row->quantity_in : $row->quantity_out)) }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->unit_cost, 2) }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((float) $row->total_cost, 2) }}</td>
-                            <td class="whitespace-nowrap">{{ $debit }}</td>
-                            <td class="whitespace-nowrap">{{ $credit }}</td>
-                            <td class="max-w-xs truncate text-app-muted">{{ $row->notes }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ $row->created_at }}</td>
+                            <td class="rc-reference whitespace-nowrap text-app-muted">{{ $row->reference_type }} #{{ $row->reference_id }}</td>
+                            <td class="rc-type whitespace-nowrap">{{ $row->transaction_type }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-quantity whitespace-nowrap text-right font-medium">{{ number_format((int) ((int) $row->quantity_in > 0 ? $row->quantity_in : $row->quantity_out)) }}</td>
+                            <td class="rc-unit_cost whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->unit_cost, 2) }}</td>
+                            <td class="rc-total whitespace-nowrap text-right font-medium">{{ number_format((float) $row->total_cost, 2) }}</td>
+                            <td class="rc-debit whitespace-nowrap">{{ $debit }}</td>
+                            <td class="rc-credit whitespace-nowrap">{{ $credit }}</td>
+                            <td class="rc-description max-w-xs truncate text-app-muted">{{ $row->notes }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="12"><x-ui.empty-state title="Tidak ada jurnal" message="Belum ada data yang cocok dengan filter." /></td></tr>

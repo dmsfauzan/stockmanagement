@@ -63,6 +63,7 @@
                             <option value="{{ $size }}">{{ $size }}</option>
                         @endforeach
                     </select>
+                    @include('livewire.reports._report-columns')
                 </div>
             </div>
             <div class="mt-3 px-4 pb-1">
@@ -74,37 +75,37 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>
+                        <th class="rc-sku">
                             <button type="button" wire:click="sortBy('sku')" class="inline-flex items-center gap-1 hover:text-app-text">
                                 SKU @if ($sortField === 'sku')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif
                             </button>
                         </th>
-                        <th>Barang</th>
-                        <th>Kategori</th>
-                        <th>Warehouse</th>
-                        <th>Lokasi</th>
-                        <th class="text-right">
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-category">Kategori</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-location">Lokasi</th>
+                        <th class="rc-on_hand text-right">
                             <button type="button" wire:click="sortBy('on_hand')" class="inline-flex items-center gap-1 hover:text-app-text">
                                 On Hand @if ($sortField === 'on_hand')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif
                             </button>
                         </th>
-                        <th class="text-right">Min</th>
-                        <th class="text-right">Max</th>
-                        <th>Status</th>
+                        <th class="rc-min text-right">Min</th>
+                        <th class="rc-max text-right">Max</th>
+                        <th class="rc-status">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->category_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="text-app-muted">{{ $row->location_path }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity_on_hand) }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ (int) $row->min_stock }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ (int) $row->max_stock }}</td>
-                            <td class="whitespace-nowrap">
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-category whitespace-nowrap text-app-muted">{{ $row->category_name }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-location text-app-muted">{{ $row->location_path }}</td>
+                            <td class="rc-on_hand whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity_on_hand) }}</td>
+                            <td class="rc-min whitespace-nowrap text-right text-app-muted">{{ (int) $row->min_stock }}</td>
+                            <td class="rc-max whitespace-nowrap text-right text-app-muted">{{ (int) $row->max_stock }}</td>
+                            <td class="rc-status whitespace-nowrap">
                                 <x-ui.status-badge :status="$row->stock_status" :label="$row->stock_status->label()" />
                             </td>
                         </tr>

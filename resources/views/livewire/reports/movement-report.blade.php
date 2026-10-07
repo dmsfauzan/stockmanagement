@@ -53,8 +53,9 @@
                     @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
                 </select>
             </div>
-            <div class="mt-3">
+            <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
+                @include('livewire.reports._report-columns')
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -65,35 +66,35 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Tanggal</th>
-                        <th>SKU</th>
-                        <th>Barang</th>
-                        <th>Warehouse</th>
-                        <th>Lokasi</th>
-                        <th>Tipe</th>
-                        <th class="text-right">In</th>
-                        <th class="text-right">Out</th>
-                        <th class="text-right">Balance</th>
-                        <th class="text-right">Hrg Satuan</th>
-                        <th class="text-right">Nilai</th>
-                        <th>User</th>
+                        <th class="rc-date">Tanggal</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-location">Lokasi</th>
+                        <th class="rc-transaction_type">Tipe</th>
+                        <th class="rc-quantity_in text-right">In</th>
+                        <th class="rc-quantity_out text-right">Out</th>
+                        <th class="rc-balance_after text-right">Balance</th>
+                        <th class="rc-unit_cost text-right">Hrg Satuan</th>
+                        <th class="rc-total_cost text-right">Nilai</th>
+                        <th class="rc-user">User</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->created_at }}</td>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->location_code ?? '-' }}</td>
-                            <td class="whitespace-nowrap"><x-ui.status-badge :status="$row->transaction_type" /></td>
-                            <td class="whitespace-nowrap text-right font-medium text-emerald-600 dark:text-emerald-400">{{ (int) $row->quantity_in ?: '-' }}</td>
-                            <td class="whitespace-nowrap text-right font-medium text-rose-600 dark:text-rose-400">{{ (int) $row->quantity_out ?: '-' }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ (int) $row->balance_after }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->unit_cost, 2) }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->total_cost, 2) }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->user_name ?? '-' }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ $row->created_at }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-location whitespace-nowrap text-app-muted">{{ $row->location_code ?? '-' }}</td>
+                            <td class="rc-transaction_type whitespace-nowrap"><x-ui.status-badge :status="$row->transaction_type" /></td>
+                            <td class="rc-quantity_in whitespace-nowrap text-right font-medium text-emerald-600 dark:text-emerald-400">{{ (int) $row->quantity_in ?: '-' }}</td>
+                            <td class="rc-quantity_out whitespace-nowrap text-right font-medium text-rose-600 dark:text-rose-400">{{ (int) $row->quantity_out ?: '-' }}</td>
+                            <td class="rc-balance_after whitespace-nowrap text-right text-app-muted">{{ (int) $row->balance_after }}</td>
+                            <td class="rc-unit_cost whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->unit_cost, 2) }}</td>
+                            <td class="rc-total_cost whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->total_cost, 2) }}</td>
+                            <td class="rc-user whitespace-nowrap text-app-muted">{{ $row->user_name ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="12"><x-ui.empty-state title="Tidak ada pergerakan stok" message="Belum ada data yang cocok dengan filter." /></td></tr>

@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Exports\OpnameExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Opname')]
 class OpnameReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -38,9 +39,28 @@ class OpnameReport extends Component
         return ['search', 'statusFilter', 'warehouseFilter', 'dateFrom', 'dateTo'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'number' => ['label' => 'No. Opname'],
+            'date' => ['label' => 'Tanggal'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'location' => ['label' => 'Lokasi'],
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'system_qty' => ['label' => 'System', 'align' => 'right'],
+            'physical_qty' => ['label' => 'Fisik', 'align' => 'right'],
+            'difference' => ['label' => 'Selisih', 'align' => 'right'],
+            'reason' => ['label' => 'Alasan'],
+            'status' => ['label' => 'Status'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

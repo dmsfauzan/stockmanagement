@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Enums\TransactionType;
 use App\Exports\MovementExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Item;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Pergerakan Stok')]
 class MovementReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -45,9 +46,29 @@ class MovementReport extends Component
         return ['search', 'itemFilter', 'warehouseFilter', 'transactionTypeFilter', 'userFilter', 'fromDate', 'toDate'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'date' => ['label' => 'Tanggal'],
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'location' => ['label' => 'Lokasi'],
+            'transaction_type' => ['label' => 'Tipe'],
+            'quantity_in' => ['label' => 'In', 'align' => 'right'],
+            'quantity_out' => ['label' => 'Out', 'align' => 'right'],
+            'balance_after' => ['label' => 'Balance', 'align' => 'right'],
+            'unit_cost' => ['label' => 'Hrg Satuan', 'align' => 'right'],
+            'total_cost' => ['label' => 'Nilai', 'align' => 'right'],
+            'user' => ['label' => 'User'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

@@ -63,8 +63,9 @@
                 <input type="date" wire:model.live="dateFrom" class="app-input" title="Tanggal dari">
                 <input type="date" wire:model.live="dateTo" class="app-input" title="Tanggal sampai">
             </div>
-            <div class="mt-3">
+            <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
+                @include('livewire.reports._report-columns')
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -75,34 +76,34 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>No. Opname</th>
-                        <th>Tanggal</th>
-                        <th>Warehouse</th>
-                        <th>Lokasi</th>
-                        <th>SKU</th>
-                        <th>Barang</th>
-                        <th class="text-right">System</th>
-                        <th class="text-right">Fisik</th>
-                        <th class="text-right">Selisih</th>
-                        <th>Alasan</th>
-                        <th>Status</th>
+                        <th class="rc-number">No. Opname</th>
+                        <th class="rc-date">Tanggal</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-location">Lokasi</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-system_qty text-right">System</th>
+                        <th class="rc-physical_qty text-right">Fisik</th>
+                        <th class="rc-difference text-right">Selisih</th>
+                        <th class="rc-reason">Alasan</th>
+                        <th class="rc-status">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         @php $diff = (int) $row->difference; @endphp
                         <tr>
-                            <td class="whitespace-nowrap font-medium">{{ $row->opname_number }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->opname_date)->format('d M Y') }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->location_code ?? '-' }}</td>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-right">{{ number_format((int) $row->system_quantity) }}</td>
-                            <td class="whitespace-nowrap text-right">{{ $row->physical_quantity !== null ? number_format((int) $row->physical_quantity) : '-' }}</td>
-                            <td class="whitespace-nowrap text-right {{ $diffClass($diff) }}">{{ $diff > 0 ? '+' : '' }}{{ number_format($diff) }}</td>
-                            <td class="text-app-muted">{{ $row->reason ?? '-' }}</td>
-                            <td class="whitespace-nowrap"><x-ui.status-badge :status="$row->status" /></td>
+                            <td class="rc-number whitespace-nowrap font-medium">{{ $row->opname_number }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->opname_date)->format('d M Y') }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-location whitespace-nowrap text-app-muted">{{ $row->location_code ?? '-' }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-system_qty whitespace-nowrap text-right">{{ number_format((int) $row->system_quantity) }}</td>
+                            <td class="rc-physical_qty whitespace-nowrap text-right">{{ $row->physical_quantity !== null ? number_format((int) $row->physical_quantity) : '-' }}</td>
+                            <td class="rc-difference whitespace-nowrap text-right {{ $diffClass($diff) }}">{{ $diff > 0 ? '+' : '' }}{{ number_format($diff) }}</td>
+                            <td class="rc-reason text-app-muted">{{ $row->reason ?? '-' }}</td>
+                            <td class="rc-status whitespace-nowrap"><x-ui.status-badge :status="$row->status" /></td>
                         </tr>
                     @empty
                         <tr><td colspan="11"><x-ui.empty-state title="Tidak ada data opname" message="Belum ada data stock opname yang cocok dengan filter." /></td></tr>

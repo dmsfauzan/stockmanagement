@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Reports;
 
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Category;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Replenishment')]
 class ReplenishmentReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -46,9 +47,27 @@ class ReplenishmentReport extends Component
         return ['search', 'warehouseFilter', 'categoryFilter'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'category' => ['label' => 'Kategori'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'on_hand' => ['label' => 'On Hand', 'align' => 'right'],
+            'min' => ['label' => 'Min', 'align' => 'right'],
+            'max' => ['label' => 'Max', 'align' => 'right'],
+            'suggested' => ['label' => 'Suggested', 'align' => 'right'],
+            'supplier' => ['label' => 'Primary Supplier'],
+            'price' => ['label' => 'Price', 'align' => 'right'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

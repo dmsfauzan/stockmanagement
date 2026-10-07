@@ -43,8 +43,9 @@
                     @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
                 </select>
             </div>
-            <div class="mt-3">
+            <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
+                @include('livewire.reports._report-columns')
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -55,25 +56,25 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>SKU</th>
-                        <th>Barang</th>
-                        <th>Kategori</th>
-                        <th>Warehouse</th>
-                        <th class="text-right">Qty</th>
-                        <th class="text-right">Harga Rata-rata</th>
-                        <th class="text-right">Total Nilai</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-category">Kategori</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-quantity text-right">Qty</th>
+                        <th class="rc-average_cost text-right">Harga Rata-rata</th>
+                        <th class="rc-total_value text-right">Total Nilai</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->category_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity) }}</td>
-                            <td class="whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->average_cost, 2) }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((float) $row->total_value, 2) }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-category whitespace-nowrap text-app-muted">{{ $row->category_name }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-quantity whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity) }}</td>
+                            <td class="rc-average_cost whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->average_cost, 2) }}</td>
+                            <td class="rc-total_value whitespace-nowrap text-right font-medium">{{ number_format((float) $row->total_value, 2) }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="7"><x-ui.empty-state title="Tidak ada data valuasi" message="Belum ada data yang cocok dengan filter." /></td></tr>

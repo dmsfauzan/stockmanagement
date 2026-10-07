@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Exports\JournalExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Jurnal Akuntansi')]
 class JournalReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -39,12 +40,31 @@ class JournalReport extends Component
         return ['search', 'warehouseFilter', 'transactionType', 'dateFrom', 'dateTo'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'date' => ['label' => 'Tanggal'],
+            'reference' => ['label' => 'Referensi'],
+            'type' => ['label' => 'Tipe'],
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'quantity' => ['label' => 'Qty', 'align' => 'right'],
+            'unit_cost' => ['label' => 'Harga Satuan', 'align' => 'right'],
+            'total' => ['label' => 'Total', 'align' => 'right'],
+            'debit' => ['label' => 'Debit'],
+            'credit' => ['label' => 'Kredit'],
+            'description' => ['label' => 'Deskripsi'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
 
         $this->dateFrom = now()->subDays(30)->toDateString();
         $this->dateTo = now()->toDateString();
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

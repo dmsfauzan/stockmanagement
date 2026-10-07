@@ -43,9 +43,12 @@
             </div>
             <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
-                <select wire:model.live="perPage" class="app-select w-24">
-                    @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
-                </select>
+                <div class="flex items-center gap-3">
+                    <select wire:model.live="perPage" class="app-select w-24">
+                        @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
+                    </select>
+                    @include('livewire.reports._report-columns')
+                </div>
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -56,27 +59,27 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Issue No</th>
-                        <th>Date</th>
-                        <th>Customer / Destination</th>
-                        <th>Warehouse</th>
-                        <th>SKU</th>
-                        <th>Item</th>
-                        <th class="text-right">Qty</th>
-                        <th>Posted At</th>
+                        <th class="rc-number">Issue No</th>
+                        <th class="rc-date">Date</th>
+                        <th class="rc-customer">Customer / Destination</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Item</th>
+                        <th class="rc-quantity text-right">Qty</th>
+                        <th class="rc-posted_at">Posted At</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
-                            <td class="whitespace-nowrap font-medium">{{ $row->issue_number }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->transaction_date }}</td>
-                            <td class="text-app-muted">{{ $row->customer_name ?? $row->destination ?? '-' }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((int) $row->qty) }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->posted_at ?? '-' }}</td>
+                            <td class="rc-number whitespace-nowrap font-medium">{{ $row->issue_number }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ $row->transaction_date }}</td>
+                            <td class="rc-customer text-app-muted">{{ $row->customer_name ?? $row->destination ?? '-' }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-quantity whitespace-nowrap text-right font-medium">{{ number_format((int) $row->qty) }}</td>
+                            <td class="rc-posted_at whitespace-nowrap text-app-muted">{{ $row->posted_at ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="8"><x-ui.empty-state title="Tidak ada data barang keluar" message="Belum ada transaksi yang cocok dengan filter." /></td></tr>

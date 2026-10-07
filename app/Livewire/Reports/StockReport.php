@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Enums\StockStatus;
 use App\Exports\StockExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Category;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Stok')]
 class StockReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -45,9 +46,26 @@ class StockReport extends Component
         return ['search', 'warehouseFilter', 'locationFilter', 'categoryFilter', 'statusFilter'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Barang'],
+            'category' => ['label' => 'Kategori'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'location' => ['label' => 'Lokasi'],
+            'on_hand' => ['label' => 'On Hand', 'align' => 'right'],
+            'min' => ['label' => 'Min', 'align' => 'right'],
+            'max' => ['label' => 'Max', 'align' => 'right'],
+            'status' => ['label' => 'Status'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

@@ -64,8 +64,9 @@
                     @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
                 </select>
             </div>
-            <div class="mt-3">
+            <div class="mt-3 flex items-center justify-between">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
+                @include('livewire.reports._report-columns')
             </div>
             <div class="mt-3">
                 @include('livewire.reports._saved-filters')
@@ -76,30 +77,30 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>SKU</th>
-                        <th>Barang</th>
-                        <th>Warehouse</th>
-                        <th>Lokasi</th>
-                        <th>Batch</th>
-                        <th>Expiry Date</th>
-                        <th class="text-right">Sisa / Lewat</th>
-                        <th class="text-right">Qty Masuk</th>
-                        <th>Referensi</th>
+                        <th class="rc-sku">SKU</th>
+                        <th class="rc-item">Barang</th>
+                        <th class="rc-warehouse">Warehouse</th>
+                        <th class="rc-location">Lokasi</th>
+                        <th class="rc-batch">Batch</th>
+                        <th class="rc-expiry_date">Expiry Date</th>
+                        <th class="rc-days_left text-right">Sisa / Lewat</th>
+                        <th class="rc-quantity_in text-right">Qty Masuk</th>
+                        <th class="rc-reference">Referensi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($rows as $row)
                         @php $days = (int) ($row->days_left ?? 0); @endphp
                         <tr>
-                            <td class="whitespace-nowrap font-medium">{{ $row->sku }}</td>
-                            <td>{{ $row->item_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->location_code ?? '-' }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->batch_number ?? '-' }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->expiry_date)->format('d M Y') }}</td>
-                            <td class="whitespace-nowrap text-right {{ $daysClass($days) }}">{{ $daysLabel($days) }}</td>
-                            <td class="whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity_in) }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $row->reference_type ? class_basename($row->reference_type).' #'.$row->reference_id : '-' }}</td>
+                            <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>
+                            <td class="rc-item">{{ $row->item_name }}</td>
+                            <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-location whitespace-nowrap text-app-muted">{{ $row->location_code ?? '-' }}</td>
+                            <td class="rc-batch whitespace-nowrap text-app-muted">{{ $row->batch_number ?? '-' }}</td>
+                            <td class="rc-expiry_date whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->expiry_date)->format('d M Y') }}</td>
+                            <td class="rc-days_left whitespace-nowrap text-right {{ $daysClass($days) }}">{{ $daysLabel($days) }}</td>
+                            <td class="rc-quantity_in whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity_in) }}</td>
+                            <td class="rc-reference whitespace-nowrap text-app-muted">{{ $row->reference_type ? class_basename($row->reference_type).' #'.$row->reference_id : '-' }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="9"><x-ui.empty-state title="Tidak ada data kedaluwarsa" message="Belum ada batch dengan tanggal kedaluwarsa yang cocok dengan filter." /></td></tr>

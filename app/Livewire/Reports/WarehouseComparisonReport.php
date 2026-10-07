@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Exports\WarehouseComparisonExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Services\Inventory\ExpiryService;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Perbandingan Gudang')]
 class WarehouseComparisonReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters;
 
     public string $search = '';
 
@@ -28,9 +29,27 @@ class WarehouseComparisonReport extends Component
         return ['search'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'code' => ['label' => 'Kode'],
+            'warehouse' => ['label' => 'Gudang'],
+            'total_items' => ['label' => 'Total Item', 'align' => 'right'],
+            'on_hand' => ['label' => 'On Hand', 'align' => 'right'],
+            'available' => ['label' => 'Available', 'align' => 'right'],
+            'low' => ['label' => 'Low', 'align' => 'right'],
+            'out' => ['label' => 'Out', 'align' => 'right'],
+            'expired' => ['label' => 'Expired', 'align' => 'right'],
+            'soon' => ['label' => 'H-30', 'align' => 'right'],
+            'health' => ['label' => 'Sehat'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void

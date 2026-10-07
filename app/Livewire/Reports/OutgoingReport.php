@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Exports\OutgoingExport;
+use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Customer;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Barang Keluar')]
 class OutgoingReport extends Component
 {
-    use HandlesReportExport, HandlesSavedFilters, WithPagination;
+    use HandlesReportColumns, HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -39,9 +40,25 @@ class OutgoingReport extends Component
         return ['search', 'customerFilter', 'warehouseFilter', 'fromDate', 'toDate'];
     }
 
+    public function reportColumns(): array
+    {
+        return [
+            'number' => ['label' => 'Issue No'],
+            'date' => ['label' => 'Date'],
+            'customer' => ['label' => 'Customer / Destination'],
+            'warehouse' => ['label' => 'Warehouse'],
+            'sku' => ['label' => 'SKU'],
+            'item' => ['label' => 'Item'],
+            'quantity' => ['label' => 'Qty', 'align' => 'right'],
+            'posted_at' => ['label' => 'Posted At'],
+        ];
+    }
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('reports.view'), 403);
+
+        $this->mountReportColumns();
     }
 
     public function updatedSearch(): void
