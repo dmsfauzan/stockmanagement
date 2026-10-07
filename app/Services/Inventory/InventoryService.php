@@ -33,11 +33,33 @@ class InventoryService
                 throw new \RuntimeException('Only approved receipts can be posted.');
             }
 
+            $totalLanded = (float) ($locked->freight_cost ?? 0) + (float) ($locked->other_cost ?? 0);
+            $method = (string) ($locked->landed_cost_method ?? 'value');
+            $baseTotal = $method === 'quantity'
+                ? (float) $locked->receiptItems->sum('quantity')
+                : (float) $locked->receiptItems->sum(fn ($row) => (int) $row->quantity * (float) ($row->unit_cost ?? 0));
+
             foreach ($locked->receiptItems as $item) {
                 $expiry = $item->expiry_date;
                 $expiryDate = $expiry instanceof \DateTimeInterface
                     ? $expiry->format('Y-m-d')
                     : ($expiry !== null ? (string) $expiry : null);
+
+                $rowLanded = null;
+
+                if ($totalLanded > 0 && $baseTotal > 0) {
+                    $rowBase = $method === 'quantity'
+                        ? (float) $item->quantity
+                        : (float) $item->quantity * (float) ($item->unit_cost ?? 0);
+
+                    $rowLanded = $totalLanded * $rowBase / $baseTotal;
+                }
+
+                $effectiveCost = (float) ($item->unit_cost ?? 0);
+
+                if ($rowLanded !== null) {
+                    $effectiveCost += $rowLanded / max(1, (int) $item->quantity);
+                }
 
                 LedgerService::record(
                     (int) $item->item_id,
@@ -51,7 +73,7 @@ class InventoryService
                     $item->batch_number,
                     $expiryDate,
                     $item->notes,
-                    isset($item->unit_cost) ? (float) $item->unit_cost : null,
+                    $effectiveCost,
                     $item->serial_number ?? null
                 );
             }

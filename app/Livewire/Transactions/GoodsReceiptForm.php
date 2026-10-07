@@ -35,6 +35,12 @@ class GoodsReceiptForm extends Component
 
     public string $received_by = '';
 
+    public string $freight_cost = '0';
+
+    public string $other_cost = '0';
+
+    public string $landed_cost_method = 'value';
+
     public string $notes = '';
 
     public array $items = [];
@@ -63,6 +69,9 @@ class GoodsReceiptForm extends Component
             $this->delivery_note = (string) ($model->delivery_note ?? '');
             $this->warehouse_id = (string) $model->warehouse_id;
             $this->received_by = (string) ($model->received_by ?? '');
+            $this->freight_cost = (string) ($model->freight_cost ?? '0');
+            $this->other_cost = (string) ($model->other_cost ?? '0');
+            $this->landed_cost_method = (string) ($model->landed_cost_method ?? 'value');
             $this->notes = (string) ($model->notes ?? '');
             $this->purchaseOrderLink = $model->purchase_order_id ? (int) $model->purchase_order_id : null;
 
@@ -140,6 +149,9 @@ class GoodsReceiptForm extends Component
             'delivery_note' => ['nullable', 'string', 'max:60'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'received_by' => ['nullable', 'string', 'max:100'],
+            'freight_cost' => ['nullable', 'numeric', 'min:0'],
+            'other_cost' => ['nullable', 'numeric', 'min:0'],
+            'landed_cost_method' => ['required', 'in:value,quantity'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.item_id' => ['required', 'exists:items,id'],
@@ -293,6 +305,9 @@ class GoodsReceiptForm extends Component
             'supplier_id' => $data['supplier_id'],
             'po_number' => $data['po_number'] !== '' ? $data['po_number'] : null,
             'delivery_note' => $data['delivery_note'] !== '' ? $data['delivery_note'] : null,
+            'freight_cost' => (float) ($data['freight_cost'] ?? 0),
+            'other_cost' => (float) ($data['other_cost'] ?? 0),
+            'landed_cost_method' => $data['landed_cost_method'] ?? 'value',
             'purchase_order_id' => $this->purchaseOrderLink,
             'warehouse_id' => $data['warehouse_id'],
             'received_by' => $data['received_by'] !== '' ? $data['received_by'] : null,

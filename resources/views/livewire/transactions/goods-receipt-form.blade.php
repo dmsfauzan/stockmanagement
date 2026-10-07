@@ -45,6 +45,24 @@
                     @error('delivery_note') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div>
+                    <label for="freight_cost" class="app-label mb-1.5">Biaya Kirim</label>
+                    <input type="number" id="freight_cost" wire:model="freight_cost" min="0" step="0.01" class="app-input">
+                    @error('freight_cost') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="other_cost" class="app-label mb-1.5">Biaya Lain</label>
+                    <input type="number" id="other_cost" wire:model="other_cost" min="0" step="0.01" class="app-input">
+                    @error('other_cost') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="landed_cost_method" class="app-label mb-1.5">Alokasi Landed Cost</label>
+                    <select id="landed_cost_method" wire:model="landed_cost_method" class="app-select">
+                        <option value="value">By Value</option>
+                        <option value="quantity">By Quantity</option>
+                    </select>
+                    @error('landed_cost_method') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                <div>
                     <label for="received_by" class="app-label mb-1.5">Diterima Oleh</label>
                     <input type="text" id="received_by" wire:model="received_by" placeholder="Nama penerima" class="app-input">
                     @error('received_by') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror

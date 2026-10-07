@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'transaction_date', 'supplier_id', 'po_number', 'delivery_note', 'purchase_order_id', 'warehouse_id', 'received_by', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'posted_by', 'submitted_at', 'approved_at', 'rejected_at', 'posted_at', 'rejection_reason', 'reversed_at', 'reversed_by', 'reversal_reason'])]
+#[Fillable(['number', 'transaction_date', 'supplier_id', 'po_number', 'delivery_note', 'freight_cost', 'other_cost', 'landed_cost_method', 'purchase_order_id', 'warehouse_id', 'received_by', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'posted_by', 'submitted_at', 'approved_at', 'rejected_at', 'posted_at', 'rejection_reason', 'reversed_at', 'reversed_by', 'reversal_reason'])]
 class GoodsReceipt extends Model
 {
     use HasFactory;
@@ -24,6 +24,8 @@ class GoodsReceipt extends Model
             'rejected_at' => 'datetime',
             'posted_at' => 'datetime',
             'reversed_at' => 'datetime',
+            'freight_cost' => 'decimal:2',
+            'other_cost' => 'decimal:2',
         ];
     }
 
