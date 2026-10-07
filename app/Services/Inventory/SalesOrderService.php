@@ -6,6 +6,7 @@ use App\Enums\SalesOrderStatus;
 use App\Models\GoodsIssue;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
+use App\Services\Integration\WebhookService;
 use App\Services\Support\AuditLogger;
 
 class SalesOrderService
@@ -44,6 +45,16 @@ class SalesOrderService
         static::recomputeStatus($order);
 
         AuditLogger::log('FULFILL', 'sales_order', $order);
+
+        try {
+            WebhookService::emit('sales_order.fulfilled', [
+                'event' => 'sales_order.fulfilled',
+                'reference' => ['type' => 'SalesOrder', 'id' => $order->id, 'number' => $order->number],
+                'status' => $order->fresh()->status,
+                'occurred_at' => now()->toIso8601String(),
+            ]);
+        } catch (\Throwable $e) {
+        }
     }
 
     public static function revertFulfillment(GoodsIssue $issue): void

@@ -74,6 +74,8 @@ Query umum untuk endpoint list: `?page=`, `?per_page=` (maks 100), plus filter s
 | GET | `/reports/cogs` | `reports.view` | `date_from`, `date_to`, `warehouse_id` |
 | GET | `/reports/journal` | `reports.view` | `date_from`, `date_to`, `warehouse_id`, `transaction_type` |
 | GET | `/reports/replenishment` | `reports.view` | `warehouse_id`, `category_id`, `search` |
+| GET | `/accounting/journal` | `reports.view` | `date_from`, `date_to`, `warehouse_id`, `transaction_type` |
+| GET | `/accounting/summary` | `reports.view` | `date_from`, `date_to`, `warehouse_id` |
 
 ## Endpoint — Write (Transaksi)
 

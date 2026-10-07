@@ -37,6 +37,7 @@
         request()->routeIs('admin.roles') => 'Roles & Permissions',
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
         request()->routeIs('admin.api-tokens') => 'API Tokens',
+        request()->routeIs('admin.integrations') => 'Integrations',
         request()->routeIs('admin.settings') => 'Settings',
         request()->routeIs('profile.*') => 'Profile',
         default => 'Warehouse',
@@ -325,9 +326,15 @@
                 </a>
                 @endcan
                 @can('settings.manage')
-                <a href="{{ route('admin.settings') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.settings'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.settings')])>
-                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM10.5 12a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM10.5 18a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h4M16 6h4M4 12h4M16 12h4M4 18h4M16 18h4"/></svg>
+                <a href="{{ route('admin.api-tokens') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.api-tokens'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.api-tokens')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
                     <span x-show="!collapsed" class="truncate">API Tokens</span>
+                </a>
+                @endcan
+                @can('settings.manage')
+                <a href="{{ route('admin.integrations') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.integrations'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.integrations')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>
+                    <span x-show="!collapsed" class="truncate">Integrations</span>
                 </a>
                 @endcan
                 @can('settings.manage')

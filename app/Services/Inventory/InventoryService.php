@@ -16,6 +16,7 @@ use App\Models\StockBalance;
 use App\Models\StockMovement;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
+use App\Services\Integration\WebhookService;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
 use App\Services\Support\NotificationService;
@@ -85,6 +86,8 @@ class InventoryService
             ]);
 
             AuditLogger::log('POST', 'goods_receipt', $locked);
+
+            static::emitWebhook('goods_receipt.posted', GoodsReceipt::class, $locked);
 
             if ($locked->purchase_order_id) {
                 try {
@@ -156,6 +159,8 @@ class InventoryService
 
             AuditLogger::log('POST', 'goods_issue', $locked);
 
+            static::emitWebhook('goods_issue.posted', GoodsIssue::class, $locked);
+
             foreach ($locked->issueItems as $item) {
                 try {
                     NotificationService::notifyLowStock((int) $item->item_id, (int) $locked->warehouse_id);
@@ -216,6 +221,8 @@ class InventoryService
 
             AuditLogger::log('POST', 'stock_adjustment', $locked);
 
+            static::emitWebhook('adjustment.posted', StockAdjustment::class, $locked);
+
             foreach ($locked->items as $item) {
                 try {
                     NotificationService::notifyLowStock((int) $item->item_id, (int) $locked->warehouse_id);
@@ -262,6 +269,8 @@ class InventoryService
                 $locked->update(['status' => OpnameStatus::Completed->value]);
                 AuditLogger::log('COMPLETE', 'stock_opname', $locked);
 
+                static::emitWebhook('stock_opname.completed', StockOpname::class, $locked);
+
                 return;
             }
 
@@ -297,6 +306,8 @@ class InventoryService
             ]);
 
             AuditLogger::log('COMPLETE', 'stock_opname', $locked);
+
+            static::emitWebhook('stock_opname.completed', StockOpname::class, $locked);
         });
     }
 
@@ -334,6 +345,8 @@ class InventoryService
             ]);
 
             AuditLogger::log('DISPATCH', 'stock_transfer', $locked);
+
+            static::emitWebhook('transfer.dispatched', StockTransfer::class, $locked);
         });
     }
 
@@ -369,6 +382,8 @@ class InventoryService
             ]);
 
             AuditLogger::log('RECEIVE', 'stock_transfer', $locked);
+
+            static::emitWebhook('transfer.received', StockTransfer::class, $locked);
 
             foreach ($locked->items as $item) {
                 try {
@@ -559,5 +574,23 @@ class InventoryService
     private static function lockedIssue(int $id): GoodsIssue
     {
         return GoodsIssue::whereKey($id)->lockForUpdate()->firstOrFail();
+    }
+
+    private static function emitWebhook(string $event, string $modelClass, mixed $model): void
+    {
+        try {
+            WebhookService::emit($event, [
+                'event' => $event,
+                'reference' => [
+                    'type' => class_basename($modelClass),
+                    'id' => $model->getKey(),
+                    'number' => $model->number ?? null,
+                ],
+                'warehouse_id' => $model->warehouse_id ?? null,
+                'status' => $model->status ?? null,
+                'occurred_at' => now()->toIso8601String(),
+            ]);
+        } catch (\Throwable $e) {
+        }
     }
 }

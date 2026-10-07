@@ -9,6 +9,7 @@ use App\Services\Inventory\ReplenishmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends ApiController
@@ -605,6 +606,22 @@ class ReportController extends ApiController
         });
 
         return $this->paginated($paginator);
+    }
+
+    public function accountingSummary(Request $request): JsonResponse
+    {
+        $from = $request->filled('date_from') ? Carbon::parse((string) $request->input('date_from'))->startOfDay() : null;
+        $to = $request->filled('date_to') ? Carbon::parse((string) $request->input('date_to'))->endOfDay() : null;
+        $warehouseId = $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null;
+
+        $rows = JournalService::journalRows($from, $to, $warehouseId);
+        $totals = JournalService::totals($rows);
+
+        return $this->ok([
+            'period' => ['from' => $from?->toDateString(), 'to' => $to?->toDateString()],
+            'totals' => $totals,
+            'accounts' => JournalService::accounts(),
+        ], 'OK');
     }
 
     public function replenishment(Request $request): JsonResponse

@@ -47,6 +47,16 @@ class SettingIndex extends Component
         'security' => [
             'security_require_2fa_admin' => ['key' => 'security.require_2fa_admin', 'label' => 'Wajibkan 2FA untuk Admin', 'type' => 'select', 'options' => ['1' => 'Ya', '0' => 'Tidak']],
         ],
+        'integration' => [
+            'integration_webhook_enabled' => ['key' => 'integration.webhook_enabled', 'label' => 'Webhook (enabled)', 'type' => 'select', 'options' => ['1' => 'Enabled', '0' => 'Disabled']],
+            'integration_webhook_url' => ['key' => 'integration.webhook_url', 'label' => 'Webhook URL', 'type' => 'text'],
+            'integration_webhook_events' => ['key' => 'integration.webhook_events', 'label' => 'Event (comma separated, kosong = semua)', 'type' => 'text'],
+            'accounting_export_enabled' => ['key' => 'accounting.export_enabled', 'label' => 'Accounting Export (scheduled)', 'type' => 'select', 'options' => ['1' => 'Enabled', '0' => 'Disabled']],
+            'accounting_export_period' => ['key' => 'accounting.export_period', 'label' => 'Export Period', 'type' => 'select', 'options' => ['daily' => 'Daily', 'monthly' => 'Monthly']],
+            'accounting_export_format' => ['key' => 'accounting.export_format', 'label' => 'Format', 'type' => 'select', 'options' => ['csv' => 'CSV', 'xlsx' => 'Excel']],
+            'accounting_export_recipient' => ['key' => 'accounting.export_recipient', 'label' => 'Penerima Email (opsional)', 'type' => 'text'],
+            'accounting_export_disk' => ['key' => 'accounting.export_disk', 'label' => 'Disk Export', 'type' => 'select', 'options' => ['local' => 'Local', 'public' => 'Public']],
+        ],
     ];
 
     /** @var array<string, string> */
@@ -89,6 +99,15 @@ class SettingIndex extends Component
             'notifications_digest_enabled' => '1',
             'notifications_digest_time' => '07:05',
             'security_require_2fa_admin' => '0',
+            'integration_webhook_enabled' => '0',
+            'integration_webhook_url' => '',
+            'integration_webhook_secret' => '',
+            'integration_webhook_events' => '',
+            'accounting_export_enabled' => '0',
+            'accounting_export_period' => 'daily',
+            'accounting_export_format' => 'csv',
+            'accounting_export_recipient' => '',
+            'accounting_export_disk' => 'local',
             default => '',
         };
     }
@@ -115,6 +134,14 @@ class SettingIndex extends Component
             'values.notifications_digest_enabled' => ['required', 'in:0,1'],
             'values.notifications_digest_time' => ['required', 'regex:/^\d{2}:\d{2}$/'],
             'values.security_require_2fa_admin' => ['required', 'in:0,1'],
+            'values.integration_webhook_enabled' => ['required', 'in:0,1'],
+            'values.integration_webhook_url' => ['nullable', 'string', 'max:500'],
+            'values.integration_webhook_events' => ['nullable', 'string', 'max:1000'],
+            'values.accounting_export_enabled' => ['required', 'in:0,1'],
+            'values.accounting_export_period' => ['required', 'in:daily,monthly'],
+            'values.accounting_export_format' => ['required', 'in:csv,xlsx'],
+            'values.accounting_export_recipient' => ['nullable', 'email', 'max:255'],
+            'values.accounting_export_disk' => ['required', 'in:local,public'],
         ];
 
         $validated = $this->validate($rules)['values'];

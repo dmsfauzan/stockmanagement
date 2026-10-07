@@ -94,6 +94,8 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active'])->group(function ()
         Route::get('/reports/cogs', [ReportController::class, 'cogs'])->name('api.reports.cogs');
         Route::get('/reports/journal', [ReportController::class, 'journal'])->name('api.reports.journal');
         Route::get('/reports/replenishment', [ReportController::class, 'replenishment'])->name('api.reports.replenishment');
+        Route::get('/accounting/journal', [ReportController::class, 'journal'])->name('api.accounting.journal');
+        Route::get('/accounting/summary', [ReportController::class, 'accountingSummary'])->name('api.accounting.summary');
     });
 
     // ---------------------------------------------------------------------
