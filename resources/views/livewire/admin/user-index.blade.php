@@ -40,6 +40,7 @@
             <table class="app-table">
                 <thead>
                     <tr>
+                        <th class="w-12"></th>
                         <th>Pengguna</th>
                         <th>Roles</th>
                         <th>Status</th>
@@ -50,6 +51,13 @@
                 <tbody>
                     @forelse ($users as $user)
                         <tr>
+                            <td>
+                                @if($user->avatarUrl())
+                                    <img src="{{ $user->avatarUrl() }}" alt="{{ $user->name }}" class="h-8 w-8 rounded-full object-cover" loading="lazy">
+                                @else
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-app-surface-2 text-xs font-semibold text-app-muted">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                                @endif
+                            </td>
                             <td>
                                 <div class="font-medium text-app-text">{{ $user->name }}</div>
                                 <div class="text-xs text-app-muted">{{ $user->email }}</div>
@@ -80,7 +88,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5"><x-ui.empty-state title="Tidak ada user" message="Belum ada user yang cocok dengan pencarian." /></td></tr>
+                        <tr><td colspan="6"><x-ui.empty-state title="Tidak ada user" message="Belum ada user yang cocok dengan pencarian." /></td></tr>
                     @endforelse
                 </tbody>
             </table>

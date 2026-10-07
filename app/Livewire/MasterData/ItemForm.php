@@ -8,16 +8,26 @@ use App\Models\Supplier;
 use App\Models\SupplierItemPrice;
 use App\Models\Unit;
 use App\Services\Support\AuditLogger;
+use App\Services\Support\ImageService;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.app')]
 #[Title('Form Barang')]
 class ItemForm extends Component
 {
+    use WithFileUploads;
+
     public ?int $itemId = null;
+
+    public $image = null;
+
+    public bool $removeImage = false;
+
+    public ?string $existingImagePath = null;
 
     public string $sku = '';
 
@@ -63,6 +73,7 @@ class ItemForm extends Component
             $this->cost = (float) $model->cost;
             $this->primary_supplier_id = $model->primary_supplier_id ? (string) $model->primary_supplier_id : '';
             $this->status = (string) $model->status;
+            $this->existingImagePath = $model->image_path;
         } else {
             $this->authorize('create', Item::class);
         }
@@ -83,6 +94,7 @@ class ItemForm extends Component
             'cost' => ['nullable', 'numeric', 'min:0'],
             'primary_supplier_id' => ['nullable', 'exists:suppliers,id'],
             'status' => ['required', 'in:active,inactive'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
         ];
     }
 
@@ -95,11 +107,15 @@ class ItemForm extends Component
 
         $data = $this->validate();
 
+        unset($data['image']);
+
         $data['barcode'] = $data['barcode'] !== '' ? $data['barcode'] : null;
         $data['brand'] = $data['brand'] !== '' ? $data['brand'] : null;
         $data['description'] = $data['description'] !== '' ? $data['description'] : null;
         $data['primary_supplier_id'] = $data['primary_supplier_id'] !== '' ? $data['primary_supplier_id'] : null;
         $data['cost'] = $data['cost'] ?? 0;
+
+        $images = app(ImageService::class);
 
         if ($this->itemId) {
             $item = Item::findOrFail($this->itemId);
@@ -107,12 +123,25 @@ class ItemForm extends Component
             $this->authorize('update', $item);
 
             $old = $item->toArray();
+
+            if ($this->image) {
+                $images->delete($item->image_path);
+                $data['image_path'] = $images->store($this->image, 'items');
+            } elseif ($this->removeImage) {
+                $images->delete($item->image_path);
+                $data['image_path'] = null;
+            }
+
             $data['updated_by'] = auth()->id();
             $item->update($data);
 
             AuditLogger::logModel('update', $item, $old, $item->fresh()->toArray());
         } else {
             $this->authorize('create', Item::class);
+
+            if ($this->image) {
+                $data['image_path'] = $images->store($this->image, 'items');
+            }
 
             $data['created_by'] = auth()->id();
             $item = Item::create($data);

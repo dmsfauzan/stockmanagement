@@ -24,6 +24,19 @@
 
         <div class="p-5">
             @if ($tab === 'info')
+                <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    @if($itemModel->imageUrl())
+                        <img src="{{ $itemModel->imageUrl() }}" alt="{{ $itemModel->name }}" class="h-24 w-24 shrink-0 rounded-lg object-cover" loading="lazy">
+                    @else
+                        <span class="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg bg-app-surface-2 text-app-muted">
+                            <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21V3a.75.75 0 01.75-.75h15a.75.75 0 01.75.75v18a.75.75 0 01-.75.75H4.5a.75.75 0 01-.75-.75z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+                        </span>
+                    @endif
+                    <div class="min-w-0">
+                        <h2 class="truncate text-lg font-semibold text-app-text">{{ $itemModel->name }}</h2>
+                        <p class="mt-1 text-sm text-app-muted">SKU {{ $itemModel->sku }}@if($itemModel->barcode) &middot; Barcode {{ $itemModel->barcode }}@endif</p>
+                    </div>
+                </div>
                 <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">SKU</dt><dd class="mt-1 text-sm font-medium text-app-text">{{ $itemModel->sku }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Barcode</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->barcode ?? '-' }}</dd></div>

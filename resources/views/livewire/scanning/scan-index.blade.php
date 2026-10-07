@@ -82,13 +82,18 @@
                 @php($scanned = $result['item'])
                 <x-ui.card padding="p-0">
                     <div class="flex flex-col gap-3 border-b border-app-border p-5 sm:flex-row sm:items-start sm:justify-between">
-                        <div class="min-w-0">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h2 class="truncate text-base font-semibold text-app-text">{{ $scanned->name }}</h2>
-                                <x-ui.status-badge :status="$result['status']" :label="$result['status']->label()" />
+                        <div class="flex min-w-0 gap-3 sm:items-start">
+                            @if(($result['item'] ?? null) && $result['item']->thumbUrl())
+                                <img src="{{ $result['item']->thumbUrl() }}" alt="{{ $result['item']->name }}" class="h-16 w-16 shrink-0 rounded object-cover" loading="lazy">
+                            @endif
+                            <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h2 class="truncate text-base font-semibold text-app-text">{{ $scanned->name }}</h2>
+                                    <x-ui.status-badge :status="$result['status']" :label="$result['status']->label()" />
+                                </div>
+                                <p class="mt-1 text-sm text-app-muted">SKU {{ $scanned->sku }} &middot; Barcode {{ $scanned->barcode ?? '-' }}</p>
+                                <p class="mt-0.5 text-xs text-app-muted">{{ $scanned->category?->name ?? 'Tanpa kategori' }} &middot; {{ $scanned->brand ?? 'Tanpa brand' }}</p>
                             </div>
-                            <p class="mt-1 text-sm text-app-muted">SKU {{ $scanned->sku }} &middot; Barcode {{ $scanned->barcode ?? '-' }}</p>
-                            <p class="mt-0.5 text-xs text-app-muted">{{ $scanned->category?->name ?? 'Tanpa kategori' }} &middot; {{ $scanned->brand ?? 'Tanpa brand' }}</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             <a href="{{ route('items.show', $scanned) }}" class="app-btn app-btn-secondary">Detail</a>

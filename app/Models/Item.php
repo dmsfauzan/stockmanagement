@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['sku', 'barcode', 'name', 'category_id', 'unit_id', 'brand', 'description', 'minimum_stock', 'maximum_stock', 'cost', 'primary_supplier_id', 'status', 'created_by', 'updated_by'])]
+#[Fillable(['sku', 'barcode', 'name', 'category_id', 'unit_id', 'brand', 'description', 'image_path', 'minimum_stock', 'maximum_stock', 'cost', 'primary_supplier_id', 'status', 'created_by', 'updated_by'])]
 class Item extends Model
 {
     use HasFactory, SoftDeletes;
@@ -45,5 +45,15 @@ class Item extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function imageUrl(): ?string
+    {
+        return app(\App\Services\Support\ImageService::class)->url($this->image_path);
+    }
+
+    public function thumbUrl(): ?string
+    {
+        return app(\App\Services\Support\ImageService::class)->thumbUrl($this->image_path);
     }
 }

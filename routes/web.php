@@ -85,6 +85,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/profile/notifications', \App\Livewire\Profile\NotificationPreferences::class)->name('profile.notifications');
+    Route::get('/profile/avatar', \App\Livewire\Profile\AvatarForm::class)->name('profile.avatar');
 
     Route::middleware('permission:items.view')->get('/items', ItemIndex::class)->name('items.index');
     Route::middleware('permission:items.create')->get('/items/create', ItemForm::class)->name('items.create');

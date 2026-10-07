@@ -91,6 +91,7 @@
                 <thead>
                     <tr>
                         <th class="w-10"><input type="checkbox" wire:model.live="selectAll" @change="toggleAll($event)" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500" aria-label="Pilih semua"></th>
+                        <th class="w-12"></th>
                         <th>
                             <button type="button" wire:click="sortBy('sku')" class="inline-flex items-center gap-1 hover:text-app-text">
                                 SKU
@@ -120,6 +121,15 @@
                     @forelse ($items as $item)
                         <tr>
                             <td><input type="checkbox" name="labelIds" value="{{ $item->id }}" wire:model.live="selectedIds" @change="refreshCount()" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500"></td>
+                            <td>
+                                @if($item->thumbUrl())
+                                    <img src="{{ $item->thumbUrl() }}" alt="{{ $item->name }}" class="h-8 w-8 rounded object-cover" loading="lazy">
+                                @else
+                                    <span class="flex h-8 w-8 items-center justify-center rounded bg-app-surface-2 text-app-muted">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21V3a.75.75 0 01.75-.75h15a.75.75 0 01.75.75v18a.75.75 0 01-.75.75H4.5a.75.75 0 01-.75-.75z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+                                    </span>
+                                @endif
+                            </td>
                             <td class="whitespace-nowrap font-medium">{{ $item->sku }}</td>
                             <td class="whitespace-nowrap text-app-muted">{{ $item->barcode ?? '-' }}</td>
                             <td>{{ $item->name }}</td>
@@ -150,7 +160,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10">
+                            <td colspan="11">
                                 <x-ui.empty-state title="Tidak ada barang" message="Belum ada data barang yang cocok dengan filter." />
                             </td>
                         </tr>

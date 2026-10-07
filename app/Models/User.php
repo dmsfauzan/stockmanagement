@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'status', 'last_login_at'])]
+#[Fillable(['name', 'email', 'password', 'status', 'last_login_at', 'avatar_path'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -79,5 +79,10 @@ class User extends Authenticatable
     public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    public function avatarUrl(): ?string
+    {
+        return app(\App\Services\Support\ImageService::class)->thumbUrl($this->avatar_path);
     }
 }

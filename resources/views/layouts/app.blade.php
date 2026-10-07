@@ -330,7 +330,11 @@
 
         <div class="border-t border-slate-800 p-3">
             <div class="flex items-center gap-3 rounded-xl px-2 py-2" :class="collapsed ? 'lg:justify-center' : ''">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
+                @if (auth()->user()?->avatarUrl())
+                    <img src="{{ auth()->user()->avatarUrl() }}" alt="{{ auth()->user()->name }}" class="h-9 w-9 shrink-0 rounded-full object-cover">
+                @else
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
+                @endif
                 <div x-show="!collapsed" class="min-w-0 flex-1">
                     <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name ?? 'User' }}</p>
                     <p class="truncate text-xs text-slate-500">{{ auth()->user()->email ?? '' }}</p>
@@ -383,7 +387,11 @@
 
                 <div x-data="{ open: false }" class="relative ml-1">
                     <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-2 rounded-full border border-app-border bg-app-surface px-1.5 py-1 text-sm hover:bg-app-surface-2">
-                        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-primary-600 text-xs font-semibold text-white">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
+                        @if (auth()->user()?->avatarUrl())
+                            <img src="{{ auth()->user()->avatarUrl() }}" alt="{{ auth()->user()->name }}" class="h-7 w-7 rounded-full object-cover">
+                        @else
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-primary-600 text-xs font-semibold text-white">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
+                        @endif
                         <span class="hidden max-w-[120px] truncate font-medium text-app-text sm:inline">{{ auth()->user()->name ?? 'User' }}</span>
                         <svg class="mr-1 hidden h-4 w-4 text-app-muted sm:block" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
                     </button>
@@ -394,6 +402,7 @@
                         </div>
                         <div class="my-1 border-t border-app-border"></div>
                         <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Profile</a>
+                        <a href="{{ route('profile.avatar') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Avatar</a>
                         <a href="{{ route('profile.notifications') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Preferensi Notifikasi</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

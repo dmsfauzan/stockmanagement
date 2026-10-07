@@ -99,6 +99,34 @@
                 @error('description') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
             </div>
 
+            <div>
+                <label class="app-label mb-1">Foto Barang (JPG/PNG/WebP/GIF, maks 2MB)</label>
+                <div class="flex items-start gap-4">
+                    <div class="shrink-0">
+                        @if ($image)
+                            <img src="{{ $image->temporaryUrl() }}" alt="Preview" class="h-20 w-20 rounded-xl border border-app-border object-cover">
+                        @elseif ($existingImagePath)
+                            <img src="{{ app(\App\Services\Support\ImageService::class)->thumbUrl($existingImagePath) }}" alt="Foto barang" class="h-20 w-20 rounded-xl border border-app-border object-cover">
+                        @else
+                            <span class="flex h-20 w-20 items-center justify-center rounded-xl border border-dashed border-app-border bg-app-surface-2/50 text-app-muted">
+                                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                            </span>
+                        @endif
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <input type="file" wire:model="image" accept="image/*" class="app-input text-sm">
+                        @error('image') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                        <div wire:loading wire:target="image" class="mt-1 text-xs text-app-muted">Mengunggah…</div>
+                        @if ($existingImagePath)
+                            <label class="mt-2 flex items-center gap-2 text-sm text-app-muted">
+                                <input type="checkbox" wire:model.live="removeImage" class="rounded">
+                                Hapus foto saat ini
+                            </label>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
             <div class="flex justify-end gap-2 pt-2">
                 <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">Batal</a>
                 <button type="submit" wire:loading.attr="disabled" class="app-btn app-btn-primary gap-2">
