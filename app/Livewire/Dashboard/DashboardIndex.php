@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Models\DashboardPreference;
 use App\Models\Item;
 use App\Models\Warehouse;
 use App\Services\Inventory\ExpiryService;
@@ -16,6 +17,19 @@ use Livewire\Component;
 #[Title('Dashboard')]
 class DashboardIndex extends Component
 {
+    /** @var array<int, string> */
+    public const WIDGETS = ['stats', 'movement_chart', 'category_chart', 'expiring_soon', 'low_stock', 'recent_activities'];
+
+    /** @var array<string, string> */
+    public const WIDGET_LABELS = [
+        'stats' => 'Ringkasan Statistik',
+        'movement_chart' => 'Grafik Pergerakan Stok',
+        'category_chart' => 'Stok per Kategori',
+        'expiring_soon' => 'Batch Mendekati Kedaluwarsa',
+        'low_stock' => 'Low Stock (Top 5)',
+        'recent_activities' => 'Aktivitas Terbaru',
+    ];
+
     public string $range = '7';
 
     public string $fromDate = '';
@@ -24,9 +38,101 @@ class DashboardIndex extends Component
 
     public ?int $warehouseFilter = null;
 
+    public bool $showLayoutModal = false;
+
+    /** @var array<int, string> */
+    public array $widgetOrder = [];
+
+    /** @var array<int, string> */
+    public array $enabledWidgets = [];
+
     public function mount(): void
     {
         $this->warehouseFilter = $this->activeWarehouseId();
+        $this->loadLayout();
+    }
+
+    protected function loadLayout(): void
+    {
+        $saved = DashboardPreference::where('user_id', auth()->id())->value('widgets');
+
+        $enabled = is_array($saved) ? array_values(array_intersect($saved, self::WIDGETS)) : self::WIDGETS;
+
+        $this->enabledWidgets = $enabled === [] ? self::WIDGETS : $enabled;
+        $this->widgetOrder = array_values(array_unique(array_merge($this->enabledWidgets, self::WIDGETS)));
+    }
+
+    public function openLayoutModal(): void
+    {
+        $this->loadLayout();
+        $this->showLayoutModal = true;
+    }
+
+    public function toggleWidget(string $key): void
+    {
+        if (! in_array($key, self::WIDGETS, true)) {
+            return;
+        }
+
+        if (in_array($key, $this->enabledWidgets, true)) {
+            $this->enabledWidgets = array_values(array_diff($this->enabledWidgets, [$key]));
+        } else {
+            $this->enabledWidgets[] = $key;
+        }
+    }
+
+    public function moveWidget(string $key, string $direction): void
+    {
+        $index = array_search($key, $this->widgetOrder, true);
+
+        if ($index === false) {
+            return;
+        }
+
+        $target = $direction === 'up' ? $index - 1 : $index + 1;
+
+        if ($target < 0 || $target >= count($this->widgetOrder)) {
+            return;
+        }
+
+        $order = $this->widgetOrder;
+        [$order[$index], $order[$target]] = [$order[$target], $order[$index]];
+        $this->widgetOrder = $order;
+    }
+
+    public function saveLayout(): void
+    {
+        $visible = array_values(array_filter($this->widgetOrder, fn (string $key) => in_array($key, $this->enabledWidgets, true)));
+
+        if ($visible === []) {
+            $this->dispatch('toast', type: 'error', message: 'Pilih minimal satu widget.');
+
+            return;
+        }
+
+        DashboardPreference::updateOrCreate(
+            ['user_id' => auth()->id()],
+            ['widgets' => $visible],
+        );
+
+        $this->enabledWidgets = $visible;
+        $this->showLayoutModal = false;
+
+        $this->dispatch('toast', type: 'success', message: 'Layout dashboard disimpan.');
+    }
+
+    public function resetLayout(): void
+    {
+        DashboardPreference::where('user_id', auth()->id())->delete();
+        $this->loadLayout();
+        $this->showLayoutModal = false;
+
+        $this->dispatch('toast', type: 'success', message: 'Layout dashboard direset.');
+    }
+
+    public function isWidgetVisible(string $key): bool
+    {
+        return in_array($key, $this->enabledWidgets, true);
     }
 
     public function updatedRange(): void
@@ -151,6 +257,7 @@ class DashboardIndex extends Component
             'expiredCount' => $expiredCount,
             'activeWarehouseName' => $activeWarehouseName,
             'inventoryValue' => $inventoryValue,
+            'widgetLabels' => self::WIDGET_LABELS,
         ]);
     }
 

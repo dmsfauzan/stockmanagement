@@ -14,6 +14,10 @@
                     <input type="date" wire:model.live="fromDate" class="app-input w-auto">
                     <input type="date" wire:model.live="toDate" class="app-input w-auto">
                 @endif
+                <button type="button" wire:click="openLayoutModal" class="app-btn app-btn-secondary gap-2" title="Atur widget dashboard">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+                    Atur
+                </button>
             </div>
         </x-slot:actions>
     </x-ui.page-header>
@@ -28,6 +32,7 @@
         </div>
     @endif
 
+    @if (in_array('stats', $enabledWidgets))
     <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
         <x-ui.stat-card label="Total Items" :value="number_format($totalItems)" tone="indigo" hint="Item aktif">
             <x-slot:icon><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4 8 4 8-4zm-8 4v10M4 7v10l8 4 8-4V7"/></svg></x-slot:icon>
@@ -54,8 +59,10 @@
             <x-slot:icon><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></x-slot:icon>
         </x-ui.stat-card>
     </div>
+    @endif
 
     <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        @if (in_array('movement_chart', $enabledWidgets))
         <x-ui.card class="lg:col-span-2">
             <div class="mb-4 flex items-center justify-between">
                 <div>
@@ -100,7 +107,9 @@
                 <div x-ref="canvas"></div>
             </div>
         </x-ui.card>
+        @endif
 
+        @if (in_array('category_chart', $enabledWidgets))
         <x-ui.card>
             <h2 class="app-card-title mb-4">Inventory by Category</h2>
             @if (count($categoryChart['labels']) > 0)
@@ -132,8 +141,10 @@
                 <x-ui.empty-state title="Belum ada data" message="Belum ada saldo stok per kategori." />
             @endif
         </x-ui.card>
+        @endif
     </div>
 
+    @if (in_array('expiring_soon', $enabledWidgets))
     <div class="mb-4">
         <x-ui.card padding="p-0">
             <div class="flex items-center justify-between border-b border-app-border px-4 py-3">
@@ -171,8 +182,10 @@
             </div>
         </x-ui.card>
     </div>
+    @endif
 
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        @if (in_array('low_stock', $enabledWidgets))
         <x-ui.card padding="p-0">
             <div class="flex items-center justify-between border-b border-app-border px-4 py-3">
                 <h2 class="app-card-title">Low Stock (Top 5)</h2>
@@ -205,7 +218,9 @@
                 </table>
             </div>
         </x-ui.card>
+        @endif
 
+        @if (in_array('recent_activities', $enabledWidgets))
         <x-ui.card padding="p-0">
             <div class="flex items-center justify-between border-b border-app-border px-4 py-3">
                 <h2 class="app-card-title">Recent Activities</h2>
@@ -240,5 +255,41 @@
                 </table>
             </div>
         </x-ui.card>
+        @endif
     </div>
+
+    @if ($showLayoutModal)
+        <div class="fixed inset-0 z-[55] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" wire:click="$set('showLayoutModal', false)"></div>
+            <div class="relative w-full max-w-lg rounded-xl border border-app-border bg-app-surface p-6 shadow-popover">
+                <h3 class="text-base font-semibold text-app-text">Atur Widget Dashboard</h3>
+                <p class="mt-1 text-sm text-app-muted">Pilih widget yang tampil dan atur urutannya.</p>
+
+                <div class="mt-4 space-y-2">
+                    @foreach ($widgetOrder as $key)
+                        <div class="flex items-center gap-2 rounded-lg border border-app-border bg-app-surface-2/40 px-3 py-2">
+                            <label class="flex flex-1 items-center gap-2 text-sm text-app-text">
+                                <input type="checkbox" wire:click="toggleWidget('{{ $key }}')" @checked(in_array($key, $enabledWidgets)) class="rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+                                {{ $widgetLabels[$key] ?? $key }}
+                            </label>
+                            <button type="button" wire:click="moveWidget('{{ $key }}', 'up')" class="app-btn app-btn-ghost !p-1" title="Naik">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+                            </button>
+                            <button type="button" wire:click="moveWidget('{{ $key }}', 'down')" class="app-btn app-btn-ghost !p-1" title="Turun">
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.9" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="mt-6 flex justify-between gap-2">
+                    <button type="button" wire:click="resetLayout" class="app-btn app-btn-ghost">Reset Default</button>
+                    <div class="flex gap-2">
+                        <button type="button" wire:click="$set('showLayoutModal', false)" class="app-btn app-btn-secondary">Tutup</button>
+                        <button type="button" wire:click="saveLayout" class="app-btn app-btn-primary">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
