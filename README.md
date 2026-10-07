@@ -79,12 +79,13 @@ flowchart LR
 | Barcode / QR | Halaman `/scan` (scanner USB + kamera), label item/lokasi + cetak bulk, prefill `?scan=` di form transaksi |
 | Reserved Stock | Stok "dipesan" dokumen terbuka menahan `available`; lepas saat reject/post/dispatch |
 | Batch & Expiry | Tracking batch/expiry, report kedaluwarsa, alert dashboard, notifikasi batch ≤ 7 hari |
-| Import Barang | Excel/CSV dengan template, validasi per baris, upsert by SKU |
+| Import Barang | Excel/CSV dengan template, validasi per baris, upsert by SKU (diproses di latar belakang) |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
-| Purchase Order | PO → Barang Masuk dengan penerimaan sebagian (partial/full), `PO-...` |
+| Purchase Order | PO (`PO-...`) → Barang Masuk (penerimaan sebagian), progres penerimaan |
+| Sales Order | SO (`SO-...`): Draft→Submitted→Approved→Partial→Fulfilled→Closed, fulfilment via Barang Keluar |
 | Multi-Warehouse | Switcher gudang global (session), dashboard per gudang, report perbandingan gudang |
 | Valuation / COGS | Harga pokok rata-rata bergerak (moving average), COGS, report valuasi & COGS |
-| **REST API** | Sanctum token, 68 endpoint (read + write workflow), permission-aware, rate-limited, format konsisten — lihat [`API.md`](API.md) |
+| **REST API** | Sanctum token, ~72 endpoint (read + tulis workflow), permission- & rate-limited, format konsisten — lihat [`API.md`](API.md) |
 | Advanced Supplier | Lead time, termin, price list, skor on-time & variasi harga |
 | Replenishment | Saran beli dari min/max + buat PO sekali klik |
 | PWA | Installable, app-shell offline, scan kamera di HP |
