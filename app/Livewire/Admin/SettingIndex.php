@@ -38,6 +38,11 @@ class SettingIndex extends Component
             'account_transfer_clearing' => ['key' => 'account.transfer_clearing', 'label' => 'Akun Transfer Clearing', 'type' => 'text'],
             'account_goods_receipt_clearing' => ['key' => 'account.goods_receipt_clearing', 'label' => 'Akun GR Clearing', 'type' => 'text'],
         ],
+        'notifications' => [
+            'notifications_email_enabled' => ['key' => 'notifications.email_enabled', 'label' => 'Email Notifications (master switch)', 'type' => 'select', 'options' => ['1' => 'Enabled', '0' => 'Disabled']],
+            'notifications_digest_enabled' => ['key' => 'notifications.digest_enabled', 'label' => 'Daily Digest (email ringkasan)', 'type' => 'select', 'options' => ['1' => 'Enabled', '0' => 'Disabled']],
+            'notifications_digest_time' => ['key' => 'notifications.digest_time', 'label' => 'Jam kirim Digest (HH:MM)', 'type' => 'text'],
+        ],
     ];
 
     /** @var array<string, string> */
@@ -75,6 +80,9 @@ class SettingIndex extends Component
             'account_adjustment_loss' => '5210',
             'account_transfer_clearing' => '1310',
             'account_goods_receipt_clearing' => '2000',
+            'notifications_email_enabled' => '1',
+            'notifications_digest_enabled' => '1',
+            'notifications_digest_time' => '07:05',
             default => '',
         };
     }
@@ -96,6 +104,9 @@ class SettingIndex extends Component
             'values.account_adjustment_loss' => ['nullable', 'string', 'max:20'],
             'values.account_transfer_clearing' => ['nullable', 'string', 'max:20'],
             'values.account_goods_receipt_clearing' => ['nullable', 'string', 'max:20'],
+            'values.notifications_email_enabled' => ['required', 'in:0,1'],
+            'values.notifications_digest_enabled' => ['required', 'in:0,1'],
+            'values.notifications_digest_time' => ['required', 'regex:/^\d{2}:\d{2}$/'],
         ];
 
         $validated = $this->validate($rules)['values'];
