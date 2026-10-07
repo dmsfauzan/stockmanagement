@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Exports\TransferExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Transfer')]
 class TransferReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -33,6 +34,11 @@ class TransferReport extends Component
     public string $dateTo = '';
 
     public int $perPage = 15;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'statusFilter', 'fromWarehouseFilter', 'toWarehouseFilter', 'dateFrom', 'dateTo'];
+    }
 
     public function mount(): void
     {

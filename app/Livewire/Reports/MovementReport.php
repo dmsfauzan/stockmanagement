@@ -5,6 +5,7 @@ namespace App\Livewire\Reports;
 use App\Enums\TransactionType;
 use App\Exports\MovementExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Item;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Pergerakan Stok')]
 class MovementReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -38,6 +39,11 @@ class MovementReport extends Component
     public string $toDate = '';
 
     public int $perPage = 15;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'itemFilter', 'warehouseFilter', 'transactionTypeFilter', 'userFilter', 'fromDate', 'toDate'];
+    }
 
     public function mount(): void
     {

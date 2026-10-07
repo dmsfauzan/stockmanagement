@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Exports\WarehouseComparisonExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Services\Inventory\ExpiryService;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Carbon;
@@ -18,9 +19,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Perbandingan Gudang')]
 class WarehouseComparisonReport extends Component
 {
-    use HandlesReportExport;
+    use HandlesReportExport, HandlesSavedFilters;
 
     public string $search = '';
+
+    protected function filterKeys(): array
+    {
+        return ['search'];
+    }
 
     public function mount(): void
     {

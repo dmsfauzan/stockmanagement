@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Exports\OpnameExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Opname')]
 class OpnameReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -31,6 +32,11 @@ class OpnameReport extends Component
     public string $dateTo = '';
 
     public int $perPage = 15;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'statusFilter', 'warehouseFilter', 'dateFrom', 'dateTo'];
+    }
 
     public function mount(): void
     {

@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Exports\IncomingExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Barang Masuk')]
 class IncomingReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -32,6 +33,11 @@ class IncomingReport extends Component
     public string $toDate = '';
 
     public int $perPage = 15;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'supplierFilter', 'warehouseFilter', 'fromDate', 'toDate'];
+    }
 
     public function mount(): void
     {

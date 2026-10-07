@@ -46,6 +46,9 @@
                     <x-ui.button variant="secondary" wire:click="resetFilters">Reset</x-ui.button>
                 </div>
             </div>
+            <div class="mt-3">
+                @include('livewire.reports._saved-filters')
+            </div>
         </div>
 
         <div class="overflow-x-auto">

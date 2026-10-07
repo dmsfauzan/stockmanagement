@@ -66,6 +66,9 @@
             <div class="mt-3">
                 <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost">Reset Filter</button>
             </div>
+            <div class="mt-3">
+                @include('livewire.reports._saved-filters')
+            </div>
         </div>
 
         <div class="overflow-x-auto">

@@ -3,6 +3,7 @@
 namespace App\Livewire\Reports;
 
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\PurchaseOrder;
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Replenishment')]
 class ReplenishmentReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -39,6 +40,11 @@ class ReplenishmentReport extends Component
     public string $supplierForPo = '';
 
     public bool $selectAll = false;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'warehouseFilter', 'categoryFilter'];
+    }
 
     public function mount(): void
     {

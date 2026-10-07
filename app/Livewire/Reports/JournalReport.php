@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Exports\JournalExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
 use App\Services\Accounting\JournalService;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Jurnal Akuntansi')]
 class JournalReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -32,6 +33,11 @@ class JournalReport extends Component
     public string $dateTo = '';
 
     public int $perPage = 15;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'warehouseFilter', 'transactionType', 'dateFrom', 'dateTo'];
+    }
 
     public function mount(): void
     {

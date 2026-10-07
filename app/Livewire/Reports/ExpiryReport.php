@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Exports\ExpiryExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Location;
 use App\Models\Warehouse;
 use App\Services\Inventory\ExpiryService;
@@ -20,7 +21,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Kedaluwarsa')]
 class ExpiryReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -37,6 +38,11 @@ class ExpiryReport extends Component
     public string $toDate = '';
 
     public int $perPage = 15;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'statusFilter', 'warehouseFilter', 'locationFilter', 'batchSearch', 'fromDate', 'toDate'];
+    }
 
     public function mount(): void
     {

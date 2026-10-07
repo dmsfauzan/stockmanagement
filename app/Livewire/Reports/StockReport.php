@@ -5,6 +5,7 @@ namespace App\Livewire\Reports;
 use App\Enums\StockStatus;
 use App\Exports\StockExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\Warehouse;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Stok')]
 class StockReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -38,6 +39,11 @@ class StockReport extends Component
     public string $sortDirection = 'asc';
 
     public int $perPage = 15;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'warehouseFilter', 'locationFilter', 'categoryFilter', 'statusFilter'];
+    }
 
     public function mount(): void
     {

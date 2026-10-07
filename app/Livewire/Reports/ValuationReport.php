@@ -4,6 +4,7 @@ namespace App\Livewire\Reports;
 
 use App\Exports\ValuationExport;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
+use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Category;
 use App\Models\Warehouse;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 #[Title('Laporan Valuasi')]
 class ValuationReport extends Component
 {
-    use HandlesReportExport, WithPagination;
+    use HandlesReportExport, HandlesSavedFilters, WithPagination;
 
     public string $search = '';
 
@@ -28,6 +29,11 @@ class ValuationReport extends Component
     public string $categoryFilter = '';
 
     public int $perPage = 15;
+
+    protected function filterKeys(): array
+    {
+        return ['search', 'warehouseFilter', 'categoryFilter'];
+    }
 
     public function mount(): void
     {

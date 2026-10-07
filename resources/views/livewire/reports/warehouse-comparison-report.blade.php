@@ -37,6 +37,9 @@
                 </div>
                 <span class="hidden text-sm text-app-muted sm:inline">{{ $rows->count() }} gudang</span>
             </div>
+            <div class="mt-3">
+                @include('livewire.reports._saved-filters')
+            </div>
         </div>
 
         <div class="overflow-x-auto">

@@ -65,6 +65,9 @@
                     </select>
                 </div>
             </div>
+            <div class="mt-3 px-4 pb-1">
+                @include('livewire.reports._saved-filters')
+            </div>
         </div>
 
         <div class="overflow-x-auto">

@@ -44,6 +44,9 @@
                     @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
                 </select>
             </div>
+            <div class="mt-3">
+                @include('livewire.reports._saved-filters')
+            </div>
         </div>
 
         <div class="overflow-x-auto">
