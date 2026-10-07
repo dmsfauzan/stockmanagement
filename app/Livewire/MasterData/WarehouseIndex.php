@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Warehouse')]
@@ -21,6 +22,10 @@ class WarehouseIndex extends Component
     public string $statusFilter = '';
 
     public int $perPage = 10;
+
+    public array $selectedIds = [];
+
+    public bool $selectAll = false;
 
     public bool $showModal = false;
 
@@ -42,6 +47,37 @@ class WarehouseIndex extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectedIds(): void
+    {
+        if ($this->selectedIds === []) {
+            $this->selectAll = false;
+        }
+    }
+
+    public function updatedSelectAll(): void
+    {
+        $this->toggleSelectAll();
+    }
+
+    public function toggleSelectAll(): void
+    {
+        if (! $this->selectAll) {
+            $this->selectedIds = [];
+
+            return;
+        }
+
+        $this->selectedIds = Warehouse::query()
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->when($this->statusFilter !== '', fn ($query) => $query->where('status', $this->statusFilter))
+            ->orderBy('name')
+            ->paginate($this->perPage)
+            ->pluck('id')->map(fn ($id) => (int) $id)->all();
     }
 
     public function updatedStatusFilter(): void
@@ -119,6 +155,107 @@ class WarehouseIndex extends Component
         AuditLogger::logModel('delete', $warehouse, $old);
 
         $this->dispatch('toast', type: 'success', message: 'Warehouse dihapus.');
+    }
+
+    public function bulkDelete(): void
+    {
+        abort_unless(auth()->user()->hasPermission('warehouse.delete'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach (Warehouse::whereIn('id', $this->selectedIds)->get() as $warehouse) {
+            if (auth()->user()->cannot('delete', $warehouse)) {
+                $skipped++;
+
+                continue;
+            }
+
+            $old = $warehouse->toArray();
+            $warehouse->delete();
+            AuditLogger::logModel('delete', $warehouse, $old);
+            $deleted++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} warehouse, {$skipped} dilewati.");
+    }
+
+    public function bulkActivate(): void
+    {
+        $this->bulkSetStatus('active');
+    }
+
+    public function bulkDeactivate(): void
+    {
+        $this->bulkSetStatus('inactive');
+    }
+
+    protected function bulkSetStatus(string $status): void
+    {
+        abort_unless(auth()->user()->hasPermission('warehouse.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Warehouse::whereIn('id', $this->selectedIds)->get() as $warehouse) {
+            $old = $warehouse->toArray();
+            $warehouse->update(['status' => $status]);
+            AuditLogger::logModel('update', $warehouse, $old, $warehouse->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "{$count} warehouse diperbarui menjadi {$status}.");
+    }
+
+    public function export(): StreamedResponse
+    {
+        $this->authorize('viewAny', Warehouse::class);
+
+        $rows = Warehouse::query()
+            ->withCount('zones')
+            ->withCount(['zones as racks_count' => fn ($q) => $q->join('racks', 'racks.zone_id', '=', 'zones.id')])
+            ->withCount(['zones as locations_count' => fn ($q) => $q->join('racks', 'racks.zone_id', '=', 'zones.id')->join('locations', 'locations.rack_id', '=', 'racks.id')])
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->when($this->statusFilter !== '', fn ($query) => $query->where('status', $this->statusFilter))
+            ->orderBy('name')
+            ->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Code', 'Name', 'Address', 'Status', 'Zones', 'Racks', 'Locations']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->code,
+                    $row->name,
+                    $row->address,
+                    $row->status,
+                    $row->zones_count,
+                    $row->racks_count,
+                    $row->locations_count,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'warehouses-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()

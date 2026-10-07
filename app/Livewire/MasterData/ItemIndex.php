@@ -33,6 +33,10 @@ class ItemIndex extends Component
 
     public int $perPage = 10;
 
+    public array $selectedIds = [];
+
+    public bool $selectAll = false;
+
     public $importFile = null;
 
     public bool $showImportModal = false;
@@ -69,6 +73,29 @@ class ItemIndex extends Component
         $this->resetPage();
     }
 
+    public function updatedSelectedIds(): void
+    {
+        if ($this->selectedIds === []) {
+            $this->selectAll = false;
+        }
+    }
+
+    public function updatedSelectAll(): void
+    {
+        $this->toggleSelectAll();
+    }
+
+    public function toggleSelectAll(): void
+    {
+        if (! $this->selectAll) {
+            $this->selectedIds = [];
+
+            return;
+        }
+
+        $this->selectedIds = $this->baseQuery()->orderBy($this->sortField, $this->sortDirection)->paginate($this->perPage)->pluck('id')->map(fn ($id) => (int) $id)->all();
+    }
+
     public function sortBy(string $field): void
     {
         if (! in_array($field, ['sku', 'name', 'created_at'], true)) {
@@ -97,6 +124,75 @@ class ItemIndex extends Component
         AuditLogger::logModel('delete', $item, $old);
 
         $this->dispatch('toast', type: 'success', message: 'Barang dihapus.');
+    }
+
+    public function bulkDelete(): void
+    {
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach (Item::whereIn('id', $this->selectedIds)->get() as $item) {
+            try {
+                $this->authorize('delete', $item);
+            } catch (\Illuminate\Auth\Access\AuthorizationException) {
+                $skipped++;
+
+                continue;
+            }
+
+            $old = $item->toArray();
+            $item->delete();
+            AuditLogger::logModel('delete', $item, $old);
+            $deleted++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} barang, {$skipped} dilewati.");
+    }
+
+    public function bulkActivate(): void
+    {
+        $this->bulkSetStatus('active');
+    }
+
+    public function bulkDeactivate(): void
+    {
+        $this->bulkSetStatus('inactive');
+    }
+
+    protected function bulkSetStatus(string $status): void
+    {
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Item::whereIn('id', $this->selectedIds)->get() as $item) {
+            try {
+                $this->authorize('update', $item);
+            } catch (\Illuminate\Auth\Access\AuthorizationException) {
+                continue;
+            }
+
+            $old = $item->toArray();
+            $item->update(['status' => $status]);
+            AuditLogger::logModel('update', $item, $old, $item->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "{$count} barang diperbarui menjadi {$status}.");
     }
 
     public function openImportModal(): void

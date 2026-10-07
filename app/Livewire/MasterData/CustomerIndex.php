@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Customer / Department')]
@@ -23,6 +24,10 @@ class CustomerIndex extends Component
     public string $statusFilter = '';
 
     public int $perPage = 10;
+
+    public array $selectedIds = [];
+
+    public bool $selectAll = false;
 
     public bool $showModal = false;
 
@@ -52,6 +57,40 @@ class CustomerIndex extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectedIds(): void
+    {
+        if ($this->selectedIds === []) {
+            $this->selectAll = false;
+        }
+    }
+
+    public function updatedSelectAll(): void
+    {
+        $this->toggleSelectAll();
+    }
+
+    public function toggleSelectAll(): void
+    {
+        if (! $this->selectAll) {
+            $this->selectedIds = [];
+
+            return;
+        }
+
+        $this->selectedIds = Customer::query()
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)
+                    ->orWhere('name', 'like', $term)
+                    ->orWhere('contact_person', 'like', $term));
+            })
+            ->when($this->typeFilter !== '', fn ($query) => $query->where('type', $this->typeFilter))
+            ->when($this->statusFilter !== '', fn ($query) => $query->where('status', $this->statusFilter))
+            ->orderBy('name')
+            ->paginate($this->perPage)
+            ->pluck('id')->map(fn ($id) => (int) $id)->all();
     }
 
     public function updatedTypeFilter(): void
@@ -145,6 +184,101 @@ class CustomerIndex extends Component
         AuditLogger::logModel('delete', $customer, $old);
 
         $this->dispatch('toast', type: 'success', message: 'Customer dihapus.');
+    }
+
+    public function bulkDelete(): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.delete'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $deleted = 0;
+
+        foreach (Customer::whereIn('id', $this->selectedIds)->get() as $customer) {
+            $old = $customer->toArray();
+            $customer->delete();
+            AuditLogger::logModel('delete', $customer, $old);
+            $deleted++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "Hapus {$deleted} customer.");
+    }
+
+    public function bulkActivate(): void
+    {
+        $this->bulkSetStatus('active');
+    }
+
+    public function bulkDeactivate(): void
+    {
+        $this->bulkSetStatus('inactive');
+    }
+
+    protected function bulkSetStatus(string $status): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Customer::whereIn('id', $this->selectedIds)->get() as $customer) {
+            $old = $customer->toArray();
+            $customer->update(['status' => $status]);
+            AuditLogger::logModel('update', $customer, $old, $customer->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "{$count} customer diperbarui menjadi {$status}.");
+    }
+
+    public function export(): StreamedResponse
+    {
+        abort_unless(auth()->user()->hasPermission('items.view'), 403);
+
+        $rows = Customer::query()
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)
+                    ->orWhere('name', 'like', $term)
+                    ->orWhere('contact_person', 'like', $term));
+            })
+            ->when($this->typeFilter !== '', fn ($query) => $query->where('type', $this->typeFilter))
+            ->when($this->statusFilter !== '', fn ($query) => $query->where('status', $this->statusFilter))
+            ->orderBy('name')
+            ->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Code', 'Name', 'Type', 'Contact Person', 'Phone', 'Email', 'Address', 'Status']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->code,
+                    $row->name,
+                    $row->type,
+                    $row->contact_person,
+                    $row->phone,
+                    $row->email,
+                    $row->address,
+                    $row->status,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'customers-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()

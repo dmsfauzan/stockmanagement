@@ -20,6 +20,15 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    @if (count($selectedIds) > 0)
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+            <span class="text-xs font-medium text-app-text">{{ count($selectedIds) }} dipilih</span>
+            <x-ui.confirm action="bulkActivate" title="Aktifkan massal" :message="'Aktifkan '.count($selectedIds).' barang terpilih?'" confirm-label="Aktifkan" class="app-btn app-btn-secondary app-btn-sm">Aktifkan</x-ui.confirm>
+            <x-ui.confirm action="bulkDeactivate" title="Nonaktifkan massal" :message="'Nonaktifkan '.count($selectedIds).' barang terpilih?'" confirm-label="Nonaktifkan" class="app-btn app-btn-secondary app-btn-sm">Nonaktifkan</x-ui.confirm>
+            <x-ui.confirm action="bulkDelete" title="Hapus massal" :message="'Hapus '.count($selectedIds).' barang terpilih?'" confirm-label="Hapus" variant="danger" class="app-btn app-btn-danger app-btn-sm">Hapus</x-ui.confirm>
+        </div>
+    @endif
+
     <div
         x-data="{
             selectedCount: 0,
@@ -81,7 +90,7 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th class="w-10"><input type="checkbox" @change="toggleAll($event)" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500" aria-label="Pilih semua"></th>
+                        <th class="w-10"><input type="checkbox" wire:model.live="selectAll" @change="toggleAll($event)" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500" aria-label="Pilih semua"></th>
                         <th>
                             <button type="button" wire:click="sortBy('sku')" class="inline-flex items-center gap-1 hover:text-app-text">
                                 SKU
@@ -110,7 +119,7 @@
                 <tbody>
                     @forelse ($items as $item)
                         <tr>
-                            <td><input type="checkbox" name="labelIds" value="{{ $item->id }}" @change="refreshCount()" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500"></td>
+                            <td><input type="checkbox" name="labelIds" value="{{ $item->id }}" wire:model.live="selectedIds" @change="refreshCount()" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500"></td>
                             <td class="whitespace-nowrap font-medium">{{ $item->sku }}</td>
                             <td class="whitespace-nowrap text-app-muted">{{ $item->barcode ?? '-' }}</td>
                             <td>{{ $item->name }}</td>

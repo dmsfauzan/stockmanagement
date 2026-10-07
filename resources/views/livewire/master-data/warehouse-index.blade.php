@@ -1,6 +1,10 @@
 <div>
     <x-ui.page-header title="Warehouse" subtitle="Kelola gudang dan struktur penyimpanan">
         <x-slot:actions>
+            <button type="button" wire:click="export" class="app-btn app-btn-secondary gap-2">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                Export
+            </button>
             <button type="button" wire:click="openCreate" class="app-btn app-btn-primary gap-2">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Tambah Warehouse
@@ -30,10 +34,20 @@
             </div>
         </div>
 
+        @if (count($selectedIds) > 0)
+            <div class="flex flex-wrap items-center gap-2 border-b border-app-border px-4 py-3">
+                <span class="text-xs font-medium text-app-text">{{ count($selectedIds) }} dipilih</span>
+                <x-ui.confirm action="bulkActivate" title="Aktifkan massal" :message="'Aktifkan '.count($selectedIds).' warehouse terpilih?'" confirm-label="Aktifkan" class="app-btn app-btn-secondary app-btn-sm">Aktifkan</x-ui.confirm>
+                <x-ui.confirm action="bulkDeactivate" title="Nonaktifkan massal" :message="'Nonaktifkan '.count($selectedIds).' warehouse terpilih?'" confirm-label="Nonaktifkan" class="app-btn app-btn-secondary app-btn-sm">Nonaktifkan</x-ui.confirm>
+                <x-ui.confirm action="bulkDelete" title="Hapus massal" :message="'Hapus '.count($selectedIds).' warehouse terpilih?'" confirm-label="Hapus" variant="danger" class="app-btn app-btn-danger app-btn-sm">Hapus</x-ui.confirm>
+            </div>
+        @endif
+
         <div class="overflow-x-auto">
             <table class="app-table">
                 <thead>
                     <tr>
+                        <th class="w-8"><input type="checkbox" wire:model.live="selectAll" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500"></th>
                         <th>Kode</th>
                         <th>Nama</th>
                         <th>Alamat</th>
@@ -45,6 +59,7 @@
                 <tbody>
                     @forelse ($warehouses as $warehouse)
                         <tr>
+                            <td><input type="checkbox" value="{{ $warehouse->id }}" wire:model.live="selectedIds" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500"></td>
                             <td class="whitespace-nowrap font-medium">{{ $warehouse->code }}</td>
                             <td>{{ $warehouse->name }}</td>
                             <td class="text-app-muted">{{ \Illuminate\Support\Str::limit($warehouse->address ?? '-', 50) }}</td>
@@ -60,7 +75,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6"><x-ui.empty-state title="Tidak ada warehouse" message="Belum ada warehouse yang cocok dengan pencarian." /></td></tr>
+                        <tr><td colspan="7"><x-ui.empty-state title="Tidak ada warehouse" message="Belum ada warehouse yang cocok dengan pencarian." /></td></tr>
                     @endforelse
                 </tbody>
             </table>

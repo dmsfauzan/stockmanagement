@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Unit')]
@@ -19,6 +20,10 @@ class UnitIndex extends Component
     public string $search = '';
 
     public int $perPage = 10;
+
+    public array $selectedIds = [];
+
+    public bool $selectAll = false;
 
     public bool $showModal = false;
 
@@ -36,6 +41,36 @@ class UnitIndex extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectedIds(): void
+    {
+        if ($this->selectedIds === []) {
+            $this->selectAll = false;
+        }
+    }
+
+    public function updatedSelectAll(): void
+    {
+        $this->toggleSelectAll();
+    }
+
+    public function toggleSelectAll(): void
+    {
+        if (! $this->selectAll) {
+            $this->selectedIds = [];
+
+            return;
+        }
+
+        $this->selectedIds = Unit::query()
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->orderBy('name')
+            ->paginate($this->perPage)
+            ->pluck('id')->map(fn ($id) => (int) $id)->all();
     }
 
     public function openCreate(): void
@@ -108,6 +143,65 @@ class UnitIndex extends Component
         AuditLogger::logModel('delete', $unit, $old);
 
         $this->dispatch('toast', type: 'success', message: 'Unit dihapus.');
+    }
+
+    public function bulkDelete(): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.delete'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach (Unit::whereIn('id', $this->selectedIds)->get() as $unit) {
+            if ($unit->items()->exists()) {
+                $skipped++;
+
+                continue;
+            }
+
+            $old = $unit->toArray();
+            $unit->delete();
+            AuditLogger::logModel('delete', $unit, $old);
+            $deleted++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} unit, {$skipped} dilewati.");
+    }
+
+    public function export(): StreamedResponse
+    {
+        abort_unless(auth()->user()->hasPermission('items.view'), 403);
+
+        $rows = Unit::query()
+            ->withCount('items')
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->orderBy('name')
+            ->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Code', 'Name']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->code,
+                    $row->name,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'units-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()

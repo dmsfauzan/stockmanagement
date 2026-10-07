@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Kategori')]
@@ -19,6 +20,10 @@ class CategoryIndex extends Component
     public string $search = '';
 
     public int $perPage = 10;
+
+    public array $selectedIds = [];
+
+    public bool $selectAll = false;
 
     public bool $showModal = false;
 
@@ -40,6 +45,38 @@ class CategoryIndex extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectedIds(): void
+    {
+        if ($this->selectedIds === []) {
+            $this->selectAll = false;
+        }
+    }
+
+    public function updatedSelectAll(): void
+    {
+        $this->toggleSelectAll();
+    }
+
+    public function toggleSelectAll(): void
+    {
+        if (! $this->selectAll) {
+            $this->selectedIds = [];
+
+            return;
+        }
+
+        $this->selectedIds = Category::query()
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->orderBy('name')
+            ->paginate($this->perPage)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
     }
 
     public function openCreate(): void
@@ -119,6 +156,102 @@ class CategoryIndex extends Component
         AuditLogger::logModel('delete', $category, $old);
 
         $this->dispatch('toast', type: 'success', message: 'Kategori dihapus.');
+    }
+
+    public function bulkDelete(): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.delete'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach (Category::whereIn('id', $this->selectedIds)->get() as $category) {
+            if ($category->items()->exists()) {
+                $skipped++;
+
+                continue;
+            }
+
+            $old = $category->toArray();
+            $category->delete();
+            AuditLogger::logModel('delete', $category, $old);
+            $deleted++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} kategori, {$skipped} dilewati.");
+    }
+
+    public function bulkActivate(): void
+    {
+        $this->bulkSetStatus('active');
+    }
+
+    public function bulkDeactivate(): void
+    {
+        $this->bulkSetStatus('inactive');
+    }
+
+    protected function bulkSetStatus(string $status): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Category::whereIn('id', $this->selectedIds)->get() as $category) {
+            $old = $category->toArray();
+            $category->update(['status' => $status]);
+            AuditLogger::logModel('update', $category, $old, $category->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "{$count} kategori diperbarui menjadi {$status}.");
+    }
+
+    public function export(): StreamedResponse
+    {
+        abort_unless(auth()->user()->hasPermission('items.view'), 403);
+
+        $rows = Category::query()
+            ->withCount('items')
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->orderBy('name')
+            ->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Code', 'Name', 'Description', 'Status', 'Items Count']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->code,
+                    $row->name,
+                    $row->description,
+                    $row->status,
+                    $row->items_count,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'categories-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()

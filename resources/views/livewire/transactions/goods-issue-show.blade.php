@@ -155,6 +155,28 @@
                     @endif
                 @endcan
             @endif
+
+            <div x-data="{ open: false }">
+                <x-ui.card>
+                    <div class="flex items-center justify-between gap-2">
+                        <h2 class="app-card-title">Riwayat Audit</h2>
+                        <button type="button" @click="open = true" class="app-btn app-btn-secondary app-btn-sm">Riwayat</button>
+                    </div>
+                    <p class="mt-1 text-xs text-app-muted">Jejak perubahan transaksi ini.</p>
+                </x-ui.card>
+                <div x-show="open" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+                    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="open = false"></div>
+                    <div class="relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-app-border bg-app-surface shadow-popover">
+                        <div class="flex items-center justify-between border-b border-app-border px-5 py-3">
+                            <h3 class="text-base font-semibold text-app-text">Riwayat Audit</h3>
+                            <button type="button" @click="open = false" class="app-btn app-btn-ghost !p-1.5 text-lg leading-none">&times;</button>
+                        </div>
+                        <div class="overflow-y-auto p-5">
+                            <x-ui.audit-history :auditableType="\App\Models\GoodsIssue::class" :auditableId="$issue->id" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

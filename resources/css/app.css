@@ -37,6 +37,7 @@
     .app-btn-secondary { @apply border border-app-border bg-app-surface text-app-text hover:bg-app-surface-2; }
     .app-btn-ghost { @apply text-app-muted hover:bg-app-surface-2 hover:text-app-text; }
     .app-btn-danger { @apply bg-rose-600 text-white hover:bg-rose-700; }
+    .app-btn-sm { @apply !px-2.5 !py-1.5 text-xs; }
     .app-input, .app-select, .app-textarea {
         @apply w-full rounded-lg border border-app-border bg-app-surface px-3 py-2 text-sm text-app-text placeholder:text-slate-400 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-100 dark:placeholder:text-slate-500 dark:focus:border-primary-500 dark:focus:ring-primary-900/30;
     }

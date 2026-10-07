@@ -12,6 +12,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Location / Rack')]
@@ -26,6 +27,10 @@ class LocationIndex extends Component
     public string $zoneFilter = '';
 
     public int $perPage = 10;
+
+    public array $selectedIds = [];
+
+    public bool $selectAll = false;
 
     public bool $showModal = false;
 
@@ -49,6 +54,42 @@ class LocationIndex extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectedIds(): void
+    {
+        if ($this->selectedIds === []) {
+            $this->selectAll = false;
+        }
+    }
+
+    public function updatedSelectAll(): void
+    {
+        $this->toggleSelectAll();
+    }
+
+    public function toggleSelectAll(): void
+    {
+        if (! $this->selectAll) {
+            $this->selectedIds = [];
+
+            return;
+        }
+
+        $this->selectedIds = Location::query()
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->when($this->warehouseFilter !== '', function ($query): void {
+                $query->whereHas('rack.zone', fn ($inner) => $inner->where('warehouse_id', $this->warehouseFilter));
+            })
+            ->when($this->zoneFilter !== '', function ($query): void {
+                $query->whereHas('rack', fn ($inner) => $inner->where('zone_id', $this->zoneFilter));
+            })
+            ->orderBy('code')
+            ->paginate($this->perPage)
+            ->pluck('id')->map(fn ($id) => (int) $id)->all();
     }
 
     public function updatedWarehouseFilter(): void
@@ -166,6 +207,75 @@ class LocationIndex extends Component
         AuditLogger::logModel('delete', $location, $old);
 
         $this->dispatch('toast', type: 'success', message: 'Location dihapus.');
+    }
+
+    public function bulkDelete(): void
+    {
+        abort_unless(auth()->user()->hasPermission('location.delete'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach (Location::whereIn('id', $this->selectedIds)->get() as $location) {
+            if (auth()->user()->cannot('delete', $location)) {
+                $skipped++;
+
+                continue;
+            }
+
+            $old = $location->toArray();
+            $location->delete();
+            AuditLogger::logModel('delete', $location, $old);
+            $deleted++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} lokasi, {$skipped} dilewati.");
+    }
+
+    public function export(): StreamedResponse
+    {
+        $this->authorize('viewAny', Location::class);
+
+        $rows = Location::query()
+            ->with(['rack.zone.warehouse'])
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->when($this->warehouseFilter !== '', function ($query): void {
+                $query->whereHas('rack.zone', fn ($inner) => $inner->where('warehouse_id', $this->warehouseFilter));
+            })
+            ->when($this->zoneFilter !== '', function ($query): void {
+                $query->whereHas('rack', fn ($inner) => $inner->where('zone_id', $this->zoneFilter));
+            })
+            ->orderBy('code')
+            ->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Code', 'Name', 'Warehouse', 'Zone', 'Rack', 'Full Path']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->code,
+                    $row->name,
+                    $row->rack?->zone?->warehouse?->name,
+                    $row->rack?->zone?->name,
+                    $row->rack?->name,
+                    $row->fullPath(),
+                ]);
+            }
+
+            fclose($handle);
+        }, 'locations-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()

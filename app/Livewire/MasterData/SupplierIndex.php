@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.app')]
 #[Title('Supplier')]
@@ -21,6 +22,10 @@ class SupplierIndex extends Component
     public string $statusFilter = '';
 
     public int $perPage = 10;
+
+    public array $selectedIds = [];
+
+    public bool $selectAll = false;
 
     public bool $showModal = false;
 
@@ -54,6 +59,40 @@ class SupplierIndex extends Component
     public function updatedSearch(): void
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectedIds(): void
+    {
+        if ($this->selectedIds === []) {
+            $this->selectAll = false;
+        }
+    }
+
+    public function updatedSelectAll(): void
+    {
+        $this->toggleSelectAll();
+    }
+
+    public function toggleSelectAll(): void
+    {
+        if (! $this->selectAll) {
+            $this->selectedIds = [];
+
+            return;
+        }
+
+        $this->selectedIds = Supplier::query()
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)
+                    ->orWhere('name', 'like', $term)
+                    ->orWhere('contact_person', 'like', $term)
+                    ->orWhere('phone', 'like', $term));
+            })
+            ->when($this->statusFilter !== '', fn ($query) => $query->where('status', $this->statusFilter))
+            ->orderBy('name')
+            ->paginate($this->perPage)
+            ->pluck('id')->map(fn ($id) => (int) $id)->all();
     }
 
     public function updatedStatusFilter(): void
@@ -154,6 +193,112 @@ class SupplierIndex extends Component
         AuditLogger::logModel('delete', $supplier, $old);
 
         $this->dispatch('toast', type: 'success', message: 'Supplier dihapus.');
+    }
+
+    public function bulkDelete(): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.delete'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach (Supplier::whereIn('id', $this->selectedIds)->get() as $supplier) {
+            if ($supplier->primaryItems()->exists()) {
+                $skipped++;
+
+                continue;
+            }
+
+            $old = $supplier->toArray();
+            $supplier->delete();
+            AuditLogger::logModel('delete', $supplier, $old);
+            $deleted++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} supplier, {$skipped} dilewati.");
+    }
+
+    public function bulkActivate(): void
+    {
+        $this->bulkSetStatus('active');
+    }
+
+    public function bulkDeactivate(): void
+    {
+        $this->bulkSetStatus('inactive');
+    }
+
+    protected function bulkSetStatus(string $status): void
+    {
+        abort_unless(auth()->user()->hasPermission('items.update'), 403);
+
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+
+            return;
+        }
+
+        $count = 0;
+
+        foreach (Supplier::whereIn('id', $this->selectedIds)->get() as $supplier) {
+            $old = $supplier->toArray();
+            $supplier->update(['status' => $status]);
+            AuditLogger::logModel('update', $supplier, $old, $supplier->fresh()->toArray());
+            $count++;
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $this->dispatch('toast', type: 'success', message: "{$count} supplier diperbarui menjadi {$status}.");
+    }
+
+    public function export(): StreamedResponse
+    {
+        abort_unless(auth()->user()->hasPermission('items.view'), 403);
+
+        $rows = Supplier::query()
+            ->withCount('primaryItems')
+            ->when($this->search !== '', function ($query): void {
+                $term = '%'.$this->search.'%';
+                $query->where(fn ($inner) => $inner->where('code', 'like', $term)
+                    ->orWhere('name', 'like', $term)
+                    ->orWhere('contact_person', 'like', $term)
+                    ->orWhere('phone', 'like', $term));
+            })
+            ->when($this->statusFilter !== '', fn ($query) => $query->where('status', $this->statusFilter))
+            ->orderBy('name')
+            ->get();
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Code', 'Name', 'Contact Person', 'Phone', 'Email', 'Address', 'Status', 'Lead Time Days', 'Payment Terms', 'Region', 'Primary Items Count']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->code,
+                    $row->name,
+                    $row->contact_person,
+                    $row->phone,
+                    $row->email,
+                    $row->address,
+                    $row->status,
+                    $row->lead_time_days,
+                    $row->payment_terms,
+                    $row->region,
+                    $row->primary_items_count,
+                ]);
+            }
+
+            fclose($handle);
+        }, 'suppliers-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv']);
     }
 
     public function render()
