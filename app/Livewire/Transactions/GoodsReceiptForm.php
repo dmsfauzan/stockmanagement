@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Transactions;
 
+use App\Enums\TrackingType;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
 use App\Models\Location;
@@ -72,6 +73,7 @@ class GoodsReceiptForm extends Component
                 'unit_id' => (string) $item->unit_id,
                 'location_id' => (string) $item->location_id,
                 'batch_number' => (string) ($item->batch_number ?? ''),
+                'serial_number' => (string) ($item->serial_number ?? ''),
                 'expiry_date' => $item->expiry_date?->format('Y-m-d') ?? '',
                 'notes' => (string) ($item->notes ?? ''),
             ])->values()->all();
@@ -119,6 +121,7 @@ class GoodsReceiptForm extends Component
                 'unit_id' => (string) $item->unit_id,
                 'location_id' => '',
                 'batch_number' => '',
+                'serial_number' => '',
                 'expiry_date' => '',
                 'notes' => 'Dari '.$order->number,
             ])->values()->all();
@@ -145,6 +148,7 @@ class GoodsReceiptForm extends Component
             'items.*.unit_id' => ['required', 'exists:units,id'],
             'items.*.location_id' => ['required', 'exists:locations,id'],
             'items.*.batch_number' => ['nullable', 'string', 'max:60'],
+            'items.*.serial_number' => ['nullable', 'string', 'max:80'],
             'items.*.expiry_date' => ['nullable', 'date'],
             'items.*.notes' => ['nullable', 'string', 'max:255'],
         ];
@@ -159,6 +163,7 @@ class GoodsReceiptForm extends Component
             'unit_id' => '',
             'location_id' => '',
             'batch_number' => '',
+            'serial_number' => '',
             'expiry_date' => '',
             'notes' => '',
         ];
@@ -217,6 +222,7 @@ class GoodsReceiptForm extends Component
             'unit_id' => (string) $item->unit_id,
             'location_id' => '',
             'batch_number' => '',
+            'serial_number' => '',
             'expiry_date' => '',
             'notes' => '',
         ];
@@ -254,6 +260,34 @@ class GoodsReceiptForm extends Component
             }
         }
 
+        foreach ($this->items as $index => $row) {
+            $item = Item::find($row['item_id']);
+
+            if (! $item) {
+                continue;
+            }
+
+            if ($item->tracking_type === TrackingType::Batch && trim((string) ($row['batch_number'] ?? '')) === '') {
+                $this->addError("items.{$index}.batch_number", 'Batch number wajib diisi untuk barang ini.');
+
+                return;
+            }
+
+            if ($item->tracking_type === TrackingType::Serial) {
+                if (trim((string) ($row['serial_number'] ?? '')) === '') {
+                    $this->addError("items.{$index}.serial_number", 'Serial number wajib diisi untuk barang ini.');
+
+                    return;
+                }
+
+                if ((int) $row['quantity'] !== 1) {
+                    $this->addError("items.{$index}.serial_number", 'Barang serial harus berkuantitas 1.');
+
+                    return;
+                }
+            }
+        }
+
         $header = [
             'transaction_date' => $data['transaction_date'],
             'supplier_id' => $data['supplier_id'],
@@ -272,6 +306,7 @@ class GoodsReceiptForm extends Component
             'unit_id' => $row['unit_id'],
             'location_id' => $row['location_id'],
             'batch_number' => $row['batch_number'] !== '' ? $row['batch_number'] : null,
+            'serial_number' => $row['serial_number'] !== '' ? $row['serial_number'] : null,
             'expiry_date' => $row['expiry_date'] !== '' ? $row['expiry_date'] : null,
             'notes' => $row['notes'] !== '' ? $row['notes'] : null,
         ], $this->items);

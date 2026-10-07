@@ -22,7 +22,8 @@ class LedgerService
         ?string $batchNumber = null,
         ?string $expiryDate = null,
         ?string $notes = null,
-        ?float $unitCost = null
+        ?float $unitCost = null,
+        ?string $serialNumber = null
     ): StockMovement {
         $balance = StockBalance::where('item_id', $itemId)
             ->where('warehouse_id', $warehouseId)
@@ -60,6 +61,12 @@ class LedgerService
 
         [$movementUnitCost, $movementTotalCost] = static::updateValuation($itemId, $warehouseId, $qtyIn, $qtyOut, $unitCost);
 
+        if ($qtyIn > 0) {
+            LotService::receive($itemId, $warehouseId, $locationId, $qtyIn, $movementUnitCost, $batchNumber, $serialNumber, $expiryDate);
+        } elseif ($qtyOut > 0) {
+            LotService::issue($itemId, $warehouseId, $locationId, $qtyOut, $batchNumber, $serialNumber);
+        }
+
         return StockMovement::create([
             'item_id' => $itemId,
             'warehouse_id' => $warehouseId,
@@ -73,6 +80,7 @@ class LedgerService
             'unit_cost' => $movementUnitCost,
             'total_cost' => $movementTotalCost,
             'batch_number' => $batchNumber,
+            'serial_number' => $serialNumber,
             'expiry_date' => $expiryDate,
             'notes' => $notes,
             'created_by' => auth()->id(),

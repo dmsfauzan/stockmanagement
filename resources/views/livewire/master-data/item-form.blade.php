@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                 <div>
                     <label for="minimum_stock" class="app-label mb-1">Minimum Stock<span class="text-rose-500">*</span></label>
                     <input type="number" id="minimum_stock" wire:model.live="minimum_stock" min="0" class="app-input">
@@ -90,6 +90,15 @@
                         <option value="inactive">Inactive</option>
                     </select>
                     @error('status') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="tracking_type" class="app-label mb-1">Tracking<span class="text-rose-500">*</span></label>
+                    <select id="tracking_type" wire:model="tracking_type" class="app-select">
+                        <option value="none">Tanpa Lot</option>
+                        <option value="batch">Batch / Lot</option>
+                        <option value="serial">Serial Number</option>
+                    </select>
+                    @error('tracking_type') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
             </div>
 

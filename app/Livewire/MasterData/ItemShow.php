@@ -2,8 +2,10 @@
 
 namespace App\Livewire\MasterData;
 
+use App\Enums\TrackingType;
 use App\Models\Item;
 use App\Models\StockBalance;
+use App\Models\StockLot;
 use App\Models\StockMovement;
 use App\Services\Inventory\StockStatusService;
 use Livewire\Attributes\Layout;
@@ -49,6 +51,15 @@ class ItemShow extends Component
             ->take(20)
             ->get();
 
+        $lots = collect();
+        if ($item->tracking_type !== TrackingType::None) {
+            $lots = StockLot::where('item_id', $item->id)
+                ->with(['warehouse', 'location.rack.zone.warehouse'])
+                ->available()
+                ->fefo()
+                ->get();
+        }
+
         $totalOnHand = (int) $balances->sum('quantity_on_hand');
         $totalReserved = (int) $balances->sum('quantity_reserved');
         $stockStatus = StockStatusService::evaluate($item, $totalOnHand);
@@ -57,6 +68,7 @@ class ItemShow extends Component
             'itemModel' => $item,
             'balances' => $balances,
             'movements' => $movements,
+            'lots' => $lots,
             'totalOnHand' => $totalOnHand,
             'totalReserved' => $totalReserved,
             'totalAvailable' => $totalOnHand - $totalReserved,

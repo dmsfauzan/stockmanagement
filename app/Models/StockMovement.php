@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['item_id', 'warehouse_id', 'location_id', 'transaction_type', 'reference_type', 'reference_id', 'quantity_in', 'quantity_out', 'balance_after', 'unit_cost', 'total_cost', 'batch_number', 'expiry_date', 'notes', 'created_by'])]
+#[Fillable(['item_id', 'warehouse_id', 'location_id', 'transaction_type', 'reference_type', 'reference_id', 'quantity_in', 'quantity_out', 'balance_after', 'unit_cost', 'total_cost', 'batch_number', 'serial_number', 'expiry_date', 'notes', 'created_by'])]
 class StockMovement extends Model
 {
     use HasFactory;

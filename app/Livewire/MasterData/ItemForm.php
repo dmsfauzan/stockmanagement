@@ -53,6 +53,8 @@ class ItemForm extends Component
 
     public string $status = 'active';
 
+    public string $tracking_type = 'none';
+
     public function mount($item = null): void
     {
         $model = $item instanceof Item ? $item : ($item ? Item::findOrFail($item) : null);
@@ -73,6 +75,7 @@ class ItemForm extends Component
             $this->cost = (float) $model->cost;
             $this->primary_supplier_id = $model->primary_supplier_id ? (string) $model->primary_supplier_id : '';
             $this->status = (string) $model->status;
+            $this->tracking_type = $model->tracking_type?->value ?? 'none';
             $this->existingImagePath = $model->image_path;
         } else {
             $this->authorize('create', Item::class);
@@ -94,6 +97,7 @@ class ItemForm extends Component
             'cost' => ['nullable', 'numeric', 'min:0'],
             'primary_supplier_id' => ['nullable', 'exists:suppliers,id'],
             'status' => ['required', 'in:active,inactive'],
+            'tracking_type' => ['required', 'in:none,batch,serial'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
         ];
     }

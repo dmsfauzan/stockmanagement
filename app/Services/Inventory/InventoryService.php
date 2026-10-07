@@ -51,7 +51,8 @@ class InventoryService
                     $item->batch_number,
                     $expiryDate,
                     $item->notes,
-                    $item->unit_cost !== null ? (float) $item->unit_cost : null
+                    isset($item->unit_cost) ? (float) $item->unit_cost : null,
+                    $item->serial_number ?? null
                 );
             }
 
@@ -115,9 +116,11 @@ class InventoryService
                     (int) $locked->id,
                     0,
                     (int) $item->quantity,
+                    $item->batch_number ?? null,
                     null,
+                    $item->notes,
                     null,
-                    $item->notes
+                    $item->serial_number ?? null
                 );
             }
 

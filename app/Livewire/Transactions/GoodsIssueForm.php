@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Transactions;
 
+use App\Enums\TrackingType;
 use App\Models\Customer;
 use App\Models\GoodsIssue;
 use App\Models\Item;
@@ -71,6 +72,8 @@ class GoodsIssueForm extends Component
                 'quantity' => (int) $item->quantity,
                 'unit_id' => (string) $item->unit_id,
                 'location_id' => (string) $item->location_id,
+                'batch_number' => (string) ($item->batch_number ?? ''),
+                'serial_number' => (string) ($item->serial_number ?? ''),
                 'notes' => (string) ($item->notes ?? ''),
             ])->values()->all();
         } else {
@@ -115,6 +118,8 @@ class GoodsIssueForm extends Component
                 'quantity' => (int) $item->quantity - (int) $item->fulfilled_quantity,
                 'unit_id' => (string) $item->unit_id,
                 'location_id' => '',
+                'batch_number' => '',
+                'serial_number' => '',
                 'notes' => 'Dari '.$order->number,
             ])->values()->all();
 
@@ -138,6 +143,8 @@ class GoodsIssueForm extends Component
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.unit_id' => ['required', 'exists:units,id'],
             'items.*.location_id' => ['required', 'exists:locations,id'],
+            'items.*.batch_number' => ['nullable', 'string', 'max:60'],
+            'items.*.serial_number' => ['nullable', 'string', 'max:80'],
             'items.*.notes' => ['nullable', 'string', 'max:255'],
         ];
     }
@@ -149,6 +156,8 @@ class GoodsIssueForm extends Component
             'quantity' => 1,
             'unit_id' => '',
             'location_id' => '',
+            'batch_number' => '',
+            'serial_number' => '',
             'notes' => '',
         ];
     }
@@ -200,6 +209,8 @@ class GoodsIssueForm extends Component
             'quantity' => 1,
             'unit_id' => (string) $item->unit_id,
             'location_id' => '',
+            'batch_number' => '',
+            'serial_number' => '',
             'notes' => '',
         ];
 
@@ -236,6 +247,34 @@ class GoodsIssueForm extends Component
             }
         }
 
+        foreach ($this->items as $index => $row) {
+            $item = Item::find($row['item_id']);
+
+            if (! $item) {
+                continue;
+            }
+
+            if ($item->tracking_type === TrackingType::Batch && trim((string) ($row['batch_number'] ?? '')) === '') {
+                $this->addError("items.{$index}.batch_number", 'Batch number wajib diisi untuk barang ini.');
+
+                return;
+            }
+
+            if ($item->tracking_type === TrackingType::Serial) {
+                if (trim((string) ($row['serial_number'] ?? '')) === '') {
+                    $this->addError("items.{$index}.serial_number", 'Serial number wajib diisi untuk barang ini.');
+
+                    return;
+                }
+
+                if ((int) $row['quantity'] !== 1) {
+                    $this->addError("items.{$index}.serial_number", 'Barang serial harus berkuantitas 1.');
+
+                    return;
+                }
+            }
+        }
+
         $header = [
             'transaction_date' => $data['transaction_date'],
             'customer_id' => $data['customer_id'] !== '' ? $data['customer_id'] : null,
@@ -252,6 +291,8 @@ class GoodsIssueForm extends Component
             'quantity' => $row['quantity'],
             'unit_id' => $row['unit_id'],
             'location_id' => $row['location_id'],
+            'batch_number' => $row['batch_number'] !== '' ? $row['batch_number'] : null,
+            'serial_number' => $row['serial_number'] !== '' ? $row['serial_number'] : null,
             'notes' => $row['notes'] !== '' ? $row['notes'] : null,
         ], $this->items);
 

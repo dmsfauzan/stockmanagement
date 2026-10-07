@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TrackingType;
 use App\Services\Support\ImageService;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['sku', 'barcode', 'name', 'category_id', 'unit_id', 'brand', 'description', 'image_path', 'minimum_stock', 'maximum_stock', 'cost', 'primary_supplier_id', 'status', 'created_by', 'updated_by'])]
+#[Fillable(['sku', 'barcode', 'name', 'category_id', 'unit_id', 'brand', 'description', 'image_path', 'minimum_stock', 'maximum_stock', 'cost', 'primary_supplier_id', 'status', 'tracking_type', 'created_by', 'updated_by'])]
 class Item extends Model
 {
     use HasFactory, SoftDeletes;
@@ -20,6 +21,7 @@ class Item extends Model
             'minimum_stock' => 'integer',
             'maximum_stock' => 'integer',
             'cost' => 'decimal:2',
+            'tracking_type' => TrackingType::class,
         ];
     }
 

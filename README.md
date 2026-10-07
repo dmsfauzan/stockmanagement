@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-200_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-204_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -79,6 +79,7 @@ flowchart LR
 | Barcode / QR | Halaman `/scan` (scanner USB + kamera), label item/lokasi + cetak bulk, prefill `?scan=` di form transaksi |
 | Reserved Stock | Stok "dipesan" dokumen terbuka menahan `available`; lepas saat reject/post/dispatch |
 | Batch & Expiry | Tracking batch/expiry, report kedaluwarsa, alert dashboard, notifikasi batch ≤ 7 hari |
+| Lot / Serial | `tracking_type` per item (none/batch/serial), tabel `stock_lots`, stok per lot/serial, FEFO |
 | Import Barang | Excel/CSV dengan template, validasi per baris, upsert by SKU (diproses di latar belakang) |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
 | Purchase Order | PO (`PO-...`) → Barang Masuk (penerimaan sebagian), progres penerimaan |

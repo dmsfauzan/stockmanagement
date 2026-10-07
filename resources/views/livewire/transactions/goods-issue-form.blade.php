@@ -83,6 +83,8 @@
                             <th class="text-right">Tersedia</th>
                             <th>Satuan</th>
                             <th>Lokasi</th>
+                            <th>Batch</th>
+                            <th>Serial</th>
                             <th>Catatan</th>
                             <th></th>
                         </tr>
@@ -127,6 +129,14 @@
                                         @endforeach
                                     </select>
                                     @error("items.{$index}.location_id") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                                </td>
+                                <td>
+                                    <input type="text" wire:model="items.{{ $index }}.batch_number" class="app-input w-28 px-2 py-2 text-sm">
+                                    @error("items.{$index}.batch_number") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                                </td>
+                                <td>
+                                    <input type="text" wire:model="items.{{ $index }}.serial_number" class="app-input w-28 px-2 py-2 text-sm">
+                                    @error("items.{$index}.serial_number") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                                 </td>
                                 <td>
                                     <input type="text" wire:model="items.{{ $index }}.notes" class="app-input w-40 px-2 py-2 text-sm">

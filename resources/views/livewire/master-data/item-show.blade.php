@@ -78,6 +78,44 @@
                         </table>
                     </div>
                 @endif
+
+                @if ($itemModel->tracking_type !== \App\Enums\TrackingType::None)
+                    <div class="mt-6">
+                        <h3 class="app-card-title mb-3">Lot / Serial</h3>
+                        @if ($lots->isEmpty())
+                            <x-ui.empty-state title="Belum ada lot" message="Tidak ada lot / serial tersedia untuk barang ini." />
+                        @else
+                            <div class="overflow-x-auto">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Warehouse</th>
+                                            <th>Location</th>
+                                            <th>Batch</th>
+                                            <th>Serial</th>
+                                            <th>Expiry</th>
+                                            <th class="text-right">Qty</th>
+                                            <th class="text-right">Unit Cost</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($lots as $lot)
+                                            <tr>
+                                                <td>{{ $lot->warehouse?->name ?? '-' }}</td>
+                                                <td class="text-app-muted">{{ $lot->location?->fullPath() ?? '-' }}</td>
+                                                <td class="text-app-muted">{{ $lot->batch_number ?: '-' }}</td>
+                                                <td class="text-app-muted">{{ $lot->serial_number ?: '-' }}</td>
+                                                <td class="whitespace-nowrap text-app-muted">{{ $lot->expiry_date?->format('d M Y') ?? '-' }}</td>
+                                                <td class="text-right font-medium">{{ $lot->quantity }}</td>
+                                                <td class="text-right text-app-muted">{{ number_format((float) $lot->unit_cost, 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+                @endif
             @elseif ($tab === 'movement')
                 @if ($movements->isEmpty())
                     <x-ui.empty-state title="Belum ada movement" message="Tidak ada pergerakan stok untuk barang ini." />
