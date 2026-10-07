@@ -34,12 +34,8 @@
             <div class="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-primary-500/10 to-transparent dark:from-primary-500/10"></div>
 
             <div class="relative w-full max-w-md">
-                <div class="mb-6 flex items-center justify-center gap-3">
-                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-base font-bold text-white shadow-sm">WS</span>
-                    <div class="text-left">
-                        <p class="text-sm font-semibold tracking-tight text-app-text">Stock Management</p>
-                        <p class="text-xs text-app-muted">Warehouse System</p>
-                    </div>
+                <div class="mb-6 flex flex-col items-center justify-center gap-3">
+                    <img src="{{ asset('images/logo.png') }}" alt="Warehouse Stock Management" class="h-auto w-full max-w-[260px] object-contain" width="260" height="84">
                 </div>
 
                 <div class="app-card p-6 sm:p-8">

@@ -100,7 +100,9 @@
     >
         <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-800 px-4">
             <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-2.5" :class="collapsed ? 'lg:mx-auto' : ''">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-sm font-bold text-white shadow-sm">WS</span>
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm">
+                    <img src="{{ asset('images/mark.png') }}" alt="WMS" class="h-full w-full object-contain" width="36" height="36">
+                </span>
                 <span x-show="!collapsed" class="truncate text-sm font-semibold tracking-tight">Stock Management</span>
             </a>
             <button @click="collapsed = !collapsed" class="ml-auto hidden shrink-0 rounded-lg p-1.5 text-slate-500 hover:bg-slate-800 hover:text-white lg:inline-flex" aria-label="Toggle sidebar">
