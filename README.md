@@ -190,8 +190,12 @@ Rute utama: `/dashboard`, `/items`, `/goods-receipts`, `/goods-issues`, `/stock`
 
 ## Keamanan & Validitas
 
-- Session auth + CSRF, password di-hash, **rate-limit login** (5/menit per email+IP).
+- Session auth + CSRF, password di-hash, **rate-limit login** (5/menit per email+IP) + **throttle** login & 2FA challenge (6/menit).
 - **Akun inactive otomatis ditolak** saat login dan dipaksa logout bila dinonaktifkan di tengah sesi (`EnsureAccountActive`); `last_login_at` tercatat.
+- **Kebijakan password**: `Password::min(12)->mixedCase()->numbers()->symbols()` (prod), min 8+letter+num di dev.
+- **Security headers** di setiap respons (HSTS bila HTTPS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`).
+- **2FA TOTP** (Google Authenticator/Authy) + recovery codes; opsional **wajibkan untuk admin** via Settings → Security.
+- **Health check**: `/health` (publik, ringan) & `/admin/health` (detail: DB, cache, storage, queue).
 - Validasi di frontend *dan* backend; error teknis tidak pernah diekspos ke pengguna.
 - Export Excel (`maatwebsite/excel`), PDF (`laravel-dompdf`), grafik (`apexcharts`).
 
@@ -215,6 +219,17 @@ npm run build            # produksi → public/build
 php artisan storage:link # lampiran adjustment
 ```
 
+### Backup (opsional tapi disarankan di produksi)
+
+```bash
+php artisan backup:run --only-db   # backup DB (terjadwal harian 01:00 via scheduler)
+php artisan backup:clean           # bersihkan backup lama (terjadwal 02:00)
+php artisan backup:monitor         # cek kesehatan backup (terjadwal 01:30)
+php artisan backup:list            # lihat daftar backup
+```
+
+Penerima notifikasi diatur via `BACKUP_MAIL_TO` (default `MAIL_FROM_ADDRESS`). Jadwal lengkap ada di `routes/console.php`.
+
 ## Roadmap
 
 - [x] Phase 1 — inti operasional
@@ -223,7 +238,9 @@ php artisan storage:link # lampiran adjustment
 - [x] Purchase Order & Multi-Warehouse (switcher + comparison report)
 - [x] Valuation (moving average) & COGS, accounting journal, replenishment
 - [x] PWA & REST API (Sanctum, 68 endpoint, workflow dari API)
-- [ ] Integrasi ERP/Accounting eksternal
+- [x] UX & Data — gambar barang/avatar, template label, saved filter & pilih kolom report
+- [x] Security & Ops — soft-delete/restore, 2FA, security headers, health, backup terjadwal
+- [ ] Sales Order, Advanced Inventory (lot/serial, cycle count), integrasi ERP/Accounting eksternal
 
 ## Berkontribusi & Lisensi
 
