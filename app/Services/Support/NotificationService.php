@@ -2,6 +2,7 @@
 
 namespace App\Services\Support;
 
+use App\Jobs\SendNotificationEmailJob;
 use App\Models\Item;
 use App\Models\Notification;
 use App\Models\StockBalance;
@@ -10,13 +11,13 @@ use App\Models\Warehouse;
 
 class NotificationService
 {
-    public static function notify(?int $userId, string $type, string $title, string $message, ?string $referenceType = null, ?int $referenceId = null): ?Notification
+    public static function notify(?int $userId, string $type, string $title, string $message, ?string $referenceType = null, ?int $referenceId = null, bool $email = true): ?Notification
     {
         if ($userId === null) {
             return null;
         }
 
-        return Notification::create([
+        $notification = Notification::create([
             'user_id' => $userId,
             'type' => $type,
             'title' => $title,
@@ -24,6 +25,15 @@ class NotificationService
             'reference_type' => $referenceType,
             'reference_id' => $referenceId,
         ]);
+
+        if ($email && NotificationPreferenceService::emailGloballyEnabled()) {
+            try {
+                dispatch(new SendNotificationEmailJob((int) $userId, $type, $title, $message));
+            } catch (\Throwable $e) {
+            }
+        }
+
+        return $notification;
     }
 
     public static function notifyRole(string $roleSlug, string $type, string $title, string $message, ?string $referenceType = null, ?int $referenceId = null): void
