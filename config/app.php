@@ -71,6 +71,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Display Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Storage stays UTC. Presentation is converted to this timezone via the
+    | to_display_tz() helper so users see local time (e.g. Asia/Jakarta).
+    |
+    */
+
+    'display_timezone' => env('DISPLAY_TIMEZONE', 'Asia/Jakarta'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

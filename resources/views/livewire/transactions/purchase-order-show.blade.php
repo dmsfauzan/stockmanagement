@@ -145,11 +145,11 @@
             <x-ui.card>
                 <h2 class="app-card-title">Audit</h2>
                 <dl class="mt-3 space-y-2 text-sm">
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $order->creator?->name ?? '-' }} {{ $order->created_at?->format('d M Y H:i') }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $order->submitter?->name ?? '-' }} {{ $order->submitted_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $order->approver?->name ?? '-' }} {{ $order->approved_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $order->rejecter?->name ?? '-' }} {{ $order->rejected_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Closed</dt><dd class="text-app-text">{{ $order->closer?->name ?? '-' }} {{ $order->closed_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $order->creator?->name ?? '-' }} {{ to_display_tz($order->created_at)?->format('d M Y H:i') }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $order->submitter?->name ?? '-' }} {{ to_display_tz($order->submitted_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $order->approver?->name ?? '-' }} {{ to_display_tz($order->approved_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $order->rejecter?->name ?? '-' }} {{ to_display_tz($order->rejected_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Closed</dt><dd class="text-app-text">{{ $order->closer?->name ?? '-' }} {{ to_display_tz($order->closed_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
                 </dl>
             </x-ui.card>
 

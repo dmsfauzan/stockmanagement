@@ -43,7 +43,7 @@
                             <span class="app-badge {{ $variant }}">{{ strtoupper((string) $log->action) }}</span>
                             <span class="app-badge bg-app-surface-2 text-app-muted ring-app-border">{{ $log->module }}</span>
                         </div>
-                        <span class="text-xs text-app-muted">{{ $log->created_at?->format('d M Y H:i:s') ?? '-' }}</span>
+                        <span class="text-xs text-app-muted">{{ to_display_tz($log->created_at)?->format('d M Y H:i:s') ?? '-' }}</span>
                     </div>
 
                     <p class="mt-2 text-xs text-app-muted">oleh <span class="font-medium text-app-text">{{ $log->user?->name ?? 'System' }}</span>@if($log->ip_address) · {{ $log->ip_address }}@endif</p>

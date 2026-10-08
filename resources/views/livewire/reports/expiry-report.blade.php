@@ -97,7 +97,7 @@
                             <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
                             <td class="rc-location whitespace-nowrap text-app-muted">{{ $row->location_code ?? '-' }}</td>
                             <td class="rc-batch whitespace-nowrap text-app-muted">{{ $row->batch_number ?? '-' }}</td>
-                            <td class="rc-expiry_date whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->expiry_date)->format('d M Y') }}</td>
+                            <td class="rc-expiry_date whitespace-nowrap text-app-muted">{{ to_display_tz($row->expiry_date)?->format('d M Y') }}</td>
                             <td class="rc-days_left whitespace-nowrap text-right {{ $daysClass($days) }}">{{ $daysLabel($days) }}</td>
                             <td class="rc-quantity_in whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity_in) }}</td>
                             <td class="rc-reference whitespace-nowrap text-app-muted">{{ $row->reference_type ? class_basename($row->reference_type).' #'.$row->reference_id : '-' }}</td>

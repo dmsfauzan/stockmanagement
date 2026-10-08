@@ -13,7 +13,8 @@ trait GuardsStaleEdits
 
     protected function captureUpdatedAt(?Model $model): void
     {
-        $this->editUpdatedAt = $model?->getAttribute('updated_at')?->toIso8601String();
+        $updated = $model?->getAttribute('updated_at');
+        $this->editUpdatedAt = $updated?->getTimestamp() !== null ? (string) $updated->getTimestamp() : null;
     }
 
     protected function isStale(?Model $model): bool
@@ -22,9 +23,13 @@ trait GuardsStaleEdits
             return false;
         }
 
-        $current = $model->getAttribute('updated_at')?->toIso8601String();
+        $updated = $model->getAttribute('updated_at');
 
-        return $current !== null && $current !== $this->editUpdatedAt;
+        if ($updated === null) {
+            return false;
+        }
+
+        return (string) $updated->getTimestamp() !== $this->editUpdatedAt;
     }
 
     /**

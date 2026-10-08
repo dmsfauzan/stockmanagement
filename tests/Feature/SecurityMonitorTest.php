@@ -194,6 +194,15 @@ class SecurityMonitorTest extends TestCase
         return $this->actingAs(User::find($user->id));
     }
 
+    public function test_security_page_has_typed_confirmation(): void
+    {
+        $admin = User::where('email', 'admin@stock.test')->firstOrFail();
+
+        $this->actingAs($admin)->get(route('admin.security'))
+            ->assertOk()
+            ->assertSee('PURGE', false);
+    }
+
     public function test_blocked_ip_cannot_call_api(): void
     {
         Setting::set('security.monitor_enabled', '1', 'security');

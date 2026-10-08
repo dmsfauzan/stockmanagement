@@ -89,7 +89,7 @@
                             <td class="whitespace-nowrap text-app-muted">{{ $issue->warehouse?->name ?? '-' }}</td>
                             <td class="whitespace-nowrap"><x-ui.status-badge :status="$issue->status" /></td>
                             <td class="whitespace-nowrap text-right text-app-muted">{{ $issue->issue_items_count }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $issue->created_at?->format('d M Y H:i') }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($issue->created_at)?->format('d M Y H:i') }}</td>
                             <td class="whitespace-nowrap text-right">
                                 <a href="{{ route('goods-issues.show', $issue) }}" class="app-btn app-btn-secondary px-2.5 py-1.5 text-xs">View</a>
                             </td>

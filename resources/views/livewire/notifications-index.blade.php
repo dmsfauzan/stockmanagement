@@ -54,7 +54,7 @@
                     @forelse ($items as $item)
                         @php $link = $this->linkFor($item); $hasLink = $link !== route('dashboard'); @endphp
                         <tr wire:key="notif-{{ $item->id }}" class="{{ $item->read_at ? 'text-app-muted' : 'bg-primary-50/20 font-medium' }}">
-                            <td class="whitespace-nowrap text-app-muted">{{ $item->created_at?->format('d M Y H:i') ?? '-' }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($item->created_at)?->format('d M Y H:i') ?? '-' }}</td>
                             <td class="whitespace-nowrap">
                                 <span class="app-badge {{ $this->badgeClasses($item->type) }}">{{ $item->type }}</span>
                             </td>

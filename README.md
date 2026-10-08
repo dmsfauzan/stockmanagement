@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-268_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-277_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -95,6 +95,7 @@ flowchart LR
 | CSP | `Content-Security-Policy` moderat via `SecurityHeaders` (konfigurabel di `security.csp`), nonaktif bila `null` |
 | Sanctum & 2FA | Expiry default 30 hari untuk token baru + **Rotate** di **Admin → API Tokens**; recovery code 2FA **di-hash**; notifikasi login/password/2FA |
 | Dependensi | CI menjalankan `composer audit` + `npm audit` (high+); **Dependabot** mingguan (composer/npm/actions) |
+| Anti Human-Error | Jadwal `withoutOverlapping`/`onOneServer`; seeder aman (tanpa reset password, guard produksi); **import preview dry-run**; stale-edit guard di 7 form transaksi; konfirmasi ketik-ulang (`PURGE`); zona waktu tampilan **Asia/Jakarta** (simpan UTC) |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
 | Purchase Order | PO (`PO-...`) → Barang Masuk (penerimaan sebagian), progres penerimaan |
 | Sales Order | SO (`SO-...`): Draft→Submitted→Approved→Partial→Fulfilled→Closed, fulfilment via Barang Keluar |

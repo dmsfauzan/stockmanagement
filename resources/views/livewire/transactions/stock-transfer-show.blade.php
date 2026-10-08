@@ -91,13 +91,13 @@
             <x-ui.card>
                 <h2 class="app-card-title">Audit</h2>
                 <dl class="mt-3 space-y-2 text-sm">
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $transfer->creator?->name ?? '-' }} {{ $transfer->created_at?->format('d M Y H:i') }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Requested</dt><dd class="text-app-text">{{ $transfer->requester?->name ?? '-' }} {{ $transfer->requested_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $transfer->approver?->name ?? '-' }} {{ $transfer->approved_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Received</dt><dd class="text-app-text">{{ $transfer->receiver?->name ?? '-' }} {{ $transfer->received_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Completed</dt><dd class="text-app-text">{{ $transfer->completer?->name ?? '-' }} {{ $transfer->completed_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $transfer->rejecter?->name ?? '-' }} {{ $transfer->rejected_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Shipped</dt><dd class="text-app-text">{{ $transfer->shipper?->name ?? '-' }} {{ $transfer->shipped_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $transfer->creator?->name ?? '-' }} {{ to_display_tz($transfer->created_at)?->format('d M Y H:i') }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Requested</dt><dd class="text-app-text">{{ $transfer->requester?->name ?? '-' }} {{ to_display_tz($transfer->requested_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $transfer->approver?->name ?? '-' }} {{ to_display_tz($transfer->approved_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Received</dt><dd class="text-app-text">{{ $transfer->receiver?->name ?? '-' }} {{ to_display_tz($transfer->received_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Completed</dt><dd class="text-app-text">{{ $transfer->completer?->name ?? '-' }} {{ to_display_tz($transfer->completed_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $transfer->rejecter?->name ?? '-' }} {{ to_display_tz($transfer->rejected_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Shipped</dt><dd class="text-app-text">{{ $transfer->shipper?->name ?? '-' }} {{ to_display_tz($transfer->shipped_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
                 </dl>
             </x-ui.card>
 

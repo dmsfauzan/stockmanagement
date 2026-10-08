@@ -54,7 +54,7 @@
                 <tbody>
                     @forelse ($deliveries as $delivery)
                         <tr>
-                            <td class="whitespace-nowrap text-app-muted">{{ $delivery->created_at?->format('d M Y H:i') }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($delivery->created_at)?->format('d M Y H:i') }}</td>
                             <td class="whitespace-nowrap font-mono text-xs">{{ $delivery->event }}</td>
                             <td class="max-w-xs truncate text-app-muted">{{ $delivery->url }}</td>
                             <td class="text-center">

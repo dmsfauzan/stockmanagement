@@ -27,7 +27,10 @@ class StaleEditGuardTest extends TestCase
         $component = Livewire::actingAs($admin)->test(StockAdjustmentForm::class, ['adjustment' => $adjustment]);
         $this->assertNotNull($component->get('editUpdatedAt'));
 
+        $original = (string) $component->get('editUpdatedAt');
+        $this->travel(2)->seconds();
         $adjustment->touch();
+        $this->assertNotSame($original, (string) $adjustment->fresh()->updated_at->getTimestamp());
 
         $component->call('save')->assertDispatched('toast', type: 'error');
     }

@@ -96,11 +96,11 @@
             <x-ui.card>
                 <h2 class="app-card-title">Audit</h2>
                 <dl class="mt-3 space-y-2 text-sm">
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $issue->creator?->name ?? '-' }} {{ $issue->created_at?->format('d M Y H:i') }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $issue->submitter?->name ?? '-' }} {{ $issue->submitted_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $issue->approver?->name ?? '-' }} {{ $issue->approved_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $issue->rejecter?->name ?? '-' }} {{ $issue->rejected_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Posted</dt><dd class="text-app-text">{{ $issue->poster?->name ?? '-' }} {{ $issue->posted_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $issue->creator?->name ?? '-' }} {{ to_display_tz($issue->created_at)?->format('d M Y H:i') }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $issue->submitter?->name ?? '-' }} {{ to_display_tz($issue->submitted_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $issue->approver?->name ?? '-' }} {{ to_display_tz($issue->approved_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $issue->rejecter?->name ?? '-' }} {{ to_display_tz($issue->rejected_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Posted</dt><dd class="text-app-text">{{ $issue->poster?->name ?? '-' }} {{ to_display_tz($issue->posted_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
                 </dl>
             </x-ui.card>
 
@@ -136,7 +136,7 @@
                     <h2 class="app-card-title">Reversal</h2>
                     <dl class="mt-3 space-y-2 text-sm">
                         <div class="flex justify-between gap-2"><dt class="text-app-muted">Reversed By</dt><dd class="text-app-text">{{ $issue->reverser?->name ?? '-' }}</dd></div>
-                        <div class="flex justify-between gap-2"><dt class="text-app-muted">Reversed At</dt><dd class="text-app-text">{{ $issue->reversed_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                        <div class="flex justify-between gap-2"><dt class="text-app-muted">Reversed At</dt><dd class="text-app-text">{{ to_display_tz($issue->reversed_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
                         <div class="sm:col-span-2"><dt class="text-app-muted">Reason</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->reversal_reason ?? '-' }}</dd></div>
                     </dl>
                 </x-ui.card>

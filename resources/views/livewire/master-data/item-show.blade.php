@@ -136,7 +136,7 @@
                             <tbody>
                                 @foreach ($movements as $movement)
                                     <tr>
-                                        <td class="whitespace-nowrap text-app-muted">{{ $movement->created_at?->format('d M Y H:i') ?? '-' }}</td>
+                                        <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($movement->created_at)?->format('d M Y H:i') ?? '-' }}</td>
                                         <td><x-ui.status-badge :status="$movement->transaction_type" /></td>
                                         <td class="text-app-muted">{{ $movement->warehouse?->name ?? '-' }}{{ $movement->location ? ' / ' . $movement->location->code : '' }}</td>
                                         <td class="text-right text-emerald-600 dark:text-emerald-400">{{ $movement->quantity_in > 0 ? $movement->quantity_in : '-' }}</td>

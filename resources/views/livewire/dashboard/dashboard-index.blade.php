@@ -171,7 +171,7 @@
                                 <td>{{ $row->item_name }}</td>
                                 <td class="whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
                                 <td class="whitespace-nowrap text-app-muted">{{ $row->batch_number ?? '-' }}</td>
-                                <td class="whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->expiry_date)->format('d M Y') }}</td>
+                                <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($row->expiry_date)?->format('d M Y') }}</td>
                                 <td class="whitespace-nowrap text-right font-medium {{ $days < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-amber-600 dark:text-amber-400' }}">{{ $days < 0 ? 'Lewat '.abs($days).' hari' : 'H-'.$days }}</td>
                             </tr>
                         @empty
@@ -241,7 +241,7 @@
                     <tbody>
                         @forelse ($recentActivities as $activity)
                             <tr>
-                                <td class="whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($activity->created_at)->format('d M Y H:i') }}</td>
+                                <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($activity->created_at)?->format('d M Y H:i') }}</td>
                                 <td class="whitespace-nowrap text-app-muted">{{ $activity->user_name ?? '-' }}</td>
                                 <td class="whitespace-nowrap"><x-ui.status-badge :status="$activity->transaction_type" /></td>
                                 <td>{{ $activity->sku ? $activity->sku.' — ' : '' }}{{ $activity->item_name ?? '-' }}</td>

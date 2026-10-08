@@ -82,7 +82,7 @@
                         @php $remaining = max(0, (int) $row->quantity - (int) $row->fulfilled_quantity); @endphp
                         <tr>
                             <td class="rc-number whitespace-nowrap font-medium">{{ $row->so_number }}</td>
-                            <td class="rc-date whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->order_date)->format('d M Y') }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ to_display_tz($row->order_date)?->format('d M Y') }}</td>
                             <td class="rc-customer whitespace-nowrap text-app-muted">{{ $row->customer_name }}</td>
                             <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
                             <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>

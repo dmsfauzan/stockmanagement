@@ -6,13 +6,14 @@
     'confirmLabel' => 'Ya, Lanjutkan',
     'cancelLabel' => 'Batal',
     'variant' => 'primary',
+    'requireText' => null,
 ])
 
 @php
     $args = \Illuminate\Support\Js::from(array_values($params));
 @endphp
 
-<div x-data="{ open: false, args: {{ $args }} }" x-on:keydown.escape.window="open = false">
+<div x-data="{ open: false, typed: '', args: {{ $args }} }" x-on:keydown.escape.window="open = false">
     <button type="button" @click="open = true" {{ $attributes->merge(['class' => 'app-btn']) }}>
         {{ $slot }}
     </button>
@@ -52,12 +53,20 @@
                 </div>
             </div>
 
+            @if ($requireText)
+                <div class="mt-4">
+                    <label class="app-label">Ketik <code class="rounded bg-app-surface-2 px-1 font-mono text-xs">{{ $requireText }}</code> untuk konfirmasi</label>
+                    <input type="text" x-model="typed" placeholder="{{ $requireText }}" class="app-input mt-1 font-mono">
+                </div>
+            @endif
+
             <div class="mt-6 flex justify-end gap-2">
-                <button type="button" @click="open = false" class="app-btn app-btn-secondary">{{ $cancelLabel }}</button>
+                <button type="button" @click="open = false; typed = ''" class="app-btn app-btn-secondary">{{ $cancelLabel }}</button>
                 <button
                     type="button"
                     wire:loading.attr="disabled"
-                    @click="open = false; $wire.call('{{ $action }}', ...args)"
+                    :disabled="$requireText && typed.trim() !== '{{ $requireText }}'"
+                    @click="open = false; typed = ''; $wire.call('{{ $action }}', ...args)"
                     @class([
                         'app-btn',
                         'app-btn-danger' => $variant === 'danger',

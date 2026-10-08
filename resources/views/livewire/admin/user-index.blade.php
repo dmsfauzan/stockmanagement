@@ -72,7 +72,7 @@
                                 </div>
                             </td>
                             <td class="whitespace-nowrap"><x-ui.status-badge :status="$user->status" /></td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $user->last_login_at?->format('d M Y H:i') ?? '-' }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($user->last_login_at)?->format('d M Y H:i') ?? '-' }}</td>
                             <td class="whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end gap-1">
                                     @can('update', $user)

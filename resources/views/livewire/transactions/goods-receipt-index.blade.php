@@ -87,7 +87,7 @@
                             <td class="whitespace-nowrap text-app-muted">{{ $receipt->warehouse?->name ?? '-' }}</td>
                             <td class="whitespace-nowrap"><x-ui.status-badge :status="$receipt->status" /></td>
                             <td class="whitespace-nowrap text-right text-app-muted">{{ $receipt->receipt_items_count }}</td>
-                            <td class="whitespace-nowrap text-app-muted">{{ $receipt->created_at?->format('d M Y H:i') }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($receipt->created_at)?->format('d M Y H:i') }}</td>
                             <td class="whitespace-nowrap text-right">
                                 <a href="{{ route('goods-receipts.show', $receipt) }}" class="app-btn app-btn-secondary px-2.5 py-1.5 text-xs">View</a>
                             </td>

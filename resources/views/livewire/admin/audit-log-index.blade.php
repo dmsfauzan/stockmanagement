@@ -53,7 +53,7 @@
                 <tbody>
                     @forelse ($logs as $log)
                         <tr>
-                            <td class="whitespace-nowrap text-app-muted">{{ $log->created_at?->format('d M Y H:i:s') ?? '-' }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($log->created_at)?->format('d M Y H:i:s') ?? '-' }}</td>
                             <td class="whitespace-nowrap text-app-text">{{ $log->user?->name ?? 'System' }}</td>
                             <td class="whitespace-nowrap"><span class="app-badge bg-slate-100 text-slate-600 ring-slate-500/20 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-600">{{ $log->action }}</span></td>
                             <td class="whitespace-nowrap text-app-muted">{{ $log->module }}</td>
@@ -83,7 +83,7 @@
 
                 <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div><dt class="font-medium text-app-muted">User</dt><dd class="text-app-text">{{ $selected->user?->name ?? 'System' }}</dd></div>
-                    <div><dt class="font-medium text-app-muted">Waktu</dt><dd class="text-app-text">{{ $selected->created_at?->format('d M Y H:i:s') }}</dd></div>
+                    <div><dt class="font-medium text-app-muted">Waktu</dt><dd class="text-app-text">{{ to_display_tz($selected->created_at)?->format('d M Y H:i:s') }}</dd></div>
                     <div><dt class="font-medium text-app-muted">Aksi</dt><dd class="text-app-text">{{ $selected->action }}</dd></div>
                     <div><dt class="font-medium text-app-muted">Modul</dt><dd class="text-app-text">{{ $selected->module }}</dd></div>
                     <div><dt class="font-medium text-app-muted">Entitas</dt><dd class="text-app-text">{{ $selected->auditable_type ? class_basename($selected->auditable_type).'#'.$selected->auditable_id : '-' }}</dd></div>

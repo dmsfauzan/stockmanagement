@@ -94,7 +94,7 @@
                         @php $diff = (int) $row->difference; @endphp
                         <tr>
                             <td class="rc-number whitespace-nowrap font-medium">{{ $row->opname_number }}</td>
-                            <td class="rc-date whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->opname_date)->format('d M Y') }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ to_display_tz($row->opname_date)?->format('d M Y') }}</td>
                             <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
                             <td class="rc-location whitespace-nowrap text-app-muted">{{ $row->location_code ?? '-' }}</td>
                             <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>

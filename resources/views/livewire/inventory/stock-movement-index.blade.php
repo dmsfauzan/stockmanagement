@@ -79,7 +79,7 @@
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>
-                            <td class="whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->created_at)->format('d M Y H:i') }}</td>
+                            <td class="whitespace-nowrap text-app-muted">{{ to_display_tz($row->created_at)?->format('d M Y H:i') }}</td>
                             <td class="whitespace-nowrap text-app-text">{{ $row->reference_type }}#{{ $row->reference_id }}</td>
                             <td class="whitespace-nowrap"><x-ui.status-badge :status="$row->transaction_type" /></td>
                             <td class="whitespace-nowrap font-medium text-app-text">{{ $row->sku ?? '-' }}</td>

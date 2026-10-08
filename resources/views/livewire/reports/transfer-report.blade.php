@@ -89,7 +89,7 @@
                     @forelse ($rows as $row)
                         <tr>
                             <td class="rc-number whitespace-nowrap font-medium">{{ $row->tr_number }}</td>
-                            <td class="rc-date whitespace-nowrap text-app-muted">{{ \Illuminate\Support\Carbon::parse($row->transfer_date)->format('d M Y') }}</td>
+                            <td class="rc-date whitespace-nowrap text-app-muted">{{ to_display_tz($row->transfer_date)?->format('d M Y') }}</td>
                             <td class="rc-from whitespace-nowrap text-app-muted">{{ $row->from_warehouse }}{{ $row->from_location ? ' / '.$row->from_location : '' }}</td>
                             <td class="rc-to whitespace-nowrap text-app-muted">{{ $row->to_warehouse }}{{ $row->to_location ? ' / '.$row->to_location : '' }}</td>
                             <td class="rc-sku whitespace-nowrap font-medium">{{ $row->sku }}</td>

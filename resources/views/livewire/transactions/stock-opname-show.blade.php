@@ -120,10 +120,10 @@
             <x-ui.card>
                 <h2 class="app-card-title">Audit</h2>
                 <dl class="mt-3 space-y-2 text-sm">
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $opname->creator?->name ?? '-' }} {{ $opname->created_at?->format('d M Y H:i') }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $opname->submitter?->name ?? '-' }} {{ $opname->submitted_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $opname->approver?->name ?? '-' }} {{ $opname->approved_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $opname->rejecter?->name ?? '-' }} {{ $opname->rejected_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $opname->creator?->name ?? '-' }} {{ to_display_tz($opname->created_at)?->format('d M Y H:i') }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $opname->submitter?->name ?? '-' }} {{ to_display_tz($opname->submitted_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $opname->approver?->name ?? '-' }} {{ to_display_tz($opname->approved_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $opname->rejecter?->name ?? '-' }} {{ to_display_tz($opname->rejected_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
                 </dl>
             </x-ui.card>
 

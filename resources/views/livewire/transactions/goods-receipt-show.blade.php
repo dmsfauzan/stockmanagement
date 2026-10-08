@@ -103,11 +103,11 @@
             <x-ui.card>
                 <h2 class="app-card-title">Audit</h2>
                 <dl class="mt-3 space-y-2 text-sm">
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $receipt->creator?->name ?? '-' }} {{ $receipt->created_at?->format('d M Y H:i') }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $receipt->submitter?->name ?? '-' }} {{ $receipt->submitted_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $receipt->approver?->name ?? '-' }} {{ $receipt->approved_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $receipt->rejecter?->name ?? '-' }} {{ $receipt->rejected_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Posted</dt><dd class="text-app-text">{{ $receipt->poster?->name ?? '-' }} {{ $receipt->posted_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Created</dt><dd class="text-app-text">{{ $receipt->creator?->name ?? '-' }} {{ to_display_tz($receipt->created_at)?->format('d M Y H:i') }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Submitted</dt><dd class="text-app-text">{{ $receipt->submitter?->name ?? '-' }} {{ to_display_tz($receipt->submitted_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Approved</dt><dd class="text-app-text">{{ $receipt->approver?->name ?? '-' }} {{ to_display_tz($receipt->approved_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Rejected</dt><dd class="text-app-text">{{ $receipt->rejecter?->name ?? '-' }} {{ to_display_tz($receipt->rejected_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+                    <div class="flex justify-between gap-2"><dt class="text-app-muted">Posted</dt><dd class="text-app-text">{{ $receipt->poster?->name ?? '-' }} {{ to_display_tz($receipt->posted_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
                 </dl>
             </x-ui.card>
 
@@ -143,7 +143,7 @@
                     <h2 class="app-card-title">Reversal</h2>
                     <dl class="mt-3 space-y-2 text-sm">
                         <div class="flex justify-between gap-2"><dt class="text-app-muted">Reversed By</dt><dd class="text-app-text">{{ $receipt->reverser?->name ?? '-' }}</dd></div>
-                        <div class="flex justify-between gap-2"><dt class="text-app-muted">Reversed At</dt><dd class="text-app-text">{{ $receipt->reversed_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+                        <div class="flex justify-between gap-2"><dt class="text-app-muted">Reversed At</dt><dd class="text-app-text">{{ to_display_tz($receipt->reversed_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
                         <div class="sm:col-span-2"><dt class="text-app-muted">Reason</dt><dd class="mt-1 text-sm text-app-text">{{ $receipt->reversal_reason ?? '-' }}</dd></div>
                     </dl>
                 </x-ui.card>

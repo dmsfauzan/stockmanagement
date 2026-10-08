@@ -26,8 +26,8 @@
                     @else - @endif
                 </dd></div>
             <div><dt class="text-xs font-semibold uppercase text-app-muted">Primary Items</dt><dd class="mt-1 text-sm font-semibold text-app-text">{{ $supplier->primary_items_count }} item(s)</dd></div>
-            <div><dt class="text-xs font-semibold uppercase text-app-muted">Created</dt><dd class="mt-1 text-sm text-app-muted">{{ $supplier->created_at?->format('d M Y H:i') ?? '-' }}</dd></div>
-            <div><dt class="text-xs font-semibold uppercase text-app-muted">Updated</dt><dd class="mt-1 text-sm text-app-muted">{{ $supplier->updated_at?->format('d M Y H:i') ?? '-' }}</dd></div>
+            <div><dt class="text-xs font-semibold uppercase text-app-muted">Created</dt><dd class="mt-1 text-sm text-app-muted">{{ to_display_tz($supplier->created_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
+            <div><dt class="text-xs font-semibold uppercase text-app-muted">Updated</dt><dd class="mt-1 text-sm text-app-muted">{{ to_display_tz($supplier->updated_at)?->format('d M Y H:i') ?? '-' }}</dd></div>
         </dl>
     </x-ui.card>
 
