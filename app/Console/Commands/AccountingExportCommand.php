@@ -59,7 +59,7 @@ class AccountingExportCommand extends Command
 
         if ($recipient !== '') {
             try {
-                Mail::raw('Accounting journal attached for '.$from->toDateString().'–'.$to->toDateString(), function ($message) use ($recipient, $path, $disk): void {
+                Mail::raw('Accounting journal attached for '.$from->toDateString().'–'.$to->toDateString(), function ($message) use ($recipient, $path, $disk, $from, $to): void {
                     $message->to($recipient)->subject('Accounting journal '.$from->format('Y-m-d').' – '.$to->format('Y-m-d'));
 
                     try {

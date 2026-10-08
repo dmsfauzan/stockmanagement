@@ -21,6 +21,7 @@
     "require-dev": {
         "dedoc/scramble": "^0.13.47",
         "fakerphp/faker": "^1.23",
+        "larastan/larastan": "^3.13",
         "laravel/breeze": "^2.4",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",
@@ -58,6 +59,7 @@
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test"
         ],
+        "analyse": "@php vendor/bin/phpstan analyse --no-progress --memory-limit=1G --ansi",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

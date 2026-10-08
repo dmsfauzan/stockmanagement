@@ -22,6 +22,7 @@ use App\Policies\LocationPolicy;
 use App\Policies\PurchaseOrderPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\SalesOrderPolicy;
+use App\Policies\SettingPolicy;
 use App\Policies\StockAdjustmentPolicy;
 use App\Policies\StockOpnamePolicy;
 use App\Policies\StockTransferPolicy;

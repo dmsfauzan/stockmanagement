@@ -214,7 +214,12 @@ Rute utama: `/dashboard`, `/items`, `/goods-receipts`, `/goods-issues`, `/stock`
 ```bash
 php artisan test
 php artisan test --filter="StockOpnameTest|StockTransferTest|BarcodeQrTest"
+composer analyse            # PHPStan / Larastan (level 1, phpstan.neon)
+vendor/bin/pint --test      # gaya kode
+php artisan test --coverage-clover=coverage.xml   # butuh pcov/xdebug
 ```
+
+CI (`.github/workflows/tests.yml`) menjalankan: `pint --test` → `phpstan analyse` → `php artisan test` dengan coverage (artefak).
 
 Cakupan: kalkulasi stok, insufficient stock, low/out status, adjustment, transfer antar gudang, posting atomik & anti double-post, permission per peran, import, reversal, reserved stock, expiry, notifikasi, REST API (read+write), smoke-render seluruh halaman.
 

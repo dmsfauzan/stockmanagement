@@ -2,9 +2,23 @@
 
 namespace App\Http\Resources\Api;
 
+use App\Models\StockBalance;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin StockBalance
+ *
+ * @property string $sku
+ * @property string $item_name
+ * @property string $warehouse_name
+ * @property string|null $location_path
+ * @property string|null $location_code
+ * @property int|null $min_stock
+ * @property int|null $max_stock
+ * @property string|null $stock_status
+ * @property string|null $last_movement_at
+ */
 class StockBalanceResource extends JsonResource
 {
     public function toArray(Request $request): array

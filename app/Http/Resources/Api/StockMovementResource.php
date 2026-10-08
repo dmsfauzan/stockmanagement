@@ -2,9 +2,19 @@
 
 namespace App\Http\Resources\Api;
 
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin StockMovement
+ *
+ * @property string $sku
+ * @property string $item_name
+ * @property string $warehouse_name
+ * @property string $location_code
+ * @property string|null $user_name
+ */
 class StockMovementResource extends JsonResource
 {
     public function toArray(Request $request): array
