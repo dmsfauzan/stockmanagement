@@ -1,10 +1,10 @@
 @props([
     'action',
     'params' => [],
-    'title' => 'Konfirmasi',
-    'message' => 'Apakah Anda yakin ingin melanjutkan?',
-    'confirmLabel' => 'Ya, Lanjutkan',
-    'cancelLabel' => 'Batal',
+    'title' => __('Konfirmasi'),
+    'message' => __('Apakah Anda yakin ingin melanjutkan?'),
+    'confirmLabel' => __('Ya, Lanjutkan'),
+    'cancelLabel' => __('Batal'),
     'variant' => 'primary',
     'requireText' => null,
 ])

@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsureTwoFactorForAdmin;
 use App\Http\Middleware\RecordSecurityEvents;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -29,6 +30,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(BlockBannedIps::class);
         $middleware->append(SecurityHeaders::class);
         $middleware->append(RecordSecurityEvents::class);
+        $middleware->web(append: [SetLocale::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

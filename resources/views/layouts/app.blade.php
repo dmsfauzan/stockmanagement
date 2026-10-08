@@ -1,7 +1,7 @@
 @php
     $routeTitle = match (true) {
         request()->routeIs('dashboard') => 'Dashboard',
-        request()->routeIs('items.*') => 'Master Barang',
+        request()->routeIs('items.*') => __('Master Barang'),
         request()->routeIs('categories.*') => 'Kategori',
         request()->routeIs('units.*') => 'Unit',
         request()->routeIs('suppliers.*') => 'Supplier',
@@ -10,29 +10,29 @@
         request()->routeIs('locations.*') => 'Location / Rack',
         request()->routeIs('purchase-orders.*') => 'Purchase Order',
         request()->routeIs('sales-orders.*') => 'Sales Order',
-        request()->routeIs('goods-receipts.*') => 'Barang Masuk',
-        request()->routeIs('goods-issues.*') => 'Barang Keluar',
+        request()->routeIs('goods-receipts.*') => __('Barang Masuk'),
+        request()->routeIs('goods-issues.*') => __('Barang Keluar'),
         request()->routeIs('stock-adjustments.*') => 'Stock Adjustment',
         request()->routeIs('stock-opnames.*') => 'Stock Opname',
-        request()->routeIs('stock-transfers.*') => 'Transfer Barang',
+        request()->routeIs('stock-transfers.*') => __('Transfer Barang'),
         request()->routeIs('stock.index') => 'Stock On Hand',
         request()->routeIs('stock.movements') => 'Stock Movement',
         request()->routeIs('stock.low') => 'Low Stock',
         request()->routeIs('scan') => 'Scan',
-        request()->routeIs('reports.stock') => 'Laporan Stock',
-        request()->routeIs('reports.incoming') => 'Laporan Barang Masuk',
-        request()->routeIs('reports.outgoing') => 'Laporan Barang Keluar',
-        request()->routeIs('reports.movement') => 'Laporan Movement',
-        request()->routeIs('reports.expiry') => 'Laporan Kedaluwarsa',
-        request()->routeIs('reports.opname') => 'Laporan Opname',
-        request()->routeIs('reports.adjustment') => 'Laporan Adjustment',
-        request()->routeIs('reports.transfer') => 'Laporan Transfer',
-        request()->routeIs('reports.warehouse-comparison') => 'Perbandingan Gudang',
+        request()->routeIs('reports.stock') => __('Laporan Stock'),
+        request()->routeIs('reports.incoming') => __('Laporan Barang Masuk'),
+        request()->routeIs('reports.outgoing') => __('Laporan Barang Keluar'),
+        request()->routeIs('reports.movement') => __('Laporan Movement'),
+        request()->routeIs('reports.expiry') => __('Laporan Kedaluwarsa'),
+        request()->routeIs('reports.opname') => __('Laporan Opname'),
+        request()->routeIs('reports.adjustment') => __('Laporan Adjustment'),
+        request()->routeIs('reports.transfer') => __('Laporan Transfer'),
+        request()->routeIs('reports.warehouse-comparison') => __('Perbandingan Gudang'),
         request()->routeIs('reports.replenishment') => 'Replenishment',
         request()->routeIs('reports.sales-order') => 'Laporan Sales Order',
-        request()->routeIs('reports.valuation') => 'Valuasi Persediaan',
-        request()->routeIs('reports.cogs') => 'Laporan COGS',
-        request()->routeIs('reports.journal') => 'Jurnal Akuntansi',
+        request()->routeIs('reports.valuation') => __('Valuasi Persediaan'),
+        request()->routeIs('reports.cogs') => __('Laporan COGS'),
+        request()->routeIs('reports.journal') => __('Jurnal Akuntansi'),
         request()->routeIs('admin.users') => 'Users',
         request()->routeIs('admin.roles') => 'Roles & Permissions',
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
@@ -168,13 +168,13 @@
                 @can('goods_receipt.view')
                 <a href="{{ route('goods-receipts.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('goods-receipts.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('goods-receipts.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M12 9v6m7 2a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2"/></svg>
-                    <span x-show="!collapsed" class="truncate">Barang Masuk</span>
+                    <span x-show="!collapsed" class="truncate">{{ __('Barang Masuk') }}</span>
                 </a>
                 @endcan
                 @can('goods_issue.view')
                 <a href="{{ route('goods-issues.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('goods-issues.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('goods-issues.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9M12 9v6m7 2a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2"/></svg>
-                    <span x-show="!collapsed" class="truncate">Barang Keluar</span>
+                    <span x-show="!collapsed" class="truncate">{{ __('Barang Keluar') }}</span>
                 </a>
                 @endcan
                 @can('stock.adjustment')
@@ -192,7 +192,7 @@
                 @can('transfer.view')
                 <a href="{{ route('stock-transfers.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('stock-transfers.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('stock-transfers.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h11m0 0l-3-3m3 3l-3 3M20 17H9m0 0l3-3m-3 3l3 3"/></svg>
-                    <span x-show="!collapsed" class="truncate">Transfer Barang</span>
+                    <span x-show="!collapsed" class="truncate">{{ __('Transfer Barang') }}</span>
                 </a>
                 @endcan
             </x-sidebar-group>
@@ -203,13 +203,13 @@
                 @can('items.view')
                 <a href="{{ route('items.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('items.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('items.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4 8 4 8-4zm-8 4v10M4 7v10l8 4 8-4V7"/></svg>
-                    <span x-show="!collapsed" class="truncate">Barang</span>
+                    <span x-show="!collapsed" class="truncate">{{ __('Barang') }}</span>
                 </a>
                 @endcan
                 @can('items.view')
                 <a href="{{ route('categories.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('categories.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('categories.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/></svg>
-                    <span x-show="!collapsed" class="truncate">Kategori</span>
+                    <span x-show="!collapsed" class="truncate">{{ __('Kategori') }}</span>
                 </a>
                 @endcan
                 @can('items.view')
@@ -265,7 +265,7 @@
                 </a>
                 <a href="{{ route('reports.expiry') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.expiry'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.expiry')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v1m0 0V6m0 2a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12"/></svg>
-                    <span x-show="!collapsed" class="truncate">Kedaluwarsa</span>
+                    <span x-show="!collapsed" class="truncate">{{ __('Kedaluwarsa') }}</span>
                 </a>
                 <a href="{{ route('reports.opname') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.opname'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.opname')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h6M9 8h6M5 5a2 2 0 012-2h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5z"/></svg>
@@ -285,7 +285,7 @@
                 </a>
                 <a href="{{ route('reports.valuation') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.valuation'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.valuation')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1M12 19v1M3 12h1M20 12h1M5.6 5.6l.7.7M17.7 17.7l.7.7M5.6 18.4l.7-.7M17.7 6.3l.7-.7"/></svg>
-                    <span x-show="!collapsed" class="truncate">Valuasi</span>
+                    <span x-show="!collapsed" class="truncate">{{ __('Valuasi') }}</span>
                 </a>
                 <a href="{{ route('reports.cogs') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.cogs'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.cogs')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 7V5a1 1 0 011-1h10a1 1 0 011 1v2"/></svg>
@@ -293,7 +293,7 @@
                 </a>
                 <a href="{{ route('reports.journal') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.journal'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.journal')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v16H4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 9h16M9 9v11M15 9v11"/></svg>
-                    <span x-show="!collapsed" class="truncate">Jurnal</span>
+                    <span x-show="!collapsed" class="truncate">{{ __('Jurnal') }}</span>
                 </a>
                 <a href="{{ route('reports.replenishment') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.replenishment'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.replenishment')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6M9 17h4"/></svg>
@@ -395,6 +395,14 @@
             </div>
 
             <div class="ml-auto flex items-center gap-1 md:ml-0">
+                <form method="POST" action="{{ route('locale.update') }}" class="flex items-center">
+                    @csrf
+                    <label for="locale-switcher" class="sr-only">{{ __('Language') }}</label>
+                    <select id="locale-switcher" name="locale" onchange="this.form.submit()" class="cursor-pointer rounded-lg border border-app-border bg-app-surface px-2 py-1.5 text-xs font-medium text-app-text hover:bg-app-surface-2">
+                        <option value="id" @selected(app()->getLocale() === 'id')>ID</option>
+                        <option value="en" @selected(app()->getLocale() === 'en')>EN</option>
+                    </select>
+                </form>
                 <button
                     type="button"
                     x-data="{ dark: document.documentElement.classList.contains('dark') }"
@@ -436,7 +444,7 @@
                         <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Profile</a>
                         <a href="{{ route('profile.avatar') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Avatar</a>
                         <a href="{{ route('profile.two-factor') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Two-Factor</a>
-                        <a href="{{ route('profile.notifications') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">Preferensi Notifikasi</a>
+                        <a href="{{ route('profile.notifications') }}" class="block px-4 py-2 text-sm text-app-text hover:bg-app-surface-2">{{ __('Preferensi Notifikasi') }}</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-rose-600 hover:bg-app-surface-2">Log Out</button>

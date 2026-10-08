@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\LabelController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\Admin\ApiTokensIndex;
 use App\Livewire\Admin\AuditLogIndex;
@@ -91,6 +92,8 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'active', 'twofactor.admin', 'permission:dashboard.view'])->get('/dashboard', DashboardIndex::class)->name('dashboard');
+
+Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

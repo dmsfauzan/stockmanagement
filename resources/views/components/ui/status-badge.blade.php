@@ -31,7 +31,8 @@
         'reversed' => 'bg-slate-100 text-slate-700 ring-slate-600/20 dark:bg-slate-700 dark:text-slate-300 dark:ring-slate-600',
     ];
     $classes = $map[$value] ?? 'bg-slate-100 text-slate-600 ring-slate-500/20 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-600';
-    $text = $label ?? ucwords(str_replace('_', ' ', $value));
+    $translationKey = 'status.'.$value;
+    $text = $label ?? (\Illuminate\Support\Facades\Lang::has($translationKey) ? __($translationKey) : ucwords(str_replace('_', ' ', $value)));
 @endphp
 <span {{ $attributes->merge(['class' => "app-badge $classes"]) }}>
     {{ $text }}

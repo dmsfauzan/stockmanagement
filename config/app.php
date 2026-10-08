@@ -81,6 +81,8 @@ return [
 
     'display_timezone' => env('DISPLAY_TIMEZONE', 'Asia/Jakarta'),
 
+    'available_locales' => ['id', 'en'],
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
