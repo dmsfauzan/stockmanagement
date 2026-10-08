@@ -80,6 +80,14 @@ class AppServiceProvider extends ServiceProvider
             return null;
         });
 
+        Gate::define('viewApiDocs', function (?User $user): bool {
+            if (app()->environment('local', 'testing')) {
+                return true;
+            }
+
+            return $user !== null && $user->hasPermission('settings.manage');
+        });
+
         Gate::policy(Item::class, ItemPolicy::class);
         Gate::policy(Warehouse::class, WarehousePolicy::class);
         Gate::policy(Location::class, LocationPolicy::class);

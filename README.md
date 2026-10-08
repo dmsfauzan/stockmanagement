@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-239_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-241_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -88,6 +88,7 @@ flowchart LR
 | Import Master | Excel/CSV untuk **Kategori, Satuan, Supplier, Customer, Warehouse, Location** — template, validasi per baris, upsert by code, notifikasi hasil |
 | Email Report | `reports:mail --report=stock\|low\|movement\|valuation\|expiry --period=daily\|weekly\|monthly` (jadwal 06:30/06:45 Senin/1-an 07:00), penerima & batas baris di **Settings → Reports** |
 | Retensi Movements | `inventory:archive [--days= --dry-run --force]` memindah `stock_movements` lama ke `stock_movement_archives` (jadwal Minggu 02:30), ambang di **Settings → Inventory** |
+| OpenAPI Docs | Dokumentasi interaktif `/docs/api` + spec `/docs/api.json` (Scramble, auto-generate, gated `viewApiDocs`) |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
 | Purchase Order | PO (`PO-...`) → Barang Masuk (penerimaan sebagian), progres penerimaan |
 | Sales Order | SO (`SO-...`): Draft→Submitted→Approved→Partial→Fulfilled→Closed, fulfilment via Barang Keluar |
@@ -220,6 +221,8 @@ Cakupan: kalkulasi stok, insufficient stock, low/out status, adjustment, transfe
 ## Integrasi API
 
 Ekstrak [API.md](API.md) untuk endpoint, otentikasi, dan contoh. Token dibuat lewat **Admin → API Tokens** atau `php artisan api:token admin@stock.test`.
+
+**Dokumentasi interaktif (OpenAPI)**: `/docs/api` (UI) dan `/docs/api.json` (spec), di-generate otomatis dari route via **Scramble**. Akses dibatasi (admin `settings.manage` di produksi, bebas di lokal). Ekspor spec: `php artisan scramble:export`.
 
 ## Integrasi ERP / Accounting
 

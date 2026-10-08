@@ -338,6 +338,12 @@
                 </a>
                 @endcan
                 @can('settings.manage')
+                <a href="{{ url('/docs/api') }}" target="_blank" rel="noopener" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'text-slate-400 hover:bg-slate-800 hover:text-white'])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+                    <span x-show="!collapsed" class="truncate">API Docs</span>
+                </a>
+                @endcan
+                @can('settings.manage')
                 <a href="{{ route('admin.settings') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.settings'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.settings')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v8h16V4"/><path stroke-linecap="round" stroke-linejoin="round" d="M4 12v6a2 2 0 002 2h12a2 2 0 002-2v-6"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 16h6"/></svg>
                     <span x-show="!collapsed" class="truncate">Settings</span>
