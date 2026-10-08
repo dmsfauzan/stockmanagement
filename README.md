@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-255_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-268_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -90,6 +90,11 @@ flowchart LR
 | Retensi Movements | `inventory:archive [--days= --dry-run --force]` memindah `stock_movements` lama ke `stock_movement_archives` (jadwal Minggu 02:30), ambang di **Settings → Inventory** |
 | OpenAPI Docs | Dokumentasi interaktif `/docs/api` + spec `/docs/api.json` (Scramble, auto-generate, gated `viewApiDocs`) |
 | Security Monitor | Deteksi serangan app-layer (login gagal/lockout, 403/419/429, scanner path), geo-IP negara, auto-ban IP, halaman **Admin → Security** + export CSV |
+| API Token Abilities | Permission middleware **menegakkan abilities token Sanctum** (token terbatas benar-benar dibatasi, token tanpa abilities = akses penuh user) |
+| Upload Aman | Lampiran adjustment `pdf/jpg/jpeg/png/webp` + nama aman; `ImageService` normalisasi ekstensi dari mime |
+| CSP | `Content-Security-Policy` moderat via `SecurityHeaders` (konfigurabel di `security.csp`), nonaktif bila `null` |
+| Sanctum & 2FA | Expiry default 30 hari untuk token baru + **Rotate** di **Admin → API Tokens**; recovery code 2FA **di-hash**; notifikasi login/password/2FA |
+| Dependensi | CI menjalankan `composer audit` + `npm audit` (high+); **Dependabot** mingguan (composer/npm/actions) |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
 | Purchase Order | PO (`PO-...`) → Barang Masuk (penerimaan sebagian), progres penerimaan |
 | Sales Order | SO (`SO-...`): Draft→Submitted→Approved→Partial→Fulfilled→Closed, fulfilment via Barang Keluar |
