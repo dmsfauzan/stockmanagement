@@ -17,14 +17,38 @@
                 <input type="file" wire:model="importFile" accept=".xlsx,.xls,.csv" class="app-input text-sm">
                 @error('importFile') <p class="text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
 
-                <div wire:loading wire:target="importFile,import" class="text-xs text-app-muted">Memproses…</div>
-
-                <p class="text-xs text-app-muted">File diproses di latar belakang. Anda akan menerima notifikasi saat selesai (periksa bell notifikasi).</p>
+                <div wire:loading wire:target="importFile,analyzeImport,import" class="text-xs text-app-muted">Memproses…</div>
             </div>
+
+            @if ($importAnalyzed)
+                <div class="mt-4 rounded-lg border border-app-border bg-app-surface-2/40 p-3 text-sm">
+                    <p class="font-medium text-app-text">Hasil pratinjau (belum disimpan)</p>
+                    <p class="mt-1 text-app-muted">
+                        <span class="font-semibold text-emerald-600 dark:text-emerald-400">{{ $importedCount }}</span> dibuat ·
+                        <span class="font-semibold text-amber-600 dark:text-amber-400">{{ $updatedCount }}</span> diperbarui ·
+                        <span class="font-semibold {{ count($importErrors) > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-app-muted' }}">{{ count($importErrors) }}</span> baris gagal
+                    </p>
+                    @if (count($importErrors) > 0)
+                        <ul class="mt-2 max-h-28 list-disc overflow-y-auto pl-5 text-xs text-rose-600 dark:text-rose-400">
+                            @foreach ($importErrors as $err)
+                                <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="mt-1 text-xs text-app-muted">Semua baris valid. Aman untuk diimpor.</p>
+                    @endif
+                </div>
+            @else
+                <p class="mt-3 text-xs text-app-muted">Klik <strong>Pratinjau</strong> untuk memeriksa hasil sebelum menyimpan. Import dijalankan di latar belakang dan memberi notifikasi saat selesai.</p>
+            @endif
 
             <div class="mt-6 flex justify-end gap-2">
                 <button type="button" wire:click="$set('showImportModal', false)" class="app-btn app-btn-secondary">Tutup</button>
-                <button type="button" wire:click="import" wire:loading.attr="disabled" class="app-btn app-btn-primary">Import</button>
+                @if ($importAnalyzed)
+                    <button type="button" wire:click="import" wire:loading.attr="disabled" class="app-btn app-btn-primary">Import Sekarang</button>
+                @else
+                    <button type="button" wire:click="analyzeImport" wire:loading.attr="disabled" class="app-btn app-btn-primary">Pratinjau</button>
+                @endif
             </div>
         </div>
     </div>

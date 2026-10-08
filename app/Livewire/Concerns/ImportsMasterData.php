@@ -5,8 +5,11 @@ namespace App\Livewire\Concerns;
 use App\Imports\MasterDataImport;
 use App\Jobs\ImportMasterJob;
 use App\Services\Support\AuditLogger;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithFileUploads;
+use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 trait ImportsMasterData
 {
@@ -28,6 +31,10 @@ trait ImportsMasterData
 
     public string $importLabel = '';
 
+    public ?string $importStoredPath = null;
+
+    public bool $importAnalyzed = false;
+
     /** @return class-string<MasterDataImport> */
     abstract protected function importClass(): string;
 
@@ -44,10 +51,52 @@ trait ImportsMasterData
     {
         abort_unless(auth()->user()->hasPermission($this->importPermission()), 403);
 
-        $this->reset('importFile', 'importErrors', 'importedCount', 'updatedCount');
+        $this->reset('importFile', 'importErrors', 'importedCount', 'updatedCount', 'importStoredPath', 'importAnalyzed');
         $this->importHeadings = ($this->importClass())::headings();
         $this->importLabel = $this->importLabelText();
         $this->showImportModal = true;
+    }
+
+    public function updatedImportFile(): void
+    {
+        $this->importAnalyzed = false;
+        $this->importErrors = [];
+        $this->importedCount = 0;
+        $this->updatedCount = 0;
+    }
+
+    public function analyzeImport(): void
+    {
+        abort_unless(auth()->user()->hasPermission($this->importPermission()), 403);
+
+        $this->validate([
+            'importFile' => ['required', 'file', 'mimes:xlsx,xls,csv,txt', 'max:5120'],
+        ]);
+
+        // Run the real import pipeline inside a transaction, then roll back so
+        // the preview exactly matches what a confirmed import would do.
+        DB::beginTransaction();
+
+        try {
+            $import = new ($this->importClass());
+            Excel::import($import, $this->importFile);
+
+            $this->importErrors = $import->errors;
+            $this->importedCount = $import->imported;
+            $this->updatedCount = $import->updated;
+            $this->importAnalyzed = true;
+
+            if (count($this->importErrors) > 5) {
+                $this->importErrors = array_slice($this->importErrors, 0, 5);
+            }
+        } catch (Throwable $e) {
+            $this->addError('importFile', mb_substr($e->getMessage(), 0, 400));
+        } finally {
+            try {
+                DB::rollBack();
+            } catch (Throwable) {
+            }
+        }
     }
 
     public function import(): void
@@ -77,7 +126,7 @@ trait ImportsMasterData
 
         ImportMasterJob::dispatch($this->importClass(), $storedPath, (int) auth()->id(), $disk, $this->importLabelText(), $this->importModule());
 
-        $this->reset('importFile', 'importErrors', 'importedCount', 'updatedCount');
+        $this->reset('importFile', 'importErrors', 'importedCount', 'updatedCount', 'importStoredPath', 'importAnalyzed');
         $this->showImportModal = false;
 
         $this->dispatch('toast', type: 'success', message: 'Import dijadwalkan — Anda akan menerima notifikasi saat selesai.');
