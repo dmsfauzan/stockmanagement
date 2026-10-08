@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="Detail Barang Keluar" subtitle="{{ $issue->number }}">
         <x-slot:actions>
-            <a href="{{ route('goods-issues.index') }}" class="app-btn app-btn-secondary">Kembali</a>
+            <a href="{{ route('goods-issues.index') }}" class="app-btn app-btn-secondary">{{ __('Kembali') }}</a>
             @if($issue->status === 'draft')
                 @can('update', $issue)
                     <a href="{{ route('goods-issues.edit', $issue) }}" class="app-btn app-btn-primary">Edit</a>
@@ -24,13 +24,13 @@
                 </div>
                 <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Number</dt><dd class="mt-1 text-sm font-medium text-app-text">{{ $issue->number }}</dd></div>
-                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Tanggal</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->transaction_date?->format('d M Y') }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">{{ __('Tanggal') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->transaction_date?->format('d M Y') }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Warehouse</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->warehouse?->name ?? '-' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Customer</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->customer?->name ?? '-' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Destination</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->destination }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">SO Number</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->sales_order_number ?? '-' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Dikeluarkan Oleh</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->issued_by ?? '-' }}</dd></div>
-                    <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Catatan</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->notes ?? '-' }}</dd></div>
+                    <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">{{ __('Catatan') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $issue->notes ?? '-' }}</dd></div>
                     @if($issue->rejection_reason)
                         <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wider text-app-muted">Rejection Reason</dt><dd class="mt-1 text-sm font-medium text-rose-600 dark:text-rose-400">{{ $issue->rejection_reason }}</dd></div>
                     @endif
@@ -39,17 +39,17 @@
 
             <x-ui.card padding="p-0">
                 <div class="app-card-header">
-                    <h2 class="app-card-title">Detail Barang</h2>
+                    <h2 class="app-card-title">{{ __('Detail Barang') }}</h2>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="app-table">
                         <thead>
                             <tr>
-                                <th>Barang</th>
+                                <th>{{ __('Barang') }}</th>
                                 <th class="text-right">Qty</th>
                                 <th>Unit</th>
-                                <th>Lokasi</th>
-                                <th>Catatan</th>
+                                <th>{{ __('Lokasi') }}</th>
+                                <th>{{ __('Catatan') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -109,17 +109,17 @@
                 <div class="mt-3 flex flex-col gap-2">
                     @can('submit', $issue)
                         @if($issue->status === 'draft')
-                            <x-ui.confirm action="submit" title="Submit Barang Keluar" message="Kirim transaksi ini untuk disetujui?" confirm-label="Submit" class="app-btn app-btn-primary w-full">Submit</x-ui.confirm>
+                            <x-ui.confirm action="submit" title="Submit Barang Keluar" message="Kirim transaksi ini untuk disetujui?" confirm-label="Submit" class="app-btn app-btn-primary w-full">{{ __('Submit') }}</x-ui.confirm>
                         @endif
                     @endcan
                     @can('approve', $issue)
                         @if($issue->status === 'submitted')
-                            <x-ui.confirm action="approve" title="Setujui Barang Keluar" message="Transaksi akan disetujui dan siap untuk posting." confirm-label="Approve" class="app-btn app-btn-primary w-full">Approve</x-ui.confirm>
+                            <x-ui.confirm action="approve" title="Setujui Barang Keluar" message="Transaksi akan disetujui dan siap untuk posting." confirm-label="Approve" class="app-btn app-btn-primary w-full">{{ __('Approve') }}</x-ui.confirm>
                             <div class="rounded-lg border border-app-border bg-app-surface-2/50 p-3">
                                 <label class="app-label">Rejection reason</label>
                                 <textarea wire:model="rejectionReason" rows="2" class="app-textarea mt-1" placeholder="Alasan penolakan..."></textarea>
                                 @error('rejectionReason') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
-                                <x-ui.confirm action="reject" title="Tolak Barang Keluar" message="Berikan alasan penolakan lalu tolak transaksi ini." confirm-label="Reject" variant="danger" class="app-btn app-btn-danger mt-2 w-full">Reject</x-ui.confirm>
+                                <x-ui.confirm action="reject" title="Tolak Barang Keluar" message="Berikan alasan penolakan lalu tolak transaksi ini." confirm-label="Reject" variant="danger" class="app-btn app-btn-danger mt-2 w-full">{{ __('Reject') }}</x-ui.confirm>
                             </div>
                         @endif
                     @endcan
@@ -159,8 +159,8 @@
             <div x-data="{ open: false }">
                 <x-ui.card>
                     <div class="flex items-center justify-between gap-2">
-                        <h2 class="app-card-title">Riwayat Audit</h2>
-                        <button type="button" @click="open = true" class="app-btn app-btn-secondary app-btn-sm">Riwayat</button>
+                        <h2 class="app-card-title">{{ __('Riwayat Audit') }}</h2>
+                        <button type="button" @click="open = true" class="app-btn app-btn-secondary app-btn-sm">{{ __('Riwayat') }}</button>
                     </div>
                     <p class="mt-1 text-xs text-app-muted">Jejak perubahan transaksi ini.</p>
                 </x-ui.card>
@@ -168,7 +168,7 @@
                     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="open = false"></div>
                     <div class="relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-app-border bg-app-surface shadow-popover">
                         <div class="flex items-center justify-between border-b border-app-border px-5 py-3">
-                            <h3 class="text-base font-semibold text-app-text">Riwayat Audit</h3>
+                            <h3 class="text-base font-semibold text-app-text">{{ __('Riwayat Audit') }}</h3>
                             <button type="button" @click="open = false" class="app-btn app-btn-ghost !p-1.5 text-lg leading-none">&times;</button>
                         </div>
                         <div class="overflow-y-auto p-5">

@@ -48,13 +48,13 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari no. opname / SKU / nama barang..." class="app-input pl-9">
                 </div>
                 <select wire:model.live="statusFilter" class="app-select">
-                    <option value="">Semua Status</option>
+                    <option value="">{{ __('Semua Status') }}</option>
                     @foreach ($statuses as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
                 </select>
                 <select wire:model.live="warehouseFilter" class="app-select">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $warehouse)<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>@endforeach
                 </select>
                 <select wire:model.live="perPage" class="app-select w-24">
@@ -77,15 +77,15 @@
                 <thead>
                     <tr>
                         <th class="rc-number">No. Opname</th>
-                        <th class="rc-date">Tanggal</th>
+                        <th class="rc-date">{{ __('Tanggal') }}</th>
                         <th class="rc-warehouse">Warehouse</th>
-                        <th class="rc-location">Lokasi</th>
+                        <th class="rc-location">{{ __('Lokasi') }}</th>
                         <th class="rc-sku">SKU</th>
-                        <th class="rc-item">Barang</th>
+                        <th class="rc-item">{{ __('Barang') }}</th>
                         <th class="rc-system_qty text-right">System</th>
-                        <th class="rc-physical_qty text-right">Fisik</th>
+                        <th class="rc-physical_qty text-right">{{ __('Fisik') }}</th>
                         <th class="rc-difference text-right">Selisih</th>
-                        <th class="rc-reason">Alasan</th>
+                        <th class="rc-reason">{{ __('Alasan') }}</th>
                         <th class="rc-status">Status</th>
                     </tr>
                 </thead>

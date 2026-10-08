@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="{{ $opnameId ? 'Edit Stock Opname' : 'Buat Stock Opname' }}" subtitle="{{ $opnameId ? 'Perbarui header opname' : 'Stock opname baru' }}">
         <x-slot:actions>
-            <a href="{{ $opnameId ? route('stock-opnames.show', $opnameId) : route('stock-opnames.index') }}" class="app-btn app-btn-secondary">Batal</a>
+            <a href="{{ $opnameId ? route('stock-opnames.show', $opnameId) : route('stock-opnames.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
         </x-slot:actions>
     </x-ui.page-header>
 
@@ -10,7 +10,7 @@
             <h2 class="app-card-title mb-4">Informasi Opname</h2>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                    <label for="opname_date" class="app-label mb-1.5">Tanggal<span class="text-rose-500">*</span></label>
+                    <label for="opname_date" class="app-label mb-1.5">{{ __('Tanggal') }}<span class="text-rose-500">*</span></label>
                     <input type="date" id="opname_date" wire:model="opname_date" class="app-input">
                     @error('opname_date') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
@@ -35,7 +35,7 @@
                     @error('location_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label for="type" class="app-label mb-1.5">Tipe</label>
+                    <label for="type" class="app-label mb-1.5">{{ __('Tipe') }}</label>
                     <select id="type" wire:model.live="type" class="app-select">
                         <option value="full">Full (semua di warehouse/lokasi)</option>
                         <option value="cycle">Cycle Count (per zona/rak)</option>
@@ -67,7 +67,7 @@
                     </div>
                 @endif
                 <div class="sm:col-span-2 lg:col-span-3">
-                    <label for="notes" class="app-label mb-1.5">Catatan</label>
+                    <label for="notes" class="app-label mb-1.5">{{ __('Catatan') }}</label>
                     <textarea id="notes" wire:model="notes" rows="2" class="app-textarea" placeholder="Catatan opname..."></textarea>
                     @error('notes') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
@@ -101,7 +101,7 @@
         @endif
 
         <div class="flex justify-end gap-2">
-            <a href="{{ $opnameId ? route('stock-opnames.show', $opnameId) : route('stock-opnames.index') }}" class="app-btn app-btn-secondary">Batal</a>
+            <a href="{{ $opnameId ? route('stock-opnames.show', $opnameId) : route('stock-opnames.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
             <button type="submit" wire:loading.attr="disabled" class="app-btn app-btn-primary disabled:opacity-60">
                 <span wire:loading.remove wire:target="save">Simpan Draft</span>
                 <span wire:loading wire:target="save">Menyimpan…</span>

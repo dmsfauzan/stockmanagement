@@ -72,7 +72,7 @@
             <button type="submit" class="app-btn app-btn-primary">Terapkan</button>
         </form>
         <div class="ml-auto flex gap-2">
-            <button type="button" onclick="window.close(); if(window.opener) window.close(); else history.back();" class="app-btn app-btn-secondary">Batal</button>
+            <button type="button" onclick="window.close(); if(window.opener) window.close(); else history.back();" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
             <button type="button" onclick="window.print()" class="app-btn app-btn-primary">Print {{ $rows->count() }} Label</button>
         </div>
     </div>

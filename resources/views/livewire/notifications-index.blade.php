@@ -27,7 +27,7 @@
                     @endforeach
                 </select>
                 <select wire:model.live="readFilter" class="app-select w-auto min-w-[150px]">
-                    <option value="">Semua Status</option>
+                    <option value="">{{ __('Semua Status') }}</option>
                     <option value="unread">Belum dibaca</option>
                     <option value="read">Sudah dibaca</option>
                 </select>
@@ -42,12 +42,12 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Waktu</th>
-                        <th>Tipe</th>
+                        <th>{{ __('Waktu') }}</th>
+                        <th>{{ __('Tipe') }}</th>
                         <th>Judul</th>
                         <th>Pesan</th>
                         <th>Link</th>
-                        <th class="text-right">Aksi</th>
+                        <th class="text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody>

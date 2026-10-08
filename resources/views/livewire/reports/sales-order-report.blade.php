@@ -32,7 +32,7 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari no. SO / customer..." class="app-input pl-9">
                 </div>
                 <select wire:model.live="statusFilter" class="app-select">
-                    <option value="">Semua Status</option>
+                    <option value="">{{ __('Semua Status') }}</option>
                     @foreach ($statuses as $status)
                         <option value="{{ $status->value }}">{{ $status->label() }}</option>
                     @endforeach
@@ -42,7 +42,7 @@
                     @foreach ($customers as $customer)<option value="{{ $customer->id }}">{{ $customer->name }}</option>@endforeach
                 </select>
                 <select wire:model.live="warehouseFilter" class="app-select">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $warehouse)<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>@endforeach
                 </select>
                 <select wire:model.live="perPage" class="app-select w-24">
@@ -65,15 +65,15 @@
                 <thead>
                     <tr>
                         <th class="rc-number">No. SO</th>
-                        <th class="rc-date">Tanggal</th>
+                        <th class="rc-date">{{ __('Tanggal') }}</th>
                         <th class="rc-customer">Customer</th>
                         <th class="rc-warehouse">Warehouse</th>
                         <th class="rc-sku">SKU</th>
-                        <th class="rc-item">Barang</th>
+                        <th class="rc-item">{{ __('Barang') }}</th>
                         <th class="rc-quantity text-right">Qty</th>
                         <th class="rc-fulfilled text-right">Terpenuhi</th>
-                        <th class="rc-remaining text-right">Sisa</th>
-                        <th class="rc-unit_price text-right">Harga</th>
+                        <th class="rc-remaining text-right">{{ __('Sisa') }}</th>
+                        <th class="rc-unit_price text-right">{{ __('Harga') }}</th>
                         <th class="rc-status">Status</th>
                     </tr>
                 </thead>

@@ -26,7 +26,7 @@
                 <td>{{ $r['posted_at'] ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="8" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="8" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

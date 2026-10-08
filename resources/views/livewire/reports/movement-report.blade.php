@@ -36,7 +36,7 @@
                     @foreach ($items as $item)<option value="{{ $item->id }}">{{ $item->sku }} - {{ $item->name }}</option>@endforeach
                 </select>
                 <select wire:model.live="warehouseFilter" class="app-select">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $warehouse)<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>@endforeach
                 </select>
                 <select wire:model.live="transactionTypeFilter" class="app-select">
@@ -66,17 +66,17 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th class="rc-date">Tanggal</th>
+                        <th class="rc-date">{{ __('Tanggal') }}</th>
                         <th class="rc-sku">SKU</th>
-                        <th class="rc-item">Barang</th>
+                        <th class="rc-item">{{ __('Barang') }}</th>
                         <th class="rc-warehouse">Warehouse</th>
-                        <th class="rc-location">Lokasi</th>
-                        <th class="rc-transaction_type">Tipe</th>
+                        <th class="rc-location">{{ __('Lokasi') }}</th>
+                        <th class="rc-transaction_type">{{ __('Tipe') }}</th>
                         <th class="rc-quantity_in text-right">In</th>
                         <th class="rc-quantity_out text-right">Out</th>
                         <th class="rc-balance_after text-right">Balance</th>
                         <th class="rc-unit_cost text-right">Hrg Satuan</th>
-                        <th class="rc-total_cost text-right">Nilai</th>
+                        <th class="rc-total_cost text-right">{{ __('Nilai') }}</th>
                         <th class="rc-user">User</th>
                     </tr>
                 </thead>

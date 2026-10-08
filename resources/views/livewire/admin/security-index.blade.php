@@ -65,7 +65,7 @@
                             @else
                                 <button type="button" wire:click="quickBan('{{ $row->ip_address }}')" class="app-btn app-btn-ghost app-btn-sm">Ban 24j</button>
                             @endif
-                            <button type="button" wire:click="filterByIp('{{ $row->ip_address }}')" class="app-btn app-btn-secondary app-btn-sm">Filter</button>
+                            <button type="button" wire:click="filterByIp('{{ $row->ip_address }}')" class="app-btn app-btn-secondary app-btn-sm">{{ __('Filter') }}</button>
                         </div>
                     @endforeach
                 </div>
@@ -78,7 +78,7 @@
             <h2 class="app-card-title mb-3">Tambah blokir manual</h2>
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
                 <label class="sm:col-span-1"><span class="app-label">IP</span><input type="text" wire:model="newBanIp" placeholder="192.0.2.1" class="app-input"></label>
-                <label class="sm:col-span-2"><span class="app-label">Alasan</span><input type="text" wire:model="newBanReason" placeholder="Manual ban" class="app-input"></label>
+                <label class="sm:col-span-2"><span class="app-label">{{ __('Alasan') }}</span><input type="text" wire:model="newBanReason" placeholder="Manual ban" class="app-input"></label>
                 <label class="sm:col-span-1"><span class="app-label">Durasi (menit, 0=permanen)</span><input type="number" wire:model="newBanDuration" class="app-input"></label>
             </div>
             <div class="mt-3">
@@ -96,7 +96,7 @@
             </div>
             <div class="overflow-x-auto">
                 <table class="app-table">
-                    <thead><tr><th>IP</th><th>Negara</th><th>Alasan</th><th>Hits</th><th>Source</th><th>Kedaluwarsa</th><th class="text-right">Aksi</th></tr></thead>
+                    <thead><tr><th>IP</th><th>Negara</th><th>{{ __('Alasan') }}</th><th>Hits</th><th>Source</th><th>{{ __('Kedaluwarsa') }}</th><th class="text-right">{{ __('Aksi') }}</th></tr></thead>
                     <tbody>
                         @foreach ($bannedIps as $row)
                             <tr>
@@ -120,12 +120,12 @@
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div class="flex flex-1 flex-wrap gap-2">
                     <label class="w-full sm:max-w-[220px]"><span class="app-label">Cari (tipe/IP/email/path)</span><input type="search" wire:model.live.debounce.300ms="search" class="app-input" placeholder="Failed / 192.0.2. / wp-admin ..."></label>
-                    <label class="w-full sm:w-auto"><span class="app-label">Tipe</span><select wire:model.live="typeFilter" class="app-select"><option value="">Semua</option>@foreach ($types as $t)<option value="{{ $t }}">{{ $t }}</option>@endforeach</select></label>
-                    <label class="w-full sm:w-auto"><span class="app-label">Severity</span><select wire:model.live="severityFilter" class="app-select"><option value="">Semua</option>@foreach ($severities as $s)<option value="{{ $s }}">{{ $s }}</option>@endforeach</select></label>
+                    <label class="w-full sm:w-auto"><span class="app-label">{{ __('Tipe') }}</span><select wire:model.live="typeFilter" class="app-select"><option value="">{{ __('Semua') }}</option>@foreach ($types as $t)<option value="{{ $t }}">{{ $t }}</option>@endforeach</select></label>
+                    <label class="w-full sm:w-auto"><span class="app-label">Severity</span><select wire:model.live="severityFilter" class="app-select"><option value="">{{ __('Semua') }}</option>@foreach ($severities as $s)<option value="{{ $s }}">{{ $s }}</option>@endforeach</select></label>
                     <label class="w-full sm:w-auto"><span class="app-label">IP</span><input type="text" wire:model.live="ipFilter" placeholder="192.0.2.x" class="app-input"></label>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost app-btn-sm">Reset filter</button>
+                    <button type="button" wire:click="resetFilters" class="app-btn app-btn-ghost app-btn-sm">{{ __('Reset filter') }}</button>
                     <select wire:model.live="perPage" class="app-select w-24">@foreach ([15,25,50,100] as $n)<option value="{{ $n }}">{{ $n }}</option>@endforeach</select>
                 </div>
             </div>
@@ -133,7 +133,7 @@
 
         <div class="overflow-x-auto">
             <table class="app-table">
-                <thead><tr><th>Waktu</th><th>Tipe</th><th>IP</th><th>Negara</th><th>User / Email</th><th>Path</th><th class="text-right">Aksi</th></tr></thead>
+                <thead><tr><th>{{ __('Waktu') }}</th><th>{{ __('Tipe') }}</th><th>IP</th><th>Negara</th><th>User / Email</th><th>Path</th><th class="text-right">{{ __('Aksi') }}</th></tr></thead>
                 <tbody>
                     @forelse ($events as $row)
                         <tr>
@@ -169,7 +169,7 @@
             <div class="relative w-full max-w-xl rounded-xl border border-app-border bg-app-surface p-6 shadow-popover">
                 <h3 class="text-base font-semibold text-app-text">Detail — {{ $selected->event_type }}</h3>
                 <dl class="mt-4 grid grid-cols-3 gap-3 text-sm">
-                    <dt class="text-app-muted col-span-1">Waktu</dt><dd class="col-span-2 font-mono text-xs">{{ $selected->created_at }}</dd>
+                    <dt class="text-app-muted col-span-1">{{ __('Waktu') }}</dt><dd class="col-span-2 font-mono text-xs">{{ $selected->created_at }}</dd>
                     <dt class="text-app-muted col-span-1">IP / Negara</dt><dd class="col-span-2 font-mono text-xs">{{ $selected->ip_address }} — {{ $selected->country_name ?? $selected->country_code ?? '-' }}</dd>
                     <dt class="text-app-muted col-span-1">User</dt><dd class="col-span-2 text-xs">{{ $selected->user?->name ?? $selected->email ?? '-' }}</dd>
                     <dt class="text-app-muted col-span-1">Method / Path</dt><dd class="col-span-2 text-xs">{{ $selected->method }} {{ $selected->path }}</dd>

@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="{{ $purchaseOrderId ? 'Edit Purchase Order' : 'Buat Purchase Order' }}" subtitle="{{ $purchaseOrderId ? 'Perbarui pesanan pembelian' : 'Pesanan pembelian baru' }}">
         <x-slot:actions>
-            <a href="{{ $purchaseOrderId ? route('purchase-orders.show', $purchaseOrderId) : route('purchase-orders.index') }}" class="app-btn app-btn-secondary">Batal</a>
+            <a href="{{ $purchaseOrderId ? route('purchase-orders.show', $purchaseOrderId) : route('purchase-orders.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
         </x-slot:actions>
     </x-ui.page-header>
 
@@ -40,7 +40,7 @@
                     @error('warehouse_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div class="sm:col-span-2 lg:col-span-3">
-                    <label for="notes" class="app-label mb-1.5">Catatan</label>
+                    <label for="notes" class="app-label mb-1.5">{{ __('Catatan') }}</label>
                     <textarea id="notes" wire:model="notes" rows="2" class="app-textarea" placeholder="Catatan PO..."></textarea>
                     @error('notes') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
@@ -49,7 +49,7 @@
 
         <x-ui.card padding="p-0">
             <div class="app-card-header flex-col gap-3 sm:flex-row">
-                <h2 class="app-card-title">Detail Barang</h2>
+                <h2 class="app-card-title">{{ __('Detail Barang') }}</h2>
                 <button type="button" wire:click="addRow" class="app-btn app-btn-secondary">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     Tambah Baris
@@ -62,12 +62,12 @@
                 <table class="app-table">
                     <thead>
                         <tr>
-                            <th>Barang</th>
+                            <th>{{ __('Barang') }}</th>
                             <th class="text-right">Qty</th>
                             <th class="text-right">Diterima</th>
-                            <th>Satuan</th>
-                            <th class="text-right">Harga Satuan</th>
-                            <th>Catatan</th>
+                            <th>{{ __('Satuan') }}</th>
+                            <th class="text-right">{{ __('Harga Satuan') }}</th>
+                            <th>{{ __('Catatan') }}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -118,7 +118,7 @@
         </x-ui.card>
 
         <div class="flex justify-end gap-2">
-            <a href="{{ $purchaseOrderId ? route('purchase-orders.show', $purchaseOrderId) : route('purchase-orders.index') }}" class="app-btn app-btn-secondary">Batal</a>
+            <a href="{{ $purchaseOrderId ? route('purchase-orders.show', $purchaseOrderId) : route('purchase-orders.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
             <button type="submit" wire:loading.attr="disabled" class="app-btn app-btn-primary disabled:opacity-60">
                 <span wire:loading.remove wire:target="save">Simpan Draft</span>
                 <span wire:loading wire:target="save">Menyimpan…</span>

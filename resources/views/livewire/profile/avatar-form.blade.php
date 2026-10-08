@@ -32,7 +32,7 @@
             </label>
             <div class="flex justify-end gap-2">
                 <button type="button" wire:click="remove" class="app-btn app-btn-ghost text-rose-600 dark:text-rose-400">Hapus</button>
-                <button type="button" wire:click="save" wire:loading.attr="disabled" class="app-btn app-btn-primary">Simpan</button>
+                <button type="button" wire:click="save" wire:loading.attr="disabled" class="app-btn app-btn-primary">{{ __('Simpan') }}</button>
             </div>
         </div>
     </x-ui.card>

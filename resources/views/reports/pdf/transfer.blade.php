@@ -3,11 +3,11 @@
     <thead>
         <tr>
             <th>No. Transfer</th>
-            <th>Tanggal</th>
-            <th>Dari</th>
+            <th>{{ __('Tanggal') }}</th>
+            <th>{{ __('Dari') }}</th>
             <th>Tujuan</th>
             <th>SKU</th>
-            <th>Barang</th>
+            <th>{{ __('Barang') }}</th>
             <th class="right">Qty</th>
             <th>Status</th>
         </tr>
@@ -26,7 +26,7 @@
                 <td>{{ $r['status'] ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="8" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="8" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

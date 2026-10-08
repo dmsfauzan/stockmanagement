@@ -1,5 +1,5 @@
 <div>
-    <x-ui.page-header title="Barang" subtitle="Kelola master data barang">
+    <x-ui.page-header title="{{ __('Barang') }}" subtitle="Kelola master data barang">
         <x-slot:actions>
             @can('items.create')
                 <a href="{{ route('items.create') }}" class="app-btn app-btn-primary gap-2">
@@ -14,7 +14,7 @@
             @can('items.create')
                 <button type="button" wire:click="openImportModal" class="app-btn app-btn-secondary gap-2">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-                    Import
+                    {{ __('Import') }}
                 </button>
             @endcan
         </x-slot:actions>
@@ -23,10 +23,10 @@
     @if (count($selectedIds) > 0)
         <div class="mt-3 flex flex-wrap items-center gap-2">
             <span class="text-xs font-medium text-app-text">{{ count($selectedIds) }} dipilih</span>
-            <x-ui.confirm action="bulkActivate" title="Aktifkan massal" :message="'Aktifkan '.count($selectedIds).' barang terpilih?'" confirm-label="Aktifkan" class="app-btn app-btn-secondary app-btn-sm">Aktifkan</x-ui.confirm>
-            <x-ui.confirm action="bulkDeactivate" title="Nonaktifkan massal" :message="'Nonaktifkan '.count($selectedIds).' barang terpilih?'" confirm-label="Nonaktifkan" class="app-btn app-btn-secondary app-btn-sm">Nonaktifkan</x-ui.confirm>
+            <x-ui.confirm action="bulkActivate" title="Aktifkan massal" :message="'Aktifkan '.count($selectedIds).' barang terpilih?'" confirm-label="Aktifkan" class="app-btn app-btn-secondary app-btn-sm">{{ __('Aktifkan') }}</x-ui.confirm>
+            <x-ui.confirm action="bulkDeactivate" title="Nonaktifkan massal" :message="'Nonaktifkan '.count($selectedIds).' barang terpilih?'" confirm-label="Nonaktifkan" class="app-btn app-btn-secondary app-btn-sm">{{ __('Nonaktifkan') }}</x-ui.confirm>
             <x-ui.confirm action="bulkDelete" title="Hapus massal" :message="'Hapus '.count($selectedIds).' barang terpilih?'" confirm-label="Hapus" variant="danger" class="app-btn app-btn-danger app-btn-sm">Hapus</x-ui.confirm>
-            <x-ui.confirm action="bulkRestore" title="Pulihkan massal" :message="'Pulihkan '.count($selectedIds).' barang terpilih?'" confirm-label="Pulihkan" class="app-btn app-btn-secondary app-btn-sm">Pulihkan</x-ui.confirm>
+            <x-ui.confirm action="bulkRestore" title="Pulihkan massal" :message="'Pulihkan '.count($selectedIds).' barang terpilih?'" confirm-label="Pulihkan" class="app-btn app-btn-secondary app-btn-sm">{{ __('Pulihkan') }}</x-ui.confirm>
         </div>
     @endif
 
@@ -63,14 +63,14 @@
                         @endforeach
                     </select>
                     <select wire:model.live="statusFilter" class="app-select w-full sm:w-auto">
-                        <option value="">Semua Status</option>
+                        <option value="">{{ __('Semua Status') }}</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
                     <select wire:model.live="trashedFilter" class="app-select w-full sm:w-auto">
                         <option value="">Aktif</option>
-                        <option value="trashed">Terhapus</option>
-                        <option value="all">Semua</option>
+                        <option value="trashed">{{ __('Terhapus') }}</option>
+                        <option value="all">{{ __('Semua') }}</option>
                     </select>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
@@ -86,7 +86,7 @@
                             </a>
                         </div>
                     @endcan
-                    <span class="text-xs text-app-muted">Per halaman</span>
+                    <span class="text-xs text-app-muted">{{ __('Per halaman') }}</span>
                     <select wire:model.live="perPage" class="app-select w-auto">
                         @foreach ([10, 25, 50, 100] as $size)
                             <option value="{{ $size }}">{{ $size }}</option>
@@ -110,7 +110,7 @@
                                 @endif
                             </button>
                         </th>
-                        <th>Barcode</th>
+                        <th>{{ __('Barcode') }}</th>
                         <th>
                             <button type="button" wire:click="sortBy('name')" class="inline-flex items-center gap-1 hover:text-app-text">
                                 Nama
@@ -119,12 +119,12 @@
                                 @endif
                             </button>
                         </th>
-                        <th>Kategori</th>
+                        <th>{{ __('Kategori') }}</th>
                         <th>Unit</th>
                         <th class="text-right">Min</th>
                         <th class="text-right">Max</th>
                         <th>Status</th>
-                        <th class="text-right">Aksi</th>
+                        <th class="text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -149,7 +149,7 @@
                             <td class="whitespace-nowrap text-right text-app-muted">{{ $item->maximum_stock }}</td>
                             <td class="whitespace-nowrap">
                                 @if ($item->trashed())
-                                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 ring-1 ring-inset ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-600">Terhapus</span>
+                                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 ring-1 ring-inset ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-600">{{ __('Terhapus') }}</span>
                                 @else
                                     <x-ui.status-badge :status="$item->status" />
                                 @endif
@@ -157,7 +157,7 @@
                             <td class="whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end gap-1">
                                     @if ($item->trashed())
-                                        <x-ui.confirm action="restore" :params="[$item->id]" title="Pulihkan Barang" :message="'Pulihkan ' . $item->sku . ' - ' . $item->name . '?'" confirm-label="Pulihkan" class="app-btn app-btn-ghost app-btn-sm">Pulihkan</x-ui.confirm>
+                                        <x-ui.confirm action="restore" :params="[$item->id]" title="Pulihkan Barang" :message="'Pulihkan ' . $item->sku . ' - ' . $item->name . '?'" confirm-label="Pulihkan" class="app-btn app-btn-ghost app-btn-sm">{{ __('Pulihkan') }}</x-ui.confirm>
                                     @else
                                         <a href="{{ route('items.show', $item) }}" class="app-btn app-btn-ghost !p-1.5" title="View">
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -221,7 +221,7 @@
 
                 <div class="mt-6 flex justify-end gap-2">
                     <button type="button" wire:click="$set('showImportModal', false)" class="app-btn app-btn-secondary">Tutup</button>
-                    <button type="button" wire:click="import" wire:loading.attr="disabled" class="app-btn app-btn-primary">Import</button>
+                    <button type="button" wire:click="import" wire:loading.attr="disabled" class="app-btn app-btn-primary">{{ __('Import') }}</button>
                 </div>
             </div>
         </div>

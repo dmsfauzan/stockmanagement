@@ -41,9 +41,9 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Waktu</th>
+                        <th>{{ __('Waktu') }}</th>
                         <th>User</th>
-                        <th>Aksi</th>
+                        <th>{{ __('Aksi') }}</th>
                         <th>Modul</th>
                         <th>Entitas</th>
                         <th>IP</th>
@@ -83,8 +83,8 @@
 
                 <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div><dt class="font-medium text-app-muted">User</dt><dd class="text-app-text">{{ $selected->user?->name ?? 'System' }}</dd></div>
-                    <div><dt class="font-medium text-app-muted">Waktu</dt><dd class="text-app-text">{{ to_display_tz($selected->created_at)?->format('d M Y H:i:s') }}</dd></div>
-                    <div><dt class="font-medium text-app-muted">Aksi</dt><dd class="text-app-text">{{ $selected->action }}</dd></div>
+                    <div><dt class="font-medium text-app-muted">{{ __('Waktu') }}</dt><dd class="text-app-text">{{ to_display_tz($selected->created_at)?->format('d M Y H:i:s') }}</dd></div>
+                    <div><dt class="font-medium text-app-muted">{{ __('Aksi') }}</dt><dd class="text-app-text">{{ $selected->action }}</dd></div>
                     <div><dt class="font-medium text-app-muted">Modul</dt><dd class="text-app-text">{{ $selected->module }}</dd></div>
                     <div><dt class="font-medium text-app-muted">Entitas</dt><dd class="text-app-text">{{ $selected->auditable_type ? class_basename($selected->auditable_type).'#'.$selected->auditable_id : '-' }}</dd></div>
                     <div><dt class="font-medium text-app-muted">IP</dt><dd class="text-app-text">{{ $selected->ip_address ?? '-' }}</dd></div>
@@ -122,7 +122,7 @@
                         <div class="mt-2 overflow-x-auto rounded-lg border border-app-border">
                             <table class="app-table text-xs">
                                 <thead>
-                                    <tr><th>Field</th><th>Sebelum</th><th>Sesudah</th></tr>
+                                    <tr><th>Field</th><th>{{ __('Sebelum') }}</th><th>{{ __('Sesudah') }}</th></tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($diff as $field => $v)

@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="Counting Stock Opname" subtitle="{{ $opname->number }} — {{ $opname->opname_date?->format('d M Y') }} — {{ $opname->warehouse?->name ?? '-' }}">
         <x-slot:actions>
-            <a href="{{ route('stock-opnames.show', $opname) }}" class="app-btn app-btn-secondary">Kembali</a>
+            <a href="{{ route('stock-opnames.show', $opname) }}" class="app-btn app-btn-secondary">{{ __('Kembali') }}</a>
         </x-slot:actions>
     </x-ui.page-header>
 
@@ -23,12 +23,12 @@
                 <table class="app-table">
                     <thead>
                         <tr>
-                            <th>Barang</th>
+                            <th>{{ __('Barang') }}</th>
                             <th class="text-right">System Qty</th>
                             <th class="text-right">Physical Qty</th>
                             <th class="text-right">Difference</th>
-                            <th>Alasan</th>
-                            <th>Catatan</th>
+                            <th>{{ __('Alasan') }}</th>
+                            <th>{{ __('Catatan') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -72,8 +72,8 @@
         </x-ui.card>
 
         <div class="mt-4 flex justify-end gap-2">
-            <a href="{{ route('stock-opnames.show', $opname) }}" class="app-btn app-btn-secondary">Batal</a>
-            <x-ui.confirm action="submit" title="Ajukan Opname" message="Pastikan semua physical qty terisi. Opname akan diajukan untuk persetujuan." confirm-label="Submit" class="app-btn app-btn-primary">Submit</x-ui.confirm>
+            <a href="{{ route('stock-opnames.show', $opname) }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
+            <x-ui.confirm action="submit" title="Ajukan Opname" message="Pastikan semua physical qty terisi. Opname akan diajukan untuk persetujuan." confirm-label="Submit" class="app-btn app-btn-primary">{{ __('Submit') }}</x-ui.confirm>
         </div>
     @endif
 </div>

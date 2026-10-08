@@ -28,13 +28,13 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Nama</th>
+                        <th>{{ __('Nama') }}</th>
                         <th>User</th>
                         <th>Abilities</th>
-                        <th>Dibuat</th>
+                        <th>{{ __('Dibuat') }}</th>
                         <th>Terakhir dipakai</th>
-                        <th>Kedaluwarsa</th>
-                        <th class="text-right">Aksi</th>
+                        <th>{{ __('Kedaluwarsa') }}</th>
+                        <th class="text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,7 +93,7 @@
                         @error('tokenName') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="app-label">Kedaluwarsa</label>
+                        <label class="app-label">{{ __('Kedaluwarsa') }}</label>
                         <input type="date" wire:model="expiresAt" class="app-input">
                         @error('expiresAt') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
@@ -112,7 +112,7 @@
                 </div>
 
                 <div class="mt-6 flex justify-end gap-2">
-                    <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">Batal</button>
+                    <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
                     <button type="button" wire:click="createToken" wire:loading.attr="disabled" class="app-btn app-btn-primary">Buat</button>
                 </div>
             </div>

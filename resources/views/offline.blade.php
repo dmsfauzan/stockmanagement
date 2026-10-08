@@ -56,7 +56,7 @@
         <h1>Anda sedang offline</h1>
         <p class="muted">Tidak ada koneksi internet. Perubahan stok tidak dikirim saat offline — buka kembali halaman ini setelah tersambung untuk sinkronisasi.</p>
         <div class="actions">
-            <button type="button" class="ghost" onclick="history.back()">Kembali</button>
+            <button type="button" class="ghost" onclick="history.back()">{{ __('Kembali') }}</button>
             <button type="button" class="dark" onclick="location.reload()">Coba lagi</button>
             <a href="{{ route('dashboard') }}" class="primary">Ke Dashboard</a>
         </div>

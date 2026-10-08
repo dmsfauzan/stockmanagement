@@ -43,14 +43,14 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari SKU / nama barang..." class="app-input pl-9">
                 </div>
                 <select wire:model.live="statusFilter" class="app-select">
-                    <option value="all">Semua Status</option>
-                    <option value="expired">Kedaluwarsa</option>
+                    <option value="all">{{ __('Semua Status') }}</option>
+                    <option value="expired">{{ __('Kedaluwarsa') }}</option>
                     <option value="expiring_30">Segera (<= {{ \App\Services\Inventory\ExpiryService::warnDays() }} hari)</option>
                     <option value="expiring_90">31-90 hari</option>
                     <option value="valid">Valid (&gt; 90 hari)</option>
                 </select>
                 <select wire:model.live="warehouseFilter" class="app-select">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $warehouse)<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>@endforeach
                 </select>
                 <select wire:model.live="locationFilter" class="app-select">
@@ -78,14 +78,14 @@
                 <thead>
                     <tr>
                         <th class="rc-sku">SKU</th>
-                        <th class="rc-item">Barang</th>
+                        <th class="rc-item">{{ __('Barang') }}</th>
                         <th class="rc-warehouse">Warehouse</th>
-                        <th class="rc-location">Lokasi</th>
+                        <th class="rc-location">{{ __('Lokasi') }}</th>
                         <th class="rc-batch">Batch</th>
                         <th class="rc-expiry_date">Expiry Date</th>
                         <th class="rc-days_left text-right">Sisa / Lewat</th>
                         <th class="rc-quantity_in text-right">Qty Masuk</th>
-                        <th class="rc-reference">Referensi</th>
+                        <th class="rc-reference">{{ __('Referensi') }}</th>
                     </tr>
                 </thead>
                 <tbody>

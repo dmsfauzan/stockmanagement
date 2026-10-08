@@ -32,7 +32,7 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari SKU / nama barang..." class="app-input pl-9">
                 </div>
                 <select wire:model.live="warehouseFilter" class="app-select">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $warehouse)<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>@endforeach
                 </select>
                 <select wire:model.live="categoryFilter" class="app-select">
@@ -57,12 +57,12 @@
                 <thead>
                     <tr>
                         <th class="rc-sku">SKU</th>
-                        <th class="rc-item">Barang</th>
-                        <th class="rc-category">Kategori</th>
+                        <th class="rc-item">{{ __('Barang') }}</th>
+                        <th class="rc-category">{{ __('Kategori') }}</th>
                         <th class="rc-warehouse">Warehouse</th>
                         <th class="rc-quantity text-right">Qty</th>
                         <th class="rc-average_cost text-right">Harga Rata-rata</th>
-                        <th class="rc-total_value text-right">Total Nilai</th>
+                        <th class="rc-total_value text-right">{{ __('Total Nilai') }}</th>
                     </tr>
                 </thead>
                 <tbody>

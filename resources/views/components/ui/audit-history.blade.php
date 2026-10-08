@@ -52,7 +52,7 @@
                         <div class="mt-2 overflow-x-auto rounded-lg border border-app-border">
                             <table class="app-table text-xs">
                                 <thead>
-                                    <tr><th>Field</th><th>Sebelum</th><th>Sesudah</th></tr>
+                                    <tr><th>Field</th><th>{{ __('Sebelum') }}</th><th>{{ __('Sesudah') }}</th></tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($diff as $field => $value)

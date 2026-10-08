@@ -24,7 +24,7 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari SKU / barcode / nama..." class="app-input pl-9">
                 </label>
                 <select wire:model.live="warehouseFilter" class="app-select sm:w-auto">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $w)
                         <option value="{{ $w->id }}">{{ $w->name }}</option>
                     @endforeach
@@ -37,7 +37,7 @@
                 </select>
             </div>
             <div class="flex items-center gap-2">
-                <span class="text-xs text-app-muted">Per halaman</span>
+                <span class="text-xs text-app-muted">{{ __('Per halaman') }}</span>
                 <select wire:model.live="perPage" class="app-select w-auto">
                     @foreach ([10, 25, 50, 100] as $s)
                         <option value="{{ $s }}">{{ $s }}</option>

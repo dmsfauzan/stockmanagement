@@ -47,8 +47,8 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th class="rc-code">Kode</th>
-                        <th class="rc-warehouse">Gudang</th>
+                        <th class="rc-code">{{ __('Kode') }}</th>
+                        <th class="rc-warehouse">{{ __('Gudang') }}</th>
                         <th class="rc-total_items text-right">Total Item</th>
                         <th class="rc-on_hand text-right">On Hand</th>
                         <th class="rc-available text-right">Available</th>

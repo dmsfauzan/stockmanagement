@@ -28,7 +28,7 @@
                 <td>{{ $r['reference'] ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="9" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="9" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

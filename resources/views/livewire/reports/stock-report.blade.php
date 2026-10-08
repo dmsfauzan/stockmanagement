@@ -33,7 +33,7 @@
                         <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari SKU / nama barang..." class="app-input pl-9">
                     </div>
                     <select wire:model.live="warehouseFilter" class="app-select">
-                        <option value="">Semua Warehouse</option>
+                        <option value="">{{ __('Semua Warehouse') }}</option>
                         @foreach ($warehouses as $warehouse)
                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
@@ -53,7 +53,7 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <select wire:model.live="statusFilter" class="app-select">
-                        <option value="">Semua Status</option>
+                        <option value="">{{ __('Semua Status') }}</option>
                         @foreach ($statuses as $status)
                             <option value="{{ $status->value }}">{{ $status->label() }}</option>
                         @endforeach
@@ -80,10 +80,10 @@
                                 SKU @if ($sortField === 'sku')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif
                             </button>
                         </th>
-                        <th class="rc-item">Barang</th>
-                        <th class="rc-category">Kategori</th>
+                        <th class="rc-item">{{ __('Barang') }}</th>
+                        <th class="rc-category">{{ __('Kategori') }}</th>
                         <th class="rc-warehouse">Warehouse</th>
-                        <th class="rc-location">Lokasi</th>
+                        <th class="rc-location">{{ __('Lokasi') }}</th>
                         <th class="rc-on_hand text-right">
                             <button type="button" wire:click="sortBy('on_hand')" class="inline-flex items-center gap-1 hover:text-app-text">
                                 On Hand @if ($sortField === 'on_hand')<span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>@endif

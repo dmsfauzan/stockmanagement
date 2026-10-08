@@ -23,20 +23,20 @@
                         <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari number / reason..." class="app-input pl-9">
                     </label>
                     <select wire:model.live="statusFilter" class="app-select sm:w-auto">
-                        <option value="">Semua Status</option>
+                        <option value="">{{ __('Semua Status') }}</option>
                         @foreach ($statuses as $status)
                             <option value="{{ $status }}">{{ ucfirst($status) }}</option>
                         @endforeach
                     </select>
                     <select wire:model.live="warehouseFilter" class="app-select sm:w-auto">
-                        <option value="">Semua Warehouse</option>
+                        <option value="">{{ __('Semua Warehouse') }}</option>
                         @foreach ($warehouses as $warehouse)
                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="text-xs text-app-muted">Per halaman</span>
+                    <span class="text-xs text-app-muted">{{ __('Per halaman') }}</span>
                     <select wire:model.live="perPage" class="app-select w-auto">
                         @foreach ([10, 25, 50, 100] as $size)
                             <option value="{{ $size }}">{{ $size }}</option>
@@ -46,15 +46,15 @@
             </div>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <label class="flex items-center gap-2 text-sm">
-                    <span class="text-app-muted">Dari</span>
+                    <span class="text-app-muted">{{ __('Dari') }}</span>
                     <input type="date" wire:model.live="dateFrom" class="app-input w-auto">
                 </label>
                 <label class="flex items-center gap-2 text-sm">
-                    <span class="text-app-muted">Sampai</span>
+                    <span class="text-app-muted">{{ __('Sampai') }}</span>
                     <input type="date" wire:model.live="dateTo" class="app-input w-auto">
                 </label>
                 @if($dateFrom || $dateTo)
-                    <button type="button" wire:click="$set('dateFrom',''); $set('dateTo','')" class="text-xs font-medium app-link">Reset tanggal</button>
+                    <button type="button" wire:click="$set('dateFrom',''); $set('dateTo','')" class="text-xs font-medium app-link">{{ __('Reset tanggal') }}</button>
                 @endif
             </div>
         </div>
@@ -66,7 +66,7 @@
                         <th>Number</th>
                         <th>
                             <button type="button" wire:click="sortByDate" class="inline-flex items-center gap-1 hover:text-app-text">
-                                Tanggal
+                                {{ __('Tanggal') }}
                                 <span>{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
                             </button>
                         </th>
@@ -75,7 +75,7 @@
                         <th>Reason</th>
                         <th class="text-right">Total Items</th>
                         <th>Status</th>
-                        <th class="text-right">Aksi</th>
+                        <th class="text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody>

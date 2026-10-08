@@ -43,12 +43,12 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Waktu</th>
+                        <th>{{ __('Waktu') }}</th>
                         <th>Event</th>
                         <th>URL</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Attempts</th>
-                        <th class="text-right">Aksi</th>
+                        <th class="text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="{{ $issueId ? 'Edit Barang Keluar' : 'Buat Barang Keluar' }}" subtitle="{{ $issueId ? 'Perbarui transaksi pengeluaran' : 'Transaksi pengeluaran barang baru' }}">
         <x-slot:actions>
-            <a href="{{ $issueId ? route('goods-issues.show', $issueId) : route('goods-issues.index') }}" class="app-btn app-btn-secondary">Batal</a>
+            <a href="{{ $issueId ? route('goods-issues.show', $issueId) : route('goods-issues.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
         </x-slot:actions>
     </x-ui.page-header>
 
@@ -10,7 +10,7 @@
             <h2 class="app-card-title mb-4">Informasi Transaksi</h2>
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                    <label for="transaction_date" class="app-label mb-1.5">Tanggal<span class="text-rose-500">*</span></label>
+                    <label for="transaction_date" class="app-label mb-1.5">{{ __('Tanggal') }}<span class="text-rose-500">*</span></label>
                     <input type="date" id="transaction_date" wire:model="transaction_date" class="app-input">
                     @error('transaction_date') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
@@ -50,7 +50,7 @@
                     @error('issued_by') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div class="sm:col-span-2 lg:col-span-3">
-                    <label for="notes" class="app-label mb-1.5">Catatan</label>
+                    <label for="notes" class="app-label mb-1.5">{{ __('Catatan') }}</label>
                     <textarea id="notes" wire:model="notes" rows="2" class="app-textarea" placeholder="Catatan transaksi..."></textarea>
                     @error('notes') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
@@ -59,7 +59,7 @@
 
         <x-ui.card padding="p-0">
             <div class="app-card-header flex-col gap-3 sm:flex-row">
-                <h2 class="app-card-title">Detail Barang</h2>
+                <h2 class="app-card-title">{{ __('Detail Barang') }}</h2>
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <label class="relative block">
                         <svg class="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-app-muted" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/></svg>
@@ -78,14 +78,14 @@
                 <table class="app-table">
                     <thead>
                         <tr>
-                            <th>Barang</th>
+                            <th>{{ __('Barang') }}</th>
                             <th class="text-right">Qty</th>
                             <th class="text-right">Tersedia</th>
-                            <th>Satuan</th>
-                            <th>Lokasi</th>
+                            <th>{{ __('Satuan') }}</th>
+                            <th>{{ __('Lokasi') }}</th>
                             <th>Batch</th>
-                            <th>Serial</th>
-                            <th>Catatan</th>
+                            <th>{{ __('Serial') }}</th>
+                            <th>{{ __('Catatan') }}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -162,7 +162,7 @@
         </x-ui.card>
 
         <div class="flex justify-end gap-2">
-            <a href="{{ $issueId ? route('goods-issues.show', $issueId) : route('goods-issues.index') }}" class="app-btn app-btn-secondary">Batal</a>
+            <a href="{{ $issueId ? route('goods-issues.show', $issueId) : route('goods-issues.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
             <button type="submit" wire:loading.attr="disabled" class="app-btn app-btn-primary disabled:opacity-60">
                 <span wire:loading.remove wire:target="save">Simpan Draft</span>
                 <span wire:loading wire:target="save">Menyimpan…</span>

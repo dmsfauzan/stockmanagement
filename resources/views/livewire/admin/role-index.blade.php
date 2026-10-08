@@ -31,8 +31,8 @@
                         <th>Slug</th>
                         <th class="text-center">Permissions</th>
                         <th class="text-center">Users</th>
-                        <th>Tipe</th>
-                        <th class="text-right">Aksi</th>
+                        <th>{{ __('Tipe') }}</th>
+                        <th class="text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,8 +111,8 @@
                     </div>
 
                     <div class="flex justify-end gap-2">
-                        <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">Batal</button>
-                        <button type="submit" class="app-btn app-btn-primary">Simpan</button>
+                        <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
+                        <button type="submit" class="app-btn app-btn-primary">{{ __('Simpan') }}</button>
                     </div>
                 </form>
             </div>

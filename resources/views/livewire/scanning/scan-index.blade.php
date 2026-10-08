@@ -166,7 +166,7 @@
                                 <thead>
                                     <tr>
                                         <th>SKU</th>
-                                        <th>Barang</th>
+                                        <th>{{ __('Barang') }}</th>
                                         <th class="text-right">On Hand</th>
                                         <th class="text-right">Reserved</th>
                                         <th class="text-right">Available</th>

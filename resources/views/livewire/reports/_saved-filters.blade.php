@@ -4,7 +4,7 @@
 <div class="flex flex-wrap items-center gap-2">
     <div class="flex items-center gap-1">
         <input type="text" wire:model="savedFilterName" placeholder="Nama filter" class="app-input w-36 text-xs">
-        <button type="button" wire:click="saveCurrentFilter" class="app-btn app-btn-secondary app-btn-sm whitespace-nowrap">Simpan Filter</button>
+        <button type="button" wire:click="saveCurrentFilter" class="app-btn app-btn-secondary app-btn-sm whitespace-nowrap">{{ __('Simpan Filter') }}</button>
     </div>
 
     @if (count($savedFilters) > 0)

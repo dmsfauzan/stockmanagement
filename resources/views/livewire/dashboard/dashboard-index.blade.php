@@ -138,7 +138,7 @@
                     <div x-ref="canvas"></div>
                 </div>
             @else
-                <x-ui.empty-state title="Belum ada data" message="Belum ada saldo stok per kategori." />
+                <x-ui.empty-state title="{{ __('Belum ada data') }}" message="Belum ada saldo stok per kategori." />
             @endif
         </x-ui.card>
         @endif
@@ -160,7 +160,7 @@
                             <th>Warehouse</th>
                             <th>Batch</th>
                             <th>Expiry</th>
-                            <th class="text-right">Sisa</th>
+                            <th class="text-right">{{ __('Sisa') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -230,7 +230,7 @@
                 <table class="app-table">
                     <thead>
                         <tr>
-                            <th>Waktu</th>
+                            <th>{{ __('Waktu') }}</th>
                             <th>User</th>
                             <th>Type</th>
                             <th>Item</th>
@@ -286,7 +286,7 @@
                     <button type="button" wire:click="resetLayout" class="app-btn app-btn-ghost">Reset Default</button>
                     <div class="flex gap-2">
                         <button type="button" wire:click="$set('showLayoutModal', false)" class="app-btn app-btn-secondary">Tutup</button>
-                        <button type="button" wire:click="saveLayout" class="app-btn app-btn-primary">Simpan</button>
+                        <button type="button" wire:click="saveLayout" class="app-btn app-btn-primary">{{ __('Simpan') }}</button>
                     </div>
                 </div>
             </div>

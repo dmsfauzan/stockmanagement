@@ -4,11 +4,11 @@
         <tr>
             <th>SKU</th>
             <th>Item</th>
-            <th>Kategori</th>
+            <th>{{ __('Kategori') }}</th>
             <th>Warehouse</th>
             <th class="right">Qty</th>
             <th class="right">Harga Rata-rata</th>
-            <th class="right">Total Nilai</th>
+            <th class="right">{{ __('Total Nilai') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -24,7 +24,7 @@
                 <td class="right">{{ number_format((float) ($r['total_value'] ?? 0), 2) }}</td>
             </tr>
         @empty
-            <tr><td colspan="7" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="7" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

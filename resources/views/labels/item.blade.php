@@ -33,8 +33,8 @@
 <body class="bg-slate-100 p-6 font-sans text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100">
     <div class="no-print mx-auto mb-6 flex max-w-3xl flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2">
-            <a href="{{ route('items.show', $item) }}" class="app-btn app-btn-secondary">Kembali</a>
-            <button type="button" onclick="window.close(); if(window.opener) window.close(); else history.back();" class="app-btn app-btn-secondary">Batal</button>
+            <a href="{{ route('items.show', $item) }}" class="app-btn app-btn-secondary">{{ __('Kembali') }}</a>
+            <button type="button" onclick="window.close(); if(window.opener) window.close(); else history.back();" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
             <button type="button" onclick="window.print()" class="app-btn app-btn-primary">Print</button>
         </div>
         <div class="flex flex-wrap items-center gap-2">

@@ -32,7 +32,7 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari SKU / nama / referensi..." class="app-input pl-9">
                 </div>
                 <select wire:model.live="warehouseFilter" class="app-select">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $warehouse)<option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>@endforeach
                 </select>
                 <select wire:model.live="transactionType" class="app-select">
@@ -60,18 +60,18 @@
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th class="rc-date">Tanggal</th>
-                        <th class="rc-reference">Referensi</th>
-                        <th class="rc-type">Tipe</th>
+                        <th class="rc-date">{{ __('Tanggal') }}</th>
+                        <th class="rc-reference">{{ __('Referensi') }}</th>
+                        <th class="rc-type">{{ __('Tipe') }}</th>
                         <th class="rc-sku">SKU</th>
-                        <th class="rc-item">Barang</th>
+                        <th class="rc-item">{{ __('Barang') }}</th>
                         <th class="rc-warehouse">Warehouse</th>
                         <th class="rc-quantity text-right">Qty</th>
-                        <th class="rc-unit_cost text-right">Harga Satuan</th>
+                        <th class="rc-unit_cost text-right">{{ __('Harga Satuan') }}</th>
                         <th class="rc-total text-right">Total</th>
                         <th class="rc-debit">Debit</th>
                         <th class="rc-credit">Kredit</th>
-                        <th class="rc-description">Deskripsi</th>
+                        <th class="rc-description">{{ __('Deskripsi') }}</th>
                     </tr>
                 </thead>
                 <tbody>

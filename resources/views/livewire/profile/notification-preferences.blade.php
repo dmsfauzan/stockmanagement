@@ -46,7 +46,7 @@
         </div>
 
         <div class="mt-6 flex justify-end">
-            <button type="button" wire:click="save" class="app-btn app-btn-primary">Simpan</button>
+            <button type="button" wire:click="save" class="app-btn app-btn-primary">{{ __('Simpan') }}</button>
         </div>
     </x-ui.card>
 </div>

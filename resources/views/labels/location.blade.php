@@ -16,14 +16,14 @@
 <body class="bg-slate-100 p-6 font-sans text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100">
     <div class="no-print mx-auto mb-6 flex max-w-3xl items-center justify-between gap-3">
         <div class="flex items-center gap-2">
-            <button type="button" onclick="window.close(); if(window.opener) window.close(); else history.back();" class="app-btn app-btn-secondary">Batal</button>
+            <button type="button" onclick="window.close(); if(window.opener) window.close(); else history.back();" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
             <button type="button" onclick="window.print()" class="app-btn app-btn-primary">Print</button>
         </div>
     </div>
 
     <div class="mx-auto flex max-w-3xl justify-center">
         <div class="w-[85mm] min-h-[54mm] rounded-xl border border-slate-300 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800 print:shadow-none">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Lokasi</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ __('Lokasi') }}</p>
             <p class="mt-0.5 text-sm font-semibold leading-tight text-slate-900 dark:text-slate-100">{{ $location->fullPath() }}</p>
             <p class="mt-1 font-mono text-xs text-slate-600 dark:text-slate-300">{{ $location->code }}</p>
             <div class="mt-3 flex justify-center">

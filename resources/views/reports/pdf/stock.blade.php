@@ -4,9 +4,9 @@
         <tr>
             <th>SKU</th>
             <th>Item</th>
-            <th>Kategori</th>
+            <th>{{ __('Kategori') }}</th>
             <th>Warehouse</th>
-            <th>Lokasi</th>
+            <th>{{ __('Lokasi') }}</th>
             <th class="right">On Hand</th>
             <th class="right">Min</th>
             <th class="right">Max</th>
@@ -27,7 +27,7 @@
                 <td>{{ is_array($row) ? $row['status'] : ($row->stock_status ?? $row->status ?? '-') }}</td>
             </tr>
         @empty
-            <tr><td colspan="9" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="9" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

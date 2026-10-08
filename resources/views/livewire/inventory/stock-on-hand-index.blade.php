@@ -16,7 +16,7 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari SKU / barcode / nama..." class="app-input pl-9">
                 </label>
                 <select wire:model.live="warehouseFilter" class="app-select">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $w)
                         <option value="{{ $w->id }}">{{ $w->name }}</option>
                     @endforeach
@@ -34,7 +34,7 @@
                     @endforeach
                 </select>
                 <select wire:model.live="statusFilter" class="app-select">
-                    <option value="">Semua Status</option>
+                    <option value="">{{ __('Semua Status') }}</option>
                     <option value="normal">Normal</option>
                     <option value="low">Low Stock</option>
                     <option value="out">Out of Stock</option>
@@ -57,7 +57,7 @@
                         <option value="asc">Asc</option>
                         <option value="desc">Desc</option>
                     </select>
-                    <span class="text-xs text-app-muted">Per halaman</span>
+                    <span class="text-xs text-app-muted">{{ __('Per halaman') }}</span>
                     <select wire:model.live="perPage" class="app-select w-auto py-1.5">
                         @foreach ([10, 25, 50, 100] as $s)
                             <option value="{{ $s }}">{{ $s }}</option>
@@ -73,7 +73,7 @@
                     <tr>
                         <th><button type="button" wire:click="sortBy('sku')" class="inline-flex items-center gap-1 hover:text-app-text">SKU @if($sortField==='sku')<span>{{ $sortDirection==='asc'?'↑':'↓' }}</span>@endif</button></th>
                         <th>Item</th>
-                        <th>Kategori</th>
+                        <th>{{ __('Kategori') }}</th>
                         <th>Warehouse</th>
                         <th>Location</th>
                         <th class="text-right"><button type="button" wire:click="sortBy('on_hand')" class="inline-flex items-center gap-1 hover:text-app-text">On Hand @if($sortField==='on_hand')<span>{{ $sortDirection==='asc'?'↑':'↓' }}</span>@endif</button></th>

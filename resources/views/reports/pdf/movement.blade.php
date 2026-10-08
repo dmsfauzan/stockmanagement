@@ -34,7 +34,7 @@
                 <td>{{ $r['user_name'] ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="12" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="12" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="{{ $itemId ? 'Edit Barang' : 'Tambah Barang' }}" subtitle="{{ $itemId ? 'Perbarui data barang' : 'Tambahkan barang baru' }}">
         <x-slot:actions>
-            <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">Batal</a>
+            <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
         </x-slot:actions>
     </x-ui.page-header>
 
@@ -14,21 +14,21 @@
                     @error('sku') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label for="barcode" class="app-label mb-1">Barcode</label>
+                    <label for="barcode" class="app-label mb-1">{{ __('Barcode') }}</label>
                     <input type="text" id="barcode" wire:model="barcode" class="app-input" placeholder="899xxxxxxxxx">
                     @error('barcode') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
             </div>
 
             <div>
-                <label for="name" class="app-label mb-1">Nama<span class="text-rose-500">*</span></label>
+                <label for="name" class="app-label mb-1">{{ __('Nama') }}<span class="text-rose-500">*</span></label>
                 <input type="text" id="name" wire:model="name" class="app-input" placeholder="Nama barang">
                 @error('name') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                    <label for="category_id" class="app-label mb-1">Kategori<span class="text-rose-500">*</span></label>
+                    <label for="category_id" class="app-label mb-1">{{ __('Kategori') }}<span class="text-rose-500">*</span></label>
                     <select id="category_id" wire:model="category_id" class="app-select">
                         <option value="">-- Pilih Kategori --</option>
                         @foreach ($categories as $category)
@@ -38,7 +38,7 @@
                     @error('category_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label for="unit_id" class="app-label mb-1">Satuan<span class="text-rose-500">*</span></label>
+                    <label for="unit_id" class="app-label mb-1">{{ __('Satuan') }}<span class="text-rose-500">*</span></label>
                     <select id="unit_id" wire:model="unit_id" class="app-select">
                         <option value="">-- Pilih Satuan --</option>
                         @foreach ($units as $unit)
@@ -79,7 +79,7 @@
                     @error('maximum_stock') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label for="cost" class="app-label mb-1">Harga Satuan</label>
+                    <label for="cost" class="app-label mb-1">{{ __('Harga Satuan') }}</label>
                     <input type="number" id="cost" wire:model="cost" min="0" step="0.01" class="app-input" placeholder="0">
                     @error('cost') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
@@ -103,7 +103,7 @@
             </div>
 
             <div>
-                <label for="description" class="app-label mb-1">Deskripsi</label>
+                <label for="description" class="app-label mb-1">{{ __('Deskripsi') }}</label>
                 <textarea id="description" wire:model="description" rows="3" class="app-input min-h-[84px] resize-y" placeholder="Deskripsi barang..."></textarea>
                 @error('description') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
             </div>
@@ -137,9 +137,9 @@
             </div>
 
             <div class="flex justify-end gap-2 pt-2">
-                <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">Batal</a>
+                <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
                 <button type="submit" wire:loading.attr="disabled" class="app-btn app-btn-primary gap-2">
-                    <span wire:loading.remove wire:target="save">Simpan</span>
+                    <span wire:loading.remove wire:target="save">{{ __('Simpan') }}</span>
                     <span wire:loading wire:target="save">Menyimpan…</span>
                 </button>
             </div>

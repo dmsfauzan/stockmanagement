@@ -7,7 +7,7 @@
             </button>
             <button type="button" wire:click="openImportModal" class="app-btn app-btn-secondary gap-2">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-                Import
+                {{ __('Import') }}
             </button>
             <button type="button" wire:click="openCreate" class="app-btn app-btn-primary gap-2">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
@@ -22,7 +22,7 @@
         <div class="mt-3 flex flex-wrap items-center gap-2">
             <span class="text-xs font-medium text-app-text">{{ count($selectedIds) }} dipilih</span>
             <x-ui.confirm action="bulkDelete" title="Hapus massal" :message="'Hapus '.count($selectedIds).' unit terpilih?'" confirm-label="Hapus" variant="danger" class="app-btn app-btn-danger app-btn-sm">Hapus</x-ui.confirm>
-            <x-ui.confirm action="bulkRestore" title="Pulihkan massal" :message="'Pulihkan '.count($selectedIds).' unit terpilih?'" confirm-label="Pulihkan" class="app-btn app-btn-secondary app-btn-sm">Pulihkan</x-ui.confirm>
+            <x-ui.confirm action="bulkRestore" title="Pulihkan massal" :message="'Pulihkan '.count($selectedIds).' unit terpilih?'" confirm-label="Pulihkan" class="app-btn app-btn-secondary app-btn-sm">{{ __('Pulihkan') }}</x-ui.confirm>
         </div>
     @endif
 
@@ -35,8 +35,8 @@
                 </label>
                 <select wire:model.live="trashedFilter" class="app-select w-full sm:w-auto">
                     <option value="">Aktif</option>
-                    <option value="trashed">Terhapus</option>
-                    <option value="all">Semua</option>
+                    <option value="trashed">{{ __('Terhapus') }}</option>
+                    <option value="all">{{ __('Semua') }}</option>
                 </select>
                 <select wire:model.live="perPage" class="app-select w-24">
                     @foreach ([10, 25, 50] as $size)
@@ -51,10 +51,10 @@
                 <thead>
                     <tr>
                         <th class="w-8"><input type="checkbox" wire:model.live="selectAll" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500"></th>
-                        <th>Kode</th>
-                        <th>Nama</th>
-                        <th class="text-right">Barang</th>
-                        <th class="text-right">Aksi</th>
+                        <th>{{ __('Kode') }}</th>
+                        <th>{{ __('Nama') }}</th>
+                        <th class="text-right">{{ __('Barang') }}</th>
+                        <th class="text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,8 +67,8 @@
                             <td class="whitespace-nowrap text-right">
                                 <div class="flex items-center justify-end gap-1">
                                     @if ($unit->trashed())
-                                        <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 ring-1 ring-inset ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-600">Terhapus</span>
-                                        <x-ui.confirm action="restore" :params="[$unit->id]" title="Pulihkan Data" message="Pulihkan data ini?" confirm-label="Pulihkan" class="app-btn app-btn-ghost app-btn-sm">Pulihkan</x-ui.confirm>
+                                        <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500 ring-1 ring-inset ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-600">{{ __('Terhapus') }}</span>
+                                        <x-ui.confirm action="restore" :params="[$unit->id]" title="Pulihkan Data" message="Pulihkan data ini?" confirm-label="Pulihkan" class="app-btn app-btn-ghost app-btn-sm">{{ __('Pulihkan') }}</x-ui.confirm>
                                     @else
                                         <button type="button" wire:click="openEdit({{ $unit->id }})" class="app-btn app-btn-ghost !p-1.5" title="Edit">
                                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
@@ -96,18 +96,18 @@
                 <h2 class="text-lg font-semibold text-app-text">{{ $editingId ? 'Edit Unit' : 'Tambah Unit' }}</h2>
                 <form wire:submit="save" class="mt-4 space-y-4">
                     <div>
-                        <label class="app-label mb-1">Kode<span class="text-rose-500">*</span></label>
+                        <label class="app-label mb-1">{{ __('Kode') }}<span class="text-rose-500">*</span></label>
                         <input type="text" wire:model="code" class="app-input" placeholder="PCS">
                         @error('code') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="app-label mb-1">Nama<span class="text-rose-500">*</span></label>
+                        <label class="app-label mb-1">{{ __('Nama') }}<span class="text-rose-500">*</span></label>
                         <input type="text" wire:model="name" class="app-input" placeholder="Pieces">
                         @error('name') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
                     <div class="flex justify-end gap-2">
-                        <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">Batal</button>
-                        <button type="submit" class="app-btn app-btn-primary">Simpan</button>
+                        <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
+                        <button type="submit" class="app-btn app-btn-primary">{{ __('Simpan') }}</button>
                     </div>
                 </form>
             </div>

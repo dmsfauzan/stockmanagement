@@ -8,7 +8,7 @@
             <th>Item</th>
             <th>Warehouse</th>
             <th class="right">Qty Out</th>
-            <th class="right">Harga Satuan</th>
+            <th class="right">{{ __('Harga Satuan') }}</th>
             <th class="right">Total COGS</th>
         </tr>
     </thead>
@@ -26,7 +26,7 @@
                 <td class="right">{{ number_format((float) ($r['total_cost'] ?? 0), 2) }}</td>
             </tr>
         @empty
-            <tr><td colspan="8" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="8" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

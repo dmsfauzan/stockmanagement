@@ -16,7 +16,7 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari SKU / nama..." class="app-input pl-9">
                 </label>
                 <select wire:model.live="warehouseFilter" class="app-select">
-                    <option value="">Semua Warehouse</option>
+                    <option value="">{{ __('Semua Warehouse') }}</option>
                     @foreach ($warehouses as $w)
                         <option value="{{ $w->id }}">{{ $w->name }}</option>
                     @endforeach
@@ -48,14 +48,14 @@
                 <input type="date" wire:model.live="fromDate" class="app-input" placeholder="From">
                 <input type="date" wire:model.live="toDate" class="app-input" placeholder="To">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs text-app-muted">Per halaman</span>
+                    <span class="text-xs text-app-muted">{{ __('Per halaman') }}</span>
                     <select wire:model.live="perPage" class="app-select flex-1">
                         @foreach ([10, 25, 50, 100] as $s)
                             <option value="{{ $s }}">{{ $s }}</option>
                         @endforeach
                     </select>
                 </div>
-                <button type="button" wire:click="clearDates" class="app-btn app-btn-secondary">Reset tanggal</button>
+                <button type="button" wire:click="clearDates" class="app-btn app-btn-secondary">{{ __('Reset tanggal') }}</button>
             </div>
         </div>
 

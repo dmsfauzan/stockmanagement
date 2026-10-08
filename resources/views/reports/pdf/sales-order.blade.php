@@ -3,15 +3,15 @@
     <thead>
         <tr>
             <th>No. SO</th>
-            <th>Tanggal</th>
+            <th>{{ __('Tanggal') }}</th>
             <th>Customer</th>
             <th>Warehouse</th>
             <th>SKU</th>
-            <th>Barang</th>
+            <th>{{ __('Barang') }}</th>
             <th class="right">Qty</th>
             <th class="right">Terpenuhi</th>
-            <th class="right">Sisa</th>
-            <th class="right">Harga</th>
+            <th class="right">{{ __('Sisa') }}</th>
+            <th class="right">{{ __('Harga') }}</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -32,7 +32,7 @@
                 <td>{{ $r['status'] ?? '-' }}</td>
             </tr>
         @empty
-            <tr><td colspan="11" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="11" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

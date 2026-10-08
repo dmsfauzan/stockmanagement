@@ -1,7 +1,7 @@
 <div>
-    <x-ui.page-header title="Detail Barang" subtitle="{{ $itemModel->name }}">
+    <x-ui.page-header title="{{ __('Detail Barang') }}" subtitle="{{ $itemModel->name }}">
         <x-slot:actions>
-            <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">Kembali</a>
+            <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">{{ __('Kembali') }}</a>
             @can('view', $itemModel)
                 <span class="flex items-center gap-1.5">
                     <a href="{{ route('labels.item', $itemModel) }}?format=qr" target="_blank" rel="noopener" class="app-btn app-btn-secondary !py-1.5 text-xs">Cetak Label (QR)</a>
@@ -39,15 +39,15 @@
                 </div>
                 <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">SKU</dt><dd class="mt-1 text-sm font-medium text-app-text">{{ $itemModel->sku }}</dd></div>
-                    <div><dt class="text-xs font-semibold uppercase text-app-muted">Barcode</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->barcode ?? '-' }}</dd></div>
-                    <div><dt class="text-xs font-semibold uppercase text-app-muted">Nama</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->name }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Barcode') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->barcode ?? '-' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Nama') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->name }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Brand</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->brand ?? '-' }}</dd></div>
-                    <div><dt class="text-xs font-semibold uppercase text-app-muted">Kategori</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->category?->name ?? '-' }}</dd></div>
-                    <div><dt class="text-xs font-semibold uppercase text-app-muted">Satuan</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->unit?->name ?? '-' }} {{ $itemModel->unit?->code ? '(' . $itemModel->unit->code . ')' : '' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Kategori') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->category?->name ?? '-' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Satuan') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->unit?->name ?? '-' }} {{ $itemModel->unit?->code ? '(' . $itemModel->unit->code . ')' : '' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Supplier</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->primarySupplier?->name ?? '-' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Status</dt><dd class="mt-1"><x-ui.status-badge :status="$itemModel->status" /></dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Min / Max</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->minimum_stock }} / {{ $itemModel->maximum_stock }}</dd></div>
-                    <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase text-app-muted">Deskripsi</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->description ?? '-' }}</dd></div>
+                    <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Deskripsi') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->description ?? '-' }}</dd></div>
                 </dl>
             @elseif ($tab === 'inventory')
                 @if ($balances->isEmpty())
@@ -92,7 +92,7 @@
                                             <th>Warehouse</th>
                                             <th>Location</th>
                                             <th>Batch</th>
-                                            <th>Serial</th>
+                                            <th>{{ __('Serial') }}</th>
                                             <th>Expiry</th>
                                             <th class="text-right">Qty</th>
                                             <th class="text-right">Unit Cost</th>
@@ -124,7 +124,7 @@
                         <table class="app-table">
                             <thead>
                                 <tr>
-                                    <th>Tanggal</th>
+                                    <th>{{ __('Tanggal') }}</th>
                                     <th>Type</th>
                                     <th>Warehouse / Location</th>
                                     <th class="text-right">In</th>
@@ -178,7 +178,7 @@
         <x-ui.card>
             <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                    <h2 class="app-card-title">Riwayat Audit</h2>
+                    <h2 class="app-card-title">{{ __('Riwayat Audit') }}</h2>
                     <p class="mt-1 text-sm text-app-muted">Jejak perubahan data barang ini.</p>
                 </div>
                 <button type="button" @click="open = true" class="app-btn app-btn-secondary app-btn-sm">Lihat Riwayat</button>

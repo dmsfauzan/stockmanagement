@@ -19,7 +19,7 @@
                         <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari nama / email..." class="app-input pl-9">
                     </label>
                     <select wire:model.live="statusFilter" class="app-select">
-                        <option value="">Semua Status</option>
+                        <option value="">{{ __('Semua Status') }}</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
@@ -45,7 +45,7 @@
                         <th>Roles</th>
                         <th>Status</th>
                         <th>Last Login</th>
-                        <th class="text-right">Aksi</th>
+                        <th class="text-right">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,7 +103,7 @@
                 <h2 class="text-lg font-semibold text-app-text">{{ $editingId ? 'Edit User' : 'Tambah User' }}</h2>
                 <form wire:submit="save" class="mt-4 space-y-4">
                     <div>
-                        <label class="app-label mb-1">Nama<span class="text-rose-500">*</span></label>
+                        <label class="app-label mb-1">{{ __('Nama') }}<span class="text-rose-500">*</span></label>
                         <input type="text" wire:model="name" class="app-input">
                         @error('name') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
@@ -138,8 +138,8 @@
                         @error('selectedRoles') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
                     <div class="flex justify-end gap-2">
-                        <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">Batal</button>
-                        <button type="submit" class="app-btn app-btn-primary">Simpan</button>
+                        <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
+                        <button type="submit" class="app-btn app-btn-primary">{{ __('Simpan') }}</button>
                     </div>
                 </form>
             </div>

@@ -2,8 +2,8 @@
 <table>
     <thead>
         <tr>
-            <th>Kode</th>
-            <th>Gudang</th>
+            <th>{{ __('Kode') }}</th>
+            <th>{{ __('Gudang') }}</th>
             <th class="right">Total Item</th>
             <th class="right">On Hand</th>
             <th class="right">Available</th>
@@ -28,7 +28,7 @@
                 <td class="right">{{ number_format((int) $r->soon_count) }}</td>
             </tr>
         @empty
-            <tr><td colspan="9" class="empty">Tidak ada data.</td></tr>
+            <tr><td colspan="9" class="empty">{{ __('Tidak ada data.') }}</td></tr>
         @endforelse
     </tbody>
 </table>

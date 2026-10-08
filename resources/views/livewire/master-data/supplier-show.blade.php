@@ -1,7 +1,7 @@
 <div>
     <x-ui.page-header title="Detail Supplier" :subtitle="$supplier->name">
         <x-slot:actions>
-            <a href="{{ route('suppliers.index') }}" class="app-btn app-btn-secondary">Kembali</a>
+            <a href="{{ route('suppliers.index') }}" class="app-btn app-btn-secondary">{{ __('Kembali') }}</a>
             <a href="{{ route('suppliers.index') }}#edit-{{ $supplier->id }}" class="app-btn app-btn-secondary">Kelola di Daftar</a>
         </x-slot:actions>
     </x-ui.page-header>
@@ -16,7 +16,7 @@
         </div>
         <dl class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div><dt class="text-xs font-semibold uppercase text-app-muted">Contact Person</dt><dd class="mt-1 text-sm text-app-text">{{ $supplier->contact_person ?? '-' }}</dd></div>
-            <div><dt class="text-xs font-semibold uppercase text-app-muted">Telepon</dt><dd class="mt-1 text-sm text-app-text">{{ $supplier->phone ?? '-' }}</dd></div>
+            <div><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Telepon') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $supplier->phone ?? '-' }}</dd></div>
             <div><dt class="text-xs font-semibold uppercase text-app-muted">Email</dt><dd class="mt-1 text-sm text-app-text">{{ $supplier->email ?? '-' }}</dd></div>
             <div><dt class="text-xs font-semibold uppercase text-app-muted">Lead Time</dt><dd class="mt-1 text-sm font-medium text-app-text">{{ (int) ($supplier->lead_time_days ?? 7) }}d</dd></div>
             <div><dt class="text-xs font-semibold uppercase text-app-muted">Payment Terms</dt><dd class="mt-1 text-sm text-app-text">{{ $supplier->payment_terms ?? 'NET 30' }}</dd></div>
@@ -79,7 +79,7 @@
                     <div class="mt-4 overflow-x-auto">
                         <table class="app-table">
                             <thead>
-                                <tr><th>SKU</th><th>Nama Barang</th><th class="text-right">Price</th><th class="text-right">Lead Time</th><th>Notes</th><th class="text-right">Aksi</th></tr>
+                                <tr><th>SKU</th><th>Nama Barang</th><th class="text-right">Price</th><th class="text-right">Lead Time</th><th>Notes</th><th class="text-right">{{ __('Aksi') }}</th></tr>
                             </thead>
                             <tbody>
                                 @foreach ($prices as $row)

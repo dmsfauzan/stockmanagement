@@ -43,7 +43,7 @@
                     <input type="search" wire:model.live.debounce.300ms="search" placeholder="Cari no. transfer / SKU / nama barang..." class="app-input pl-9">
                 </div>
                 <select wire:model.live="statusFilter" class="app-select">
-                    <option value="">Semua Status</option>
+                    <option value="">{{ __('Semua Status') }}</option>
                     @foreach ($statuses as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
@@ -76,11 +76,11 @@
                 <thead>
                     <tr>
                         <th class="rc-number">No. Transfer</th>
-                        <th class="rc-date">Tanggal</th>
-                        <th class="rc-from">Dari</th>
+                        <th class="rc-date">{{ __('Tanggal') }}</th>
+                        <th class="rc-from">{{ __('Dari') }}</th>
                         <th class="rc-to">Tujuan</th>
                         <th class="rc-sku">SKU</th>
-                        <th class="rc-item">Barang</th>
+                        <th class="rc-item">{{ __('Barang') }}</th>
                         <th class="rc-quantity text-right">Qty</th>
                         <th class="rc-status">Status</th>
                     </tr>
