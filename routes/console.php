@@ -11,6 +11,9 @@ Artisan::command('inspire', function () {
 Schedule::command('inventory:alerts')->dailyAt('07:00');
 Schedule::command('inventory:digest')->dailyAt('07:05');
 Schedule::command('inventory:cycle-count')->weeklyOn(1, '08:00');
+Schedule::command('reports:mail --period=daily')->dailyAt('06:30');
+Schedule::command('reports:mail --period=weekly')->weeklyOn(1, '06:45');
+Schedule::command('reports:mail --period=monthly')->monthlyOn(1, '07:00');
 Schedule::command('accounting:export --period=daily')->dailyAt('03:00');
 Schedule::command('accounting:export --period=monthly')->monthlyOn(1, '03:30');
 Schedule::command('backup:run --only-db')->dailyAt('01:00');

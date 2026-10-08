@@ -47,6 +47,13 @@ class SettingIndex extends Component
         'security' => [
             'security_require_2fa_admin' => ['key' => 'security.require_2fa_admin', 'label' => 'Wajibkan 2FA untuk Admin', 'type' => 'select', 'options' => ['1' => 'Ya', '0' => 'Tidak']],
         ],
+        'reports' => [
+            'reports_mail_enabled' => ['key' => 'reports.mail_enabled', 'label' => 'Report Email (scheduled)', 'type' => 'select', 'options' => ['1' => 'Enabled', '0' => 'Disabled']],
+            'reports_mail_report' => ['key' => 'reports.mail_report', 'label' => 'Report', 'type' => 'select', 'options' => ['stock' => 'Stok Saat Ini', 'low' => 'Low Stock', 'movement' => 'Pergerakan', 'valuation' => 'Valuation', 'expiry' => 'Batch Expired']],
+            'reports_mail_period' => ['key' => 'reports.mail_period', 'label' => 'Period', 'type' => 'select', 'options' => ['daily' => 'Harian', 'weekly' => 'Mingguan', 'monthly' => 'Bulanan']],
+            'reports_mail_recipients' => ['key' => 'reports.mail_recipients', 'label' => 'Penerima (comma separated)', 'type' => 'text'],
+            'reports_mail_limit' => ['key' => 'reports.mail_limit', 'label' => 'Batas baris per laporan', 'type' => 'number'],
+        ],
         'integration' => [
             'integration_webhook_enabled' => ['key' => 'integration.webhook_enabled', 'label' => 'Webhook (enabled)', 'type' => 'select', 'options' => ['1' => 'Enabled', '0' => 'Disabled']],
             'integration_webhook_url' => ['key' => 'integration.webhook_url', 'label' => 'Webhook URL', 'type' => 'text'],
@@ -108,6 +115,11 @@ class SettingIndex extends Component
             'accounting_export_format' => 'csv',
             'accounting_export_recipient' => '',
             'accounting_export_disk' => 'local',
+            'reports_mail_enabled' => '0',
+            'reports_mail_report' => 'stock',
+            'reports_mail_period' => 'daily',
+            'reports_mail_recipients' => '',
+            'reports_mail_limit' => '50',
             default => '',
         };
     }
@@ -142,6 +154,11 @@ class SettingIndex extends Component
             'values.accounting_export_format' => ['required', 'in:csv,xlsx'],
             'values.accounting_export_recipient' => ['nullable', 'email', 'max:255'],
             'values.accounting_export_disk' => ['required', 'in:local,public'],
+            'values.reports_mail_enabled' => ['required', 'in:0,1'],
+            'values.reports_mail_report' => ['required', 'in:stock,low,movement,valuation,expiry'],
+            'values.reports_mail_period' => ['required', 'in:daily,weekly,monthly'],
+            'values.reports_mail_recipients' => ['nullable', 'string', 'max:500'],
+            'values.reports_mail_limit' => ['required', 'integer', 'min:5', 'max:500'],
         ];
 
         $validated = $this->validate($rules)['values'];
