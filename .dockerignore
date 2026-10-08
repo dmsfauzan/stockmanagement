@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+!.env.docker
+node_modules
+vendor
+public/build
+public/hot
+storage/*.key
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+*.log
+.phpunit.result.cache
+/.idea
+/.vscode

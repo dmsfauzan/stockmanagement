@@ -242,6 +242,18 @@ npm run build            # produksi → public/build
 php artisan storage:link # lampiran adjustment
 ```
 
+### Docker Compose (opsional)
+
+Alternatif untuk mereproduksi seluruh stack (app + MySQL + queue + scheduler) tanpa Laragon.
+
+```bash
+docker compose up --build            # app → http://localhost:8080 (MySQL host port 3307)
+docker compose exec app php artisan db:seed   # data demo + admin@stock.test / password
+docker compose down -v               # hentikan + hapus volume
+```
+
+Service: `mysql` (8.0), `app` (php artisan serve :8000), `queue` (`queue:work`, database), `scheduler` (`schedule:work`). Migrasi dijalankan otomatis oleh `docker/entrypoint.sh`. Kredensial ada di `.env.docker` (demo, **jangan** dipakai di produksi).
+
 ### Backup (opsional tapi disarankan di produksi)
 
 ```bash
@@ -266,6 +278,8 @@ Penerima notifikasi diatur via `BACKUP_MAIL_TO` (default `MAIL_FROM_ADDRESS`). J
 - [x] Sales Order — SO → Barang Keluar (fulfilment), report & REST API
 - [x] Advanced Inventory — Lot/Serial, Cycle Counting, Landed Cost, FEFO
 - [x] Integrasi ERP/Accounting — webhook (HMAC) + ekspor jurnal terjadwal + API accounting
+- [x] Polish — restore Barang, import master lain, dashboard widget, email report, arsip movements
+- [x] DevOps — OpenAPI docs, Larastan/PHPStan + coverage di CI, Docker Compose
 
 ## Berkontribusi & Lisensi
 
