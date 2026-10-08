@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Transactions;
 
+use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\StockAdjustment;
@@ -19,7 +20,7 @@ use Livewire\WithFileUploads;
 #[Title('Form Stock Adjustment')]
 class StockAdjustmentForm extends Component
 {
-    use WithFileUploads;
+    use GuardsStaleEdits, WithFileUploads;
 
     public ?int $adjustmentId = null;
 
@@ -55,6 +56,7 @@ class StockAdjustmentForm extends Component
             }
 
             $this->adjustmentId = $model->id;
+            $this->captureUpdatedAt($model);
             $this->transaction_date = $model->transaction_date?->format('Y-m-d') ?? now()->format('Y-m-d');
             $this->warehouse_id = (string) $model->warehouse_id;
             $this->location_id = (string) $model->location_id;
@@ -217,7 +219,12 @@ class StockAdjustmentForm extends Component
     public function save()
     {
         if ($this->adjustmentId) {
-            $this->authorize('update', StockAdjustment::findOrFail($this->adjustmentId));
+            $existing = StockAdjustment::findOrFail($this->adjustmentId);
+            $this->authorize('update', $existing);
+
+            if ($this->abortIfStale($existing)) {
+                return;
+            }
         } else {
             $this->authorize('create', StockAdjustment::class);
         }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Transactions;
 
+use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\Customer;
 use App\Models\Item;
 use App\Models\SalesOrder;
@@ -18,6 +19,8 @@ use Livewire\Component;
 #[Title('Form Sales Order')]
 class SalesOrderForm extends Component
 {
+    use GuardsStaleEdits;
+
     public ?int $salesOrderId = null;
 
     public string $order_date = '';
@@ -46,6 +49,7 @@ class SalesOrderForm extends Component
             }
 
             $this->salesOrderId = $model->id;
+            $this->captureUpdatedAt($model);
             $this->order_date = $model->order_date?->format('Y-m-d') ?? now()->format('Y-m-d');
             $this->expected_date = $model->expected_date?->format('Y-m-d') ?? '';
             $this->customer_id = (string) $model->customer_id;
@@ -127,7 +131,12 @@ class SalesOrderForm extends Component
     public function save()
     {
         if ($this->salesOrderId) {
-            $this->authorize('update', SalesOrder::findOrFail($this->salesOrderId));
+            $existing = SalesOrder::findOrFail($this->salesOrderId);
+            $this->authorize('update', $existing);
+
+            if ($this->abortIfStale($existing)) {
+                return;
+            }
         } else {
             $this->authorize('create', SalesOrder::class);
         }

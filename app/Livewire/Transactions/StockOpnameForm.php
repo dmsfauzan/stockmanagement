@@ -3,6 +3,7 @@
 namespace App\Livewire\Transactions;
 
 use App\Enums\OpnameStatus;
+use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\Location;
 use App\Models\Rack;
 use App\Models\StockBalance;
@@ -20,6 +21,8 @@ use Livewire\Component;
 #[Title('Form Stock Opname')]
 class StockOpnameForm extends Component
 {
+    use GuardsStaleEdits;
+
     public ?int $opnameId = null;
 
     public string $opname_date = '';
@@ -50,6 +53,7 @@ class StockOpnameForm extends Component
             }
 
             $this->opnameId = $model->id;
+            $this->captureUpdatedAt($model);
             $this->opname_date = $model->opname_date?->format('Y-m-d') ?? now()->format('Y-m-d');
             $this->warehouse_id = (string) $model->warehouse_id;
             $this->location_id = (string) ($model->location_id ?? '');
@@ -144,7 +148,12 @@ class StockOpnameForm extends Component
     public function save()
     {
         if ($this->opnameId) {
-            $this->authorize('update', StockOpname::findOrFail($this->opnameId));
+            $existing = StockOpname::findOrFail($this->opnameId);
+            $this->authorize('update', $existing);
+
+            if ($this->abortIfStale($existing)) {
+                return;
+            }
         } else {
             $this->authorize('create', StockOpname::class);
         }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Transactions;
 
+use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\Item;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
@@ -19,6 +20,8 @@ use Livewire\Component;
 #[Title('Form Purchase Order')]
 class PurchaseOrderForm extends Component
 {
+    use GuardsStaleEdits;
+
     public ?int $purchaseOrderId = null;
 
     public string $order_date = '';
@@ -47,6 +50,7 @@ class PurchaseOrderForm extends Component
             }
 
             $this->purchaseOrderId = $model->id;
+            $this->captureUpdatedAt($model);
             $this->order_date = $model->order_date?->format('Y-m-d') ?? now()->format('Y-m-d');
             $this->expected_date = $model->expected_date?->format('Y-m-d') ?? '';
             $this->supplier_id = (string) $model->supplier_id;
@@ -153,7 +157,12 @@ class PurchaseOrderForm extends Component
     public function save()
     {
         if ($this->purchaseOrderId) {
-            $this->authorize('update', PurchaseOrder::findOrFail($this->purchaseOrderId));
+            $existing = PurchaseOrder::findOrFail($this->purchaseOrderId);
+            $this->authorize('update', $existing);
+
+            if ($this->abortIfStale($existing)) {
+                return;
+            }
         } else {
             $this->authorize('create', PurchaseOrder::class);
         }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Transactions;
 
+use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\StockBalance;
@@ -18,6 +19,8 @@ use Livewire\Component;
 #[Title('Form Transfer Barang')]
 class StockTransferForm extends Component
 {
+    use GuardsStaleEdits;
+
     public ?int $transferId = null;
 
     public string $transfer_date = '';
@@ -48,6 +51,7 @@ class StockTransferForm extends Component
             }
 
             $this->transferId = $model->id;
+            $this->captureUpdatedAt($model);
             $this->transfer_date = $model->transfer_date?->format('Y-m-d') ?? now()->format('Y-m-d');
             $this->from_warehouse_id = (string) $model->from_warehouse_id;
             $this->from_location_id = (string) $model->from_location_id;
@@ -166,7 +170,12 @@ class StockTransferForm extends Component
     public function save()
     {
         if ($this->transferId) {
-            $this->authorize('update', StockTransfer::findOrFail($this->transferId));
+            $existing = StockTransfer::findOrFail($this->transferId);
+            $this->authorize('update', $existing);
+
+            if ($this->abortIfStale($existing)) {
+                return;
+            }
         } else {
             $this->authorize('create', StockTransfer::class);
         }

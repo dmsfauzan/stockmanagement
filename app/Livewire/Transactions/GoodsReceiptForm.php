@@ -3,6 +3,7 @@
 namespace App\Livewire\Transactions;
 
 use App\Enums\TrackingType;
+use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
 use App\Models\Location;
@@ -21,6 +22,8 @@ use Livewire\Component;
 #[Title('Form Barang Masuk')]
 class GoodsReceiptForm extends Component
 {
+    use GuardsStaleEdits;
+
     public ?int $receiptId = null;
 
     public string $transaction_date = '';
@@ -63,6 +66,7 @@ class GoodsReceiptForm extends Component
             }
 
             $this->receiptId = $model->id;
+            $this->captureUpdatedAt($model);
             $this->transaction_date = $model->transaction_date?->format('Y-m-d') ?? now()->format('Y-m-d');
             $this->supplier_id = (string) $model->supplier_id;
             $this->po_number = (string) ($model->po_number ?? '');
@@ -246,7 +250,12 @@ class GoodsReceiptForm extends Component
     public function save()
     {
         if ($this->receiptId) {
-            $this->authorize('update', GoodsReceipt::findOrFail($this->receiptId));
+            $existing = GoodsReceipt::findOrFail($this->receiptId);
+            $this->authorize('update', $existing);
+
+            if ($this->abortIfStale($existing)) {
+                return;
+            }
         } else {
             $this->authorize('create', GoodsReceipt::class);
         }

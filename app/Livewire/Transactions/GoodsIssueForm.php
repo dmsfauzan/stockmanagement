@@ -3,6 +3,7 @@
 namespace App\Livewire\Transactions;
 
 use App\Enums\TrackingType;
+use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\Customer;
 use App\Models\GoodsIssue;
 use App\Models\Item;
@@ -23,6 +24,8 @@ use Livewire\Component;
 #[Title('Form Barang Keluar')]
 class GoodsIssueForm extends Component
 {
+    use GuardsStaleEdits;
+
     public ?int $issueId = null;
 
     public string $transaction_date = '';
@@ -59,6 +62,7 @@ class GoodsIssueForm extends Component
             }
 
             $this->issueId = $model->id;
+            $this->captureUpdatedAt($model);
             $this->transaction_date = $model->transaction_date?->format('Y-m-d') ?? now()->format('Y-m-d');
             $this->customer_id = $model->customer_id ? (string) $model->customer_id : '';
             $this->destination = (string) $model->destination;
@@ -253,7 +257,12 @@ class GoodsIssueForm extends Component
     public function save()
     {
         if ($this->issueId) {
-            $this->authorize('update', GoodsIssue::findOrFail($this->issueId));
+            $existing = GoodsIssue::findOrFail($this->issueId);
+            $this->authorize('update', $existing);
+
+            if ($this->abortIfStale($existing)) {
+                return;
+            }
         } else {
             $this->authorize('create', GoodsIssue::class);
         }
