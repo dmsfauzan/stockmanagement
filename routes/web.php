@@ -17,6 +17,7 @@ use App\Livewire\Inventory\StockMovementIndex;
 use App\Livewire\Inventory\StockOnHandIndex;
 use App\Livewire\MasterData\CategoryIndex;
 use App\Livewire\MasterData\CustomerIndex;
+use App\Livewire\MasterData\CustomerShow;
 use App\Livewire\MasterData\ItemForm;
 use App\Livewire\MasterData\ItemIndex;
 use App\Livewire\MasterData\ItemShow;
@@ -114,6 +115,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:items.view')->get('/suppliers', SupplierIndex::class)->name('suppliers.index');
     Route::middleware('permission:items.view')->get('/suppliers/{supplier}', SupplierShow::class)->name('suppliers.show');
     Route::middleware('permission:items.view')->get('/customers', CustomerIndex::class)->name('customers.index');
+    Route::middleware('permission:items.view')->get('/customers/{customer}', CustomerShow::class)->name('customers.show');
 
     Route::get('/notifications', NotificationsIndex::class)->name('notifications.index');
 

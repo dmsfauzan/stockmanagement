@@ -29,6 +29,7 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
         Route::get('/units', [MasterDataController::class, 'units'])->name('api.units.index');
         Route::get('/suppliers', [MasterDataController::class, 'suppliers'])->name('api.suppliers.index');
         Route::get('/customers', [MasterDataController::class, 'customers'])->name('api.customers.index');
+        Route::get('/customers/{customer}/prices', [MasterDataController::class, 'customerPrices'])->name('api.customers.prices');
     });
 
     Route::middleware('permission:warehouse.view')->group(function (): void {

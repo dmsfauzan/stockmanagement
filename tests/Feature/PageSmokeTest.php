@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Customer;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
@@ -87,6 +88,7 @@ class PageSmokeTest extends TestCase
             'admin.settings',
             'admin.integrations',
             'admin.security',
+            'customers.show',
         ];
 
         $params = [
@@ -94,6 +96,7 @@ class PageSmokeTest extends TestCase
             'goods-receipts.show' => ['receipt' => $receipt->id],
             'goods-issues.show' => ['issue' => $issue->id],
             'stock-adjustments.show' => ['adjustment' => $adjustment->id],
+            'customers.show' => ['customer' => Customer::firstOrFail()->id],
         ];
 
         foreach ($routes as $name) {

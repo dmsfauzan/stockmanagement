@@ -63,6 +63,32 @@ class MasterDataController extends ApiController
         return $this->paginated(SupplierResource::collection($this->paginate($query, $request)));
     }
 
+    public function customerPrices(Request $request, Customer $customer): JsonResponse
+    {
+        $query = $customer->itemPrices()
+            ->with('item:id,sku,name')
+            ->when($request->filled('search'), function ($q) use ($request): void {
+                $term = '%'.$request->string('search').'%';
+                $q->whereHas('item', fn ($inner) => $inner->where('sku', 'like', $term)->orWhere('name', 'like', $term));
+            })
+            ->orderBy('item_id')
+            ->orderBy('min_quantity');
+
+        $paginator = $this->paginate($query, $request);
+
+        $paginator->getCollection()->transform(fn ($r) => [
+            'id' => $r->id,
+            'item_id' => $r->item_id,
+            'sku' => $r->item?->sku,
+            'item_name' => $r->item?->name,
+            'min_quantity' => (int) $r->min_quantity,
+            'price' => (float) $r->price,
+            'notes' => $r->notes,
+        ]);
+
+        return $this->paginated($paginator);
+    }
+
     public function customers(Request $request): JsonResponse
     {
         $query = Customer::query()

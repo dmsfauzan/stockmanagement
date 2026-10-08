@@ -4,6 +4,7 @@ namespace App\Livewire\Transactions;
 
 use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\Customer;
+use App\Models\CustomerItemPrice;
 use App\Models\Item;
 use App\Models\SalesOrder;
 use App\Models\Unit;
@@ -109,6 +110,55 @@ class SalesOrderForm extends Component
         $this->items = array_values($this->items);
     }
 
+    /**
+     * Resolve the applicable unit price for a customer/item/quantity tuple:
+     * customer price tier (largest min_quantity <= qty) -> item selling price -> item cost.
+     */
+    protected function resolveUnitPrice(int $customerId, int $itemId, int $quantity, ?Item $item = null): float
+    {
+        $tier = CustomerItemPrice::where('customer_id', $customerId)
+            ->where('item_id', $itemId)
+            ->where('min_quantity', '<=', max(1, $quantity))
+            ->orderByDesc('min_quantity')
+            ->first();
+
+        if ($tier && (float) $tier->price > 0) {
+            return (float) $tier->price;
+        }
+
+        $item = $item ?? Item::find($itemId);
+
+        if ($item) {
+            $selling = (float) ($item->price ?? 0);
+
+            if ($selling > 0) {
+                return $selling;
+            }
+
+            return (float) ($item->cost ?? 0);
+        }
+
+        return 0;
+    }
+
+    protected function applyPrice(int $index): void
+    {
+        $itemId = (int) ($this->items[$index]['item_id'] ?? 0);
+
+        if ($itemId <= 0) {
+            return;
+        }
+
+        $quantity = max(1, (int) ($this->items[$index]['quantity'] ?? 1));
+        $customerId = (int) $this->customer_id;
+
+        if ($customerId <= 0) {
+            return;
+        }
+
+        $this->items[$index]['unit_price'] = (string) $this->resolveUnitPrice($customerId, $itemId, $quantity);
+    }
+
     public function selectItem(int $index): void
     {
         $itemId = $this->items[$index]['item_id'] ?? '';
@@ -123,8 +173,40 @@ class SalesOrderForm extends Component
             $this->items[$index]['unit_id'] = (string) $item->unit_id;
 
             if (($this->items[$index]['unit_price'] ?? 0) <= 0) {
-                $this->items[$index]['unit_price'] = (string) ($item->cost ?? 0);
+                $this->items[$index]['unit_price'] = (string) $this->resolveUnitPrice((int) $this->customer_id, (int) $item->id, (int) ($this->items[$index]['quantity'] ?? 1), $item);
             }
+        }
+    }
+
+    public function updatedItems($value, $key = null): void
+    {
+        if (! is_string($key) || $key === '') {
+            foreach (array_keys($this->items) as $index) {
+                $this->applyPrice((int) $index);
+            }
+
+            return;
+        }
+
+        $segments = explode('.', trim($key));
+
+        if (count($segments) !== 2) {
+            return;
+        }
+
+        [$index, $field] = $segments;
+
+        if (! in_array($field, ['item_id', 'quantity'], true)) {
+            return;
+        }
+
+        $this->applyPrice((int) $index);
+    }
+
+    public function updatedCustomerId(): void
+    {
+        foreach (array_keys($this->items) as $index) {
+            $this->applyPrice((int) $index);
         }
     }
 

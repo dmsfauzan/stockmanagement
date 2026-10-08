@@ -49,6 +49,8 @@ class ItemForm extends Component
 
     public float $cost = 0;
 
+    public float $price = 0;
+
     public string $primary_supplier_id = '';
 
     public string $status = 'active';
@@ -73,6 +75,7 @@ class ItemForm extends Component
             $this->minimum_stock = (int) $model->minimum_stock;
             $this->maximum_stock = (int) $model->maximum_stock;
             $this->cost = (float) $model->cost;
+            $this->price = (float) $model->price;
             $this->primary_supplier_id = $model->primary_supplier_id ? (string) $model->primary_supplier_id : '';
             $this->status = (string) $model->status;
             $this->tracking_type = $model->tracking_type?->value ?? 'none';
@@ -95,6 +98,7 @@ class ItemForm extends Component
             'minimum_stock' => ['required', 'integer', 'min:0'],
             'maximum_stock' => ['required', 'integer', 'gte:minimum_stock'],
             'cost' => ['nullable', 'numeric', 'min:0'],
+            'price' => ['nullable', 'numeric', 'min:0'],
             'primary_supplier_id' => ['nullable', 'exists:suppliers,id'],
             'status' => ['required', 'in:active,inactive'],
             'tracking_type' => ['required', 'in:none,batch,serial'],
@@ -118,6 +122,7 @@ class ItemForm extends Component
         $data['description'] = $data['description'] !== '' ? $data['description'] : null;
         $data['primary_supplier_id'] = $data['primary_supplier_id'] !== '' ? $data['primary_supplier_id'] : null;
         $data['cost'] = $data['cost'] ?? 0;
+        $data['price'] = $data['price'] ?? 0;
 
         $images = app(ImageService::class);
 

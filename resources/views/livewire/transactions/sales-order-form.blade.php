@@ -84,7 +84,7 @@
                                     @error("items.{$index}.item_id") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                                 </td>
                                 <td>
-                                    <input type="number" min="1" wire:model="items.{{ $index }}.quantity" class="app-input w-24 px-2 py-2 text-right text-sm">
+                                    <input type="number" min="1" wire:model.live.debounce.500ms="items.{{ $index }}.quantity" class="app-input w-24 px-2 py-2 text-right text-sm">
                                     @error("items.{$index}.quantity") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                                 </td>
                                 <td>
