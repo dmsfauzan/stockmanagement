@@ -53,6 +53,22 @@ class ApiReadTest extends TestCase
         $this->withToken($token)->getJson('/api/goods-receipts')->assertStatus(403);
     }
 
+    public function test_token_with_limited_abilities_is_enforced(): void
+    {
+        $user = User::where('email', 'admin@stock.test')->firstOrFail();
+
+        $limited = $user->createToken('limited', ['items.view'])->plainTextToken;
+        $full = $user->createToken('full', ['*'])->plainTextToken;
+
+        $this->withToken($limited)->getJson('/api/items')->assertOk();
+        $this->withToken($limited)->getJson('/api/goods-receipts')->assertStatus(403);
+
+        // The auth guard caches the resolved user within a single test process.
+        app('auth')->forgetGuards();
+
+        $this->withToken($full)->getJson('/api/goods-receipts')->assertOk();
+    }
+
     public function test_paginated_response_has_meta(): void
     {
         $token = $this->tokenFor('admin@stock.test');
