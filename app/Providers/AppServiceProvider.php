@@ -60,6 +60,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $trusted = config('app.trusted_proxies');
+
+        if (is_string($trusted) && trim($trusted) !== '') {
+            $proxies = trim($trusted) === '*' ? '*' : array_map('trim', explode(',', $trusted));
+            \Illuminate\Http\Middleware\TrustProxies::at($proxies);
+        }
+
+        if (config('app.force_https')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         RateLimiter::for('api', function (Request $request): Limit {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });

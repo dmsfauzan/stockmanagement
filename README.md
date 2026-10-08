@@ -243,6 +243,22 @@ npm run build            # produksi → public/build
 php artisan storage:link # lampiran adjustment
 ```
 
+### Checklist Keamanan Produksi (wajib)
+
+```bash
+APP_ENV=production
+APP_DEBUG=false                  # jangan pernah true di produksi
+```
+
+- `APP_URL` = URL publik (https).
+- `FORCE_HTTPS=true` bila di belakang proxy TLS-offload.
+- `TRUSTED_PROXIES=*` (atau daftar IP proxy) bila di belakang Cloudflare/reverse proxy, agar deteksi IP klien (audit, rate limit, Security Monitor) benar.
+- `SESSION_SECURE_COOKIE=true`, `SESSION_SAME_SITE=lax` (atau `strict`), pertimbangkan `SESSION_ENCRYPT=true`.
+- Cache: `php artisan config:cache`, `php artisan route:cache`, `php artisan view:cache`.
+- Queue: jalankan `php artisan queue:work`; Scheduler: cron `* * * * * php artisan schedule:run`.
+- Token API: `php artisan api:token ... --expires=N`; ability dibatasi (lihat `API.md`).
+- Unggahan lampiran dibatasi `pdf/jpg/jpeg/png/webp` ≤ 4 MB dengan nama acak.
+
 ### Docker Compose (opsional)
 
 Alternatif untuk mereproduksi seluruh stack (app + MySQL + queue + scheduler) tanpa Laragon.

@@ -56,6 +56,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trusted Proxies & HTTPS
+    |--------------------------------------------------------------------------
+    |
+    | When the app runs behind a load balancer, reverse proxy or CDN (e.g.
+    | Cloudflare), trust its forwarded headers so the real client IP and scheme
+    | are detected. Use "*" to trust all, or a comma-separated list of IPs.
+    |
+    */
+
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
+    'force_https' => (bool) env('FORCE_HTTPS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
