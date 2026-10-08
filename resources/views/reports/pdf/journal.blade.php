@@ -1,4 +1,4 @@
-@include('reports.pdf.partials.header', ['title' => 'Jurnal Akuntansi', 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
+@include('reports.pdf.partials.header', ['title' => __('Jurnal Akuntansi'), 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
 <table>
     <thead>
         <tr>
@@ -39,7 +39,7 @@
     </tbody>
 </table>
 @if (isset($totals))
-    <p class="totals">Total Debit: {{ number_format($totals['debits'] ?? 0, 2) }} &middot; Total Kredit: {{ number_format($totals['credits'] ?? 0, 2) }} &middot; Net: {{ number_format($totals['net'] ?? 0, 2) }} &middot; Baris: {{ number_format($totals['rows'] ?? 0) }}</p>
+    <p class="totals">Total Debit: {{ number_format($totals['debits'] ?? 0, 2) }} &middot; Total Kredit: {{ number_format($totals['credits'] ?? 0, 2) }} &middot; Net: {{ number_format($totals['net'] ?? 0, 2) }} &middot; { __('Baris:') } {{ number_format($totals['rows'] ?? 0) }}</p>
 @endif
 </body>
 </html>

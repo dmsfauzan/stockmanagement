@@ -157,7 +157,7 @@ class SupplierIndex extends Component
         abort_unless(auth()->user()->hasPermission($permission), 403);
 
         if (! $this->editingId && $this->trashedConflict('suppliers', $this->code)) {
-            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+            $this->dispatch('toast', type: 'error', message: __('Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.'));
 
             return;
         }
@@ -190,7 +190,7 @@ class SupplierIndex extends Component
         }
 
         $this->showModal = false;
-        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+        $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
     }
 
     public function delete(int $id): void
@@ -200,7 +200,7 @@ class SupplierIndex extends Component
         $supplier = Supplier::findOrFail($id);
 
         if ($supplier->primaryItems()->exists()) {
-            $this->dispatch('toast', type: 'error', message: 'Supplier masih menjadi supplier utama barang.');
+            $this->dispatch('toast', type: 'error', message: __('Supplier masih menjadi supplier utama barang.'));
 
             return;
         }
@@ -210,7 +210,7 @@ class SupplierIndex extends Component
 
         AuditLogger::logModel('delete', $supplier, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Supplier dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Supplier dihapus.'));
     }
 
     public function bulkDelete(): void
@@ -218,7 +218,7 @@ class SupplierIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.delete'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -253,7 +253,7 @@ class SupplierIndex extends Component
 
         AuditLogger::logModel('restore', $supplier, null, $supplier->fresh()->toArray());
 
-        $this->dispatch('toast', type: 'success', message: 'Supplier dipulihkan.');
+        $this->dispatch('toast', type: 'success', message: __('Supplier dipulihkan.'));
     }
 
     public function bulkRestore(): void
@@ -261,7 +261,7 @@ class SupplierIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -299,7 +299,7 @@ class SupplierIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }

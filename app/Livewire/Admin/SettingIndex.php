@@ -204,7 +204,7 @@ class SettingIndex extends Component
         AuditLogger::log('update', 'settings', null, ['before' => $before], $validated);
 
         $this->loadValues();
-        $this->dispatch('toast', type: 'success', message: 'Pengaturan disimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Pengaturan disimpan.'));
     }
 
     public function render()

@@ -157,7 +157,7 @@ class CustomerIndex extends Component
         abort_unless(auth()->user()->hasPermission($permission), 403);
 
         if (! $this->editingId && $this->trashedConflict('customers', $this->code)) {
-            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+            $this->dispatch('toast', type: 'error', message: __('Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.'));
 
             return;
         }
@@ -188,7 +188,7 @@ class CustomerIndex extends Component
         }
 
         $this->showModal = false;
-        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+        $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
     }
 
     public function delete(int $id): void
@@ -201,7 +201,7 @@ class CustomerIndex extends Component
 
         AuditLogger::logModel('delete', $customer, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Customer dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Customer dihapus.'));
     }
 
     public function bulkDelete(): void
@@ -209,7 +209,7 @@ class CustomerIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.delete'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -237,7 +237,7 @@ class CustomerIndex extends Component
 
         AuditLogger::logModel('restore', $customer, null, $customer->fresh()->toArray());
 
-        $this->dispatch('toast', type: 'success', message: 'Customer dipulihkan.');
+        $this->dispatch('toast', type: 'success', message: __('Customer dipulihkan.'));
     }
 
     public function bulkRestore(): void
@@ -245,7 +245,7 @@ class CustomerIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -283,7 +283,7 @@ class CustomerIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }

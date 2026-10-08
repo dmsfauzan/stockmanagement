@@ -41,7 +41,7 @@ class AvatarForm extends Component
 
         $this->reset('avatar', 'removeAvatar');
 
-        $this->dispatch('toast', type: 'success', message: 'Avatar disimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Avatar disimpan.'));
     }
 
     public function remove(): void
@@ -50,7 +50,7 @@ class AvatarForm extends Component
         $images->delete(auth()->user()->avatar_path);
         auth()->user()->update(['avatar_path' => null]);
         $this->reset('avatar', 'removeAvatar');
-        $this->dispatch('toast', type: 'success', message: 'Avatar dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Avatar dihapus.'));
     }
 
     public function render()

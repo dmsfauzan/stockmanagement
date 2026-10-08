@@ -32,7 +32,7 @@
     </tbody>
 </table>
 @if (isset($totals))
-    <p class="totals">Total On Hand: {{ number_format($totals['on_hand'] ?? 0) }} &middot; Total Available: {{ number_format($totals['available'] ?? 0) }} &middot; Baris: {{ number_format($totals['rows'] ?? 0) }}</p>
+    <p class="totals">Total On Hand: {{ number_format($totals['on_hand'] ?? 0) }} &middot; Total Available: {{ number_format($totals['available'] ?? 0) }} &middot; { __('Baris:') } {{ number_format($totals['rows'] ?? 0) }}</p>
 @endif
 </body>
 </html>

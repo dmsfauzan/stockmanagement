@@ -131,13 +131,13 @@ class ItemIndex extends Component
 
         AuditLogger::logModel('delete', $item, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Barang dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Barang dihapus.'));
     }
 
     public function bulkDelete(): void
     {
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -174,7 +174,7 @@ class ItemIndex extends Component
 
         AuditLogger::logModel('restore', $item, null, $item->fresh()->toArray());
 
-        $this->dispatch('toast', type: 'success', message: 'Barang dipulihkan.');
+        $this->dispatch('toast', type: 'success', message: __('Barang dipulihkan.'));
     }
 
     public function bulkRestore(): void
@@ -182,7 +182,7 @@ class ItemIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -213,7 +213,7 @@ class ItemIndex extends Component
     protected function bulkSetStatus(string $status): void
     {
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -259,7 +259,7 @@ class ItemIndex extends Component
         $storedPath = $this->importFile->storeAs(path: $fileName, options: ['disk' => $disk]);
 
         if ($storedPath === false || $storedPath === null) {
-            $this->dispatch('toast', type: 'error', message: 'Gagal menyimpan file import.');
+            $this->dispatch('toast', type: 'error', message: __('Gagal menyimpan file import.'));
 
             return;
         }
@@ -271,7 +271,7 @@ class ItemIndex extends Component
         $this->reset('importFile', 'importErrors', 'importedCount', 'updatedCount');
         $this->showImportModal = false;
 
-        $this->dispatch('toast', type: 'success', message: 'Import dijadwalkan — Anda akan menerima notifikasi saat selesai.');
+        $this->dispatch('toast', type: 'success', message: __('Import dijadwalkan — Anda akan menerima notifikasi saat selesai.'));
     }
 
     public function downloadImportTemplate(): StreamedResponse

@@ -47,7 +47,7 @@ class StockTransferForm extends Component
             $this->authorize('update', $model);
 
             if ($model->status !== 'draft') {
-                abort(403, 'Hanya transaksi draft yang dapat diubah.');
+                abort(403, __('Hanya transaksi draft yang dapat diubah.'));
             }
 
             $this->transferId = $model->id;
@@ -189,7 +189,7 @@ class StockTransferForm extends Component
         $data = $this->validate();
 
         if ($this->from_warehouse_id === $this->to_warehouse_id && $this->from_location_id === $this->to_location_id) {
-            $this->addError('to_location_id', 'Lokasi asal dan tujuan tidak boleh sama.');
+            $this->addError('to_location_id', __('Lokasi asal dan tujuan tidak boleh sama.'));
 
             return;
         }
@@ -200,7 +200,7 @@ class StockTransferForm extends Component
                 ->exists();
 
             if (! $belongs) {
-                $this->addError($pair['field'], 'Lokasi tidak termasuk warehouse yang dipilih.');
+                $this->addError($pair['field'], __('Lokasi tidak termasuk warehouse yang dipilih.'));
 
                 return;
             }
@@ -269,7 +269,7 @@ class StockTransferForm extends Component
             return $transfer;
         });
 
-        $this->dispatch('toast', type: 'success', message: 'Transfer barang tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Transfer barang tersimpan.'));
 
         return $this->redirect(route('stock-transfers.show', $transfer), navigate: true);
     }

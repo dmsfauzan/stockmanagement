@@ -49,7 +49,7 @@ class StockOpnameForm extends Component
             $this->authorize('update', $model);
 
             if ($model->status !== OpnameStatus::Draft->value) {
-                abort(403, 'Hanya opname draft yang dapat diubah.');
+                abort(403, __('Hanya opname draft yang dapat diubah.'));
             }
 
             $this->opnameId = $model->id;
@@ -82,7 +82,7 @@ class StockOpnameForm extends Component
     public function generateItems(): void
     {
         if (! $this->opnameId) {
-            $this->dispatch('toast', type: 'error', message: 'Simpan opname terlebih dahulu.');
+            $this->dispatch('toast', type: 'error', message: __('Simpan opname terlebih dahulu.'));
 
             return;
         }
@@ -90,7 +90,7 @@ class StockOpnameForm extends Component
         $opname = StockOpname::findOrFail($this->opnameId);
 
         if ($opname->status !== OpnameStatus::Draft->value) {
-            $this->dispatch('toast', type: 'error', message: 'Hanya draft yang dapat generate items.');
+            $this->dispatch('toast', type: 'error', message: __('Hanya draft yang dapat generate items.'));
 
             return;
         }
@@ -115,7 +115,7 @@ class StockOpnameForm extends Component
             ->map(fn ($rows) => (int) $rows->sum('quantity_on_hand'));
 
         if ($totals->isEmpty()) {
-            $this->dispatch('toast', type: 'warning', message: 'Tidak ada saldo stok untuk di-generate.');
+            $this->dispatch('toast', type: 'warning', message: __('Tidak ada saldo stok untuk di-generate.'));
 
             return;
         }
@@ -137,7 +137,7 @@ class StockOpnameForm extends Component
         }
 
         if ($inserted === 0) {
-            $this->dispatch('toast', type: 'warning', message: 'Tidak ada item baru untuk di-generate.');
+            $this->dispatch('toast', type: 'warning', message: __('Tidak ada item baru untuk di-generate.'));
 
             return;
         }
@@ -168,7 +168,7 @@ class StockOpnameForm extends Component
                 ->exists();
 
             if (! $belongs) {
-                $this->addError('location_id', 'Lokasi tidak termasuk warehouse yang dipilih.');
+                $this->addError('location_id', __('Lokasi tidak termasuk warehouse yang dipilih.'));
 
                 return;
             }
@@ -218,7 +218,7 @@ class StockOpnameForm extends Component
             return $opname;
         });
 
-        $this->dispatch('toast', type: 'success', message: 'Stock opname tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Stock opname tersimpan.'));
 
         return $this->redirect(route('stock-opnames.show', $opname), navigate: true);
     }

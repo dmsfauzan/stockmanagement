@@ -167,7 +167,7 @@ class LocationIndex extends Component
         $this->authorize($permission, $target);
 
         if (! $this->editingId && $this->trashedConflict('locations', $this->code)) {
-            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+            $this->dispatch('toast', type: 'error', message: __('Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.'));
 
             return;
         }
@@ -183,13 +183,13 @@ class LocationIndex extends Component
         $rack = Rack::with('zone')->findOrFail($this->rack_id);
 
         if ((string) $rack->zone_id !== (string) $this->zone_id) {
-            $this->addError('rack_id', 'Rack tidak termasuk dalam Zone yang dipilih.');
+            $this->addError('rack_id', __('Rack tidak termasuk dalam Zone yang dipilih.'));
 
             return;
         }
 
         if ((string) $rack->zone->warehouse_id !== (string) $this->warehouse_id) {
-            $this->addError('zone_id', 'Zone tidak termasuk dalam Warehouse yang dipilih.');
+            $this->addError('zone_id', __('Zone tidak termasuk dalam Warehouse yang dipilih.'));
 
             return;
         }
@@ -211,7 +211,7 @@ class LocationIndex extends Component
         }
 
         $this->showModal = false;
-        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+        $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
     }
 
     public function delete(int $id): void
@@ -224,7 +224,7 @@ class LocationIndex extends Component
 
         AuditLogger::logModel('delete', $location, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Location dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Location dihapus.'));
     }
 
     public function bulkDelete(): void
@@ -232,7 +232,7 @@ class LocationIndex extends Component
         abort_unless(auth()->user()->hasPermission('location.delete'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -266,7 +266,7 @@ class LocationIndex extends Component
 
         AuditLogger::logModel('restore', $location, null, $location->fresh()->toArray());
 
-        $this->dispatch('toast', type: 'success', message: 'Location dipulihkan.');
+        $this->dispatch('toast', type: 'success', message: __('Location dipulihkan.'));
     }
 
     public function bulkRestore(): void
@@ -274,7 +274,7 @@ class LocationIndex extends Component
         abort_unless(auth()->user()->hasPermission('location.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }

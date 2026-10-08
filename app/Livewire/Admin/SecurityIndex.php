@@ -142,7 +142,7 @@ class SecurityIndex extends Component
         AuditLogger::log('BAN', 'security', null, null, ['ip' => $data['newBanIp'], 'minutes' => $duration]);
 
         $this->reset('newBanIp', 'newBanReason');
-        $this->dispatch('toast', type: 'success', message: 'IP diblokir.');
+        $this->dispatch('toast', type: 'success', message: __('IP diblokir.'));
     }
 
     public function unban(string $ip): void

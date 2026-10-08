@@ -34,7 +34,7 @@ class StockAdjustmentShow extends Component
         $this->authorize('submit', $adjustment);
         try {
             DocumentWorkflow::submitAdjustment($this->adjustmentId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil diajukan.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -46,7 +46,7 @@ class StockAdjustmentShow extends Component
         $this->authorize('approve', $adjustment);
         try {
             DocumentWorkflow::approveAdjustment($this->adjustmentId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil disetujui.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil disetujui.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -62,7 +62,7 @@ class StockAdjustmentShow extends Component
         try {
             DocumentWorkflow::rejectAdjustment($this->adjustmentId, $this->rejectionReason);
             $this->rejectionReason = '';
-            $this->dispatch('toast', type: 'success', message: 'Ditolak.');
+            $this->dispatch('toast', type: 'success', message: __('Ditolak.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -75,7 +75,7 @@ class StockAdjustmentShow extends Component
         try {
             DocumentWorkflow::postAdjustment($this->adjustmentId);
             $this->adjustmentId = StockAdjustment::findOrFail($this->adjustmentId)->id;
-            $this->dispatch('toast', type: 'success', message: 'Posting berhasil.');
+            $this->dispatch('toast', type: 'success', message: __('Posting berhasil.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -93,7 +93,7 @@ class StockAdjustmentShow extends Component
 
         try {
             InventoryService::reverseStockAdjustment($adjustment, $this->reversalReason);
-            $this->dispatch('toast', type: 'success', message: 'Reversal berhasil.');
+            $this->dispatch('toast', type: 'success', message: __('Reversal berhasil.'));
         } catch (\Throwable $e) {
             $message = $e->getMessage();
 

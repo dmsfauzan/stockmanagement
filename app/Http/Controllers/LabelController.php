@@ -88,7 +88,7 @@ class LabelController extends Controller
         }
 
         if ($items->isEmpty()) {
-            abort(404, 'No items found.');
+            abort(404, __('No items found.'));
         }
 
         $rows = $items->map(function (Item $item) use ($service, $format, $size): array {

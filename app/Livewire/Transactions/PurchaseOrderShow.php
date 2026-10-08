@@ -31,7 +31,7 @@ class PurchaseOrderShow extends Component
         $this->authorize('submit', $order);
         try {
             DocumentWorkflow::submitPo($this->purchaseOrderId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil diajukan.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -43,7 +43,7 @@ class PurchaseOrderShow extends Component
         $this->authorize('approve', $order);
         try {
             DocumentWorkflow::approvePo($this->purchaseOrderId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil disetujui.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil disetujui.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -59,7 +59,7 @@ class PurchaseOrderShow extends Component
         try {
             DocumentWorkflow::rejectPo($this->purchaseOrderId, $this->rejectionReason);
             $this->rejectionReason = '';
-            $this->dispatch('toast', type: 'success', message: 'Ditolak.');
+            $this->dispatch('toast', type: 'success', message: __('Ditolak.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -71,7 +71,7 @@ class PurchaseOrderShow extends Component
         $this->authorize('close', $order);
         try {
             DocumentWorkflow::closePo($this->purchaseOrderId);
-            $this->dispatch('toast', type: 'success', message: 'Purchase order ditutup.');
+            $this->dispatch('toast', type: 'success', message: __('Purchase order ditutup.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }

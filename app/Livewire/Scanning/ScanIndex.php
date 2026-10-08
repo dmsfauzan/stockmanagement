@@ -35,7 +35,7 @@ class ScanIndex extends Component
         $code = trim($this->code);
 
         if ($code === '') {
-            $this->dispatch('toast', type: 'error', message: 'Masukkan barcode / SKU.');
+            $this->dispatch('toast', type: 'error', message: __('Masukkan barcode / SKU.'));
 
             return;
         }
@@ -94,7 +94,7 @@ class ScanIndex extends Component
             return;
         }
 
-        $this->dispatch('toast', type: 'error', message: 'Tidak ada item atau location dengan code '.$code.'.');
+        $this->dispatch('toast', type: 'error', message: __('Tidak ada item atau location dengan code ').$code.'.');
     }
 
     public function lookupByCode(string $code): void

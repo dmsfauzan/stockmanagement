@@ -134,7 +134,7 @@ class WarehouseIndex extends Component
         $this->authorize($permission, $target);
 
         if (! $this->editingId && $this->trashedConflict('warehouses', $this->code)) {
-            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+            $this->dispatch('toast', type: 'error', message: __('Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.'));
 
             return;
         }
@@ -159,7 +159,7 @@ class WarehouseIndex extends Component
         }
 
         $this->showModal = false;
-        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+        $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
     }
 
     public function delete(int $id): void
@@ -172,7 +172,7 @@ class WarehouseIndex extends Component
 
         AuditLogger::logModel('delete', $warehouse, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Warehouse dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Warehouse dihapus.'));
     }
 
     public function bulkDelete(): void
@@ -180,7 +180,7 @@ class WarehouseIndex extends Component
         abort_unless(auth()->user()->hasPermission('warehouse.delete'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -214,7 +214,7 @@ class WarehouseIndex extends Component
 
         AuditLogger::logModel('restore', $warehouse, null, $warehouse->fresh()->toArray());
 
-        $this->dispatch('toast', type: 'success', message: 'Warehouse dipulihkan.');
+        $this->dispatch('toast', type: 'success', message: __('Warehouse dipulihkan.'));
     }
 
     public function bulkRestore(): void
@@ -222,7 +222,7 @@ class WarehouseIndex extends Component
         abort_unless(auth()->user()->hasPermission('warehouse.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -260,7 +260,7 @@ class WarehouseIndex extends Component
         abort_unless(auth()->user()->hasPermission('warehouse.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }

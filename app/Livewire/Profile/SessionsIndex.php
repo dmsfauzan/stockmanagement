@@ -24,7 +24,7 @@ class SessionsIndex extends Component
 
         AuditLogger::log('LOGOUT_OTHERS', 'session', auth()->user());
 
-        $this->dispatch('toast', type: 'success', message: 'Sesi lain berhasil dilogout.');
+        $this->dispatch('toast', type: 'success', message: __('Sesi lain berhasil dilogout.'));
     }
 
     public function render()

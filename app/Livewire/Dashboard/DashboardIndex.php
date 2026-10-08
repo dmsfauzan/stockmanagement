@@ -105,7 +105,7 @@ class DashboardIndex extends Component
         $visible = array_values(array_filter($this->widgetOrder, fn (string $key) => in_array($key, $this->enabledWidgets, true)));
 
         if ($visible === []) {
-            $this->dispatch('toast', type: 'error', message: 'Pilih minimal satu widget.');
+            $this->dispatch('toast', type: 'error', message: __('Pilih minimal satu widget.'));
 
             return;
         }
@@ -118,7 +118,7 @@ class DashboardIndex extends Component
         $this->enabledWidgets = $visible;
         $this->showLayoutModal = false;
 
-        $this->dispatch('toast', type: 'success', message: 'Layout dashboard disimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Layout dashboard disimpan.'));
     }
 
     public function resetLayout(): void
@@ -127,7 +127,7 @@ class DashboardIndex extends Component
         $this->loadLayout();
         $this->showLayoutModal = false;
 
-        $this->dispatch('toast', type: 'success', message: 'Layout dashboard direset.');
+        $this->dispatch('toast', type: 'success', message: __('Layout dashboard direset.'));
     }
 
     public function isWidgetVisible(string $key): bool

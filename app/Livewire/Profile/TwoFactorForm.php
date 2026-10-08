@@ -74,7 +74,7 @@ class TwoFactorForm extends Component
         ]);
 
         if (! $user->hasTwoFactorSetup() || ! $twoFactor->verify((string) $user->two_factor_secret, $this->code)) {
-            $this->addError('code', 'Kode tidak valid.');
+            $this->addError('code', __('Kode tidak valid.'));
 
             return;
         }
@@ -101,7 +101,7 @@ class TwoFactorForm extends Component
             (int) $user->getKey(),
         );
 
-        $this->dispatch('toast', type: 'success', message: 'Two-factor diaktifkan. Simpan recovery codes Anda.');
+        $this->dispatch('toast', type: 'success', message: __('Two-factor diaktifkan. Simpan recovery codes Anda.'));
     }
 
     public function regenerateCodes(): void
@@ -118,7 +118,7 @@ class TwoFactorForm extends Component
         $this->showRecovery = true;
         $this->reset('disablePassword');
 
-        $this->dispatch('toast', type: 'success', message: 'Recovery codes baru dibuat.');
+        $this->dispatch('toast', type: 'success', message: __('Recovery codes baru dibuat.'));
     }
 
     public function disable(): void
@@ -147,7 +147,7 @@ class TwoFactorForm extends Component
             (int) auth()->id(),
         );
 
-        $this->dispatch('toast', type: 'success', message: 'Two-factor dimatikan.');
+        $this->dispatch('toast', type: 'success', message: __('Two-factor dimatikan.'));
     }
 
     public function render()

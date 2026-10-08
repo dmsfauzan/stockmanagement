@@ -62,7 +62,7 @@ class GoodsReceiptForm extends Component
             $this->authorize('update', $model);
 
             if ($model->status !== 'draft') {
-                abort(403, 'Hanya transaksi draft yang dapat diubah.');
+                abort(403, __('Hanya transaksi draft yang dapat diubah.'));
             }
 
             $this->receiptId = $model->id;
@@ -225,7 +225,7 @@ class GoodsReceiptForm extends Component
         $item = Item::where('barcode', $code)->orWhere('sku', $code)->first();
 
         if (! $item) {
-            $this->dispatch('toast', type: 'error', message: 'Barang tidak ditemukan: '.$code);
+            $this->dispatch('toast', type: 'error', message: __('Barang tidak ditemukan: ').$code);
             $this->barcodeInput = '';
 
             return;
@@ -244,7 +244,7 @@ class GoodsReceiptForm extends Component
         ];
 
         $this->barcodeInput = '';
-        $this->dispatch('toast', type: 'success', message: 'Barang ditambahkan: '.$item->name);
+        $this->dispatch('toast', type: 'success', message: __('Barang ditambahkan: ').$item->name);
     }
 
     public function save()
@@ -274,7 +274,7 @@ class GoodsReceiptForm extends Component
                     ->exists();
 
                 if (! $belongs) {
-                    $this->addError("items.{$index}.location_id", 'Lokasi tidak termasuk warehouse yang dipilih.');
+                    $this->addError("items.{$index}.location_id", __('Lokasi tidak termasuk warehouse yang dipilih.'));
 
                     return;
                 }
@@ -289,20 +289,20 @@ class GoodsReceiptForm extends Component
             }
 
             if ($item->tracking_type === TrackingType::Batch && trim((string) ($row['batch_number'] ?? '')) === '') {
-                $this->addError("items.{$index}.batch_number", 'Batch number wajib diisi untuk barang ini.');
+                $this->addError("items.{$index}.batch_number", __('Batch number wajib diisi untuk barang ini.'));
 
                 return;
             }
 
             if ($item->tracking_type === TrackingType::Serial) {
                 if (trim((string) ($row['serial_number'] ?? '')) === '') {
-                    $this->addError("items.{$index}.serial_number", 'Serial number wajib diisi untuk barang ini.');
+                    $this->addError("items.{$index}.serial_number", __('Serial number wajib diisi untuk barang ini.'));
 
                     return;
                 }
 
                 if ((int) $row['quantity'] !== 1) {
-                    $this->addError("items.{$index}.serial_number", 'Barang serial harus berkuantitas 1.');
+                    $this->addError("items.{$index}.serial_number", __('Barang serial harus berkuantitas 1.'));
 
                     return;
                 }
@@ -362,7 +362,7 @@ class GoodsReceiptForm extends Component
             return $receipt;
         });
 
-        $this->dispatch('toast', type: 'success', message: 'Barang masuk tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Barang masuk tersimpan.'));
 
         return $this->redirect(route('goods-receipts.show', $receipt), navigate: true);
     }

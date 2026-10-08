@@ -160,7 +160,7 @@ class ItemForm extends Component
             );
         }
 
-        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+        $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
 
         return $this->redirect(route('items.index'), navigate: true);
     }

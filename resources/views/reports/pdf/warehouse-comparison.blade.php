@@ -1,4 +1,4 @@
-@include('reports.pdf.partials.header', ['title' => 'Perbandingan Gudang', 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
+@include('reports.pdf.partials.header', ['title' => __('Perbandingan Gudang'), 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
 <table>
     <thead>
         <tr>

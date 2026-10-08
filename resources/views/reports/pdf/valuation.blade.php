@@ -7,7 +7,7 @@
             <th>{{ __('Kategori') }}</th>
             <th>Warehouse</th>
             <th class="right">Qty</th>
-            <th class="right">Harga Rata-rata</th>
+            <th class="right">{ __('Harga Rata-rata') }</th>
             <th class="right">{{ __('Total Nilai') }}</th>
         </tr>
     </thead>
@@ -29,7 +29,7 @@
     </tbody>
 </table>
 @if (isset($totals))
-    <p class="totals">Total Qty: {{ number_format($totals['qty'] ?? 0) }} &middot; Total Nilai: {{ number_format($totals['value'] ?? 0, 2) }} &middot; Baris: {{ number_format($totals['rows'] ?? 0) }}</p>
+    <p class="totals">Total Qty: {{ number_format($totals['qty'] ?? 0) }} &middot; Total Nilai: {{ number_format($totals['value'] ?? 0, 2) }} &middot; { __('Baris:') } {{ number_format($totals['rows'] ?? 0) }}</p>
 @endif
 </body>
 </html>

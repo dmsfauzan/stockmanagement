@@ -113,7 +113,7 @@ trait ImportsMasterData
         $storedPath = $this->importFile->storeAs(path: $fileName, options: ['disk' => $disk]);
 
         if ($storedPath === false || $storedPath === null) {
-            $this->dispatch('toast', type: 'error', message: 'Gagal menyimpan file import.');
+            $this->dispatch('toast', type: 'error', message: __('Gagal menyimpan file import.'));
 
             return;
         }
@@ -129,7 +129,7 @@ trait ImportsMasterData
         $this->reset('importFile', 'importErrors', 'importedCount', 'updatedCount', 'importStoredPath', 'importAnalyzed');
         $this->showImportModal = false;
 
-        $this->dispatch('toast', type: 'success', message: 'Import dijadwalkan — Anda akan menerima notifikasi saat selesai.');
+        $this->dispatch('toast', type: 'success', message: __('Import dijadwalkan — Anda akan menerima notifikasi saat selesai.'));
     }
 
     public function downloadImportTemplate(): StreamedResponse

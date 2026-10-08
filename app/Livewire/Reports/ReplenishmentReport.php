@@ -152,7 +152,7 @@ class ReplenishmentReport extends Component
             ->values();
 
         if ($lines->isEmpty()) {
-            $this->dispatch('toast', type: 'error', message: 'Baris yang dipilih tidak valid.');
+            $this->dispatch('toast', type: 'error', message: __('Baris yang dipilih tidak valid.'));
 
             return null;
         }
@@ -167,7 +167,7 @@ class ReplenishmentReport extends Component
         }
 
         if (! $supplierId) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada supplier aktif.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada supplier aktif.'));
 
             return null;
         }

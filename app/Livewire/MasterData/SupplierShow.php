@@ -80,7 +80,7 @@ class SupplierShow extends Component
         $this->pricePrice = '0';
         $this->priceLeadTime = '7';
 
-        $this->dispatch('toast', type: 'success', message: 'Harga supplier tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Harga supplier tersimpan.'));
     }
 
     public function deletePrice(int $id): void
@@ -94,7 +94,7 @@ class SupplierShow extends Component
 
         AuditLogger::logModel('delete', $price, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Harga supplier dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Harga supplier dihapus.'));
     }
 
     public function render()

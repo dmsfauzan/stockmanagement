@@ -119,7 +119,7 @@ class RoleIndex extends Component
             ]);
             $role->permissions()->sync($data['selectedPermissions']);
             AuditLogger::logModel('create', $role, null, $role->toArray());
-            $this->dispatch('toast', type: 'success', message: 'Role dibuat.');
+            $this->dispatch('toast', type: 'success', message: __('Role dibuat.'));
         } else {
             $old = $roleModel->toArray();
             $old['permission_ids'] = $roleModel->permissions->pluck('id')->all();
@@ -128,7 +128,7 @@ class RoleIndex extends Component
             $new = $roleModel->fresh()->toArray();
             $new['permission_ids'] = $roleModel->fresh()->permissions->pluck('id')->all();
             AuditLogger::logModel('update', $roleModel, $old, $new);
-            $this->dispatch('toast', type: 'success', message: 'Role diperbarui.');
+            $this->dispatch('toast', type: 'success', message: __('Role diperbarui.'));
         }
 
         $this->showModal = false;
@@ -141,13 +141,13 @@ class RoleIndex extends Component
         $this->authorize('delete', $role);
 
         if ($role->is_system) {
-            $this->dispatch('toast', type: 'error', message: 'Role sistem tidak dapat dihapus.');
+            $this->dispatch('toast', type: 'error', message: __('Role sistem tidak dapat dihapus.'));
 
             return;
         }
 
         if ($role->users_count > 0) {
-            $this->dispatch('toast', type: 'error', message: 'Role masih digunakan oleh user.');
+            $this->dispatch('toast', type: 'error', message: __('Role masih digunakan oleh user.'));
 
             return;
         }
@@ -159,7 +159,7 @@ class RoleIndex extends Component
 
         AuditLogger::logModel('delete', $role, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Role dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Role dihapus.'));
     }
 
     protected function isAdminRole(): bool

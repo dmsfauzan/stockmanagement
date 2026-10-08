@@ -39,7 +39,7 @@
     </tbody>
 </table>
 @if (isset($totals))
-    <p class="totals">Total In: {{ number_format($totals['in'] ?? 0) }} &middot; Total Out: {{ number_format($totals['out'] ?? 0) }} &middot; Baris: {{ number_format($totals['rows'] ?? 0) }}</p>
+    <p class="totals">Total In: {{ number_format($totals['in'] ?? 0) }} &middot; Total Out: {{ number_format($totals['out'] ?? 0) }} &middot; { __('Baris:') } {{ number_format($totals['rows'] ?? 0) }}</p>
 @endif
 </body>
 </html>

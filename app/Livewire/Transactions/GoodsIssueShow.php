@@ -34,7 +34,7 @@ class GoodsIssueShow extends Component
         $this->authorize('submit', $issue);
         try {
             DocumentWorkflow::submitIssue($this->issueId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil diajukan.'));
         } catch (\Throwable $e) {
             $message = str_contains($e->getMessage(), 'reserve')
                 ? 'Stok tersedia tidak mencukupi untuk direservasi.'
@@ -50,7 +50,7 @@ class GoodsIssueShow extends Component
         $this->authorize('approve', $issue);
         try {
             DocumentWorkflow::approveIssue($this->issueId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil disetujui.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil disetujui.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -66,7 +66,7 @@ class GoodsIssueShow extends Component
         try {
             DocumentWorkflow::rejectIssue($this->issueId, $this->rejectionReason);
             $this->rejectionReason = '';
-            $this->dispatch('toast', type: 'success', message: 'Ditolak.');
+            $this->dispatch('toast', type: 'success', message: __('Ditolak.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -78,7 +78,7 @@ class GoodsIssueShow extends Component
         $this->authorize('post', $issue);
         try {
             DocumentWorkflow::postIssue($this->issueId);
-            $this->dispatch('toast', type: 'success', message: 'Posting berhasil.');
+            $this->dispatch('toast', type: 'success', message: __('Posting berhasil.'));
         } catch (\Throwable $e) {
             $message = $e->getMessage();
 
@@ -102,7 +102,7 @@ class GoodsIssueShow extends Component
 
         try {
             InventoryService::reverseGoodsIssue($issue, $this->reversalReason);
-            $this->dispatch('toast', type: 'success', message: 'Reversal berhasil.');
+            $this->dispatch('toast', type: 'success', message: __('Reversal berhasil.'));
         } catch (\Throwable $e) {
             $message = $e->getMessage();
 

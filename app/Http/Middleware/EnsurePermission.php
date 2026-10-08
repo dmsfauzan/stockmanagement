@@ -16,7 +16,7 @@ class EnsurePermission
         $required = $permission ?? $this->permission;
 
         if ($required === null || $required === '') {
-            abort(403, 'Permission required.');
+            abort(403, __('Permission required.'));
         }
 
         $user = $request->user();

@@ -82,7 +82,7 @@ class StockOnHandIndex extends Component
 
     public function export(): StreamedResponse
     {
-        $this->dispatch('toast', type: 'success', message: 'Export started.');
+        $this->dispatch('toast', type: 'success', message: __('Export started.'));
         $rows = $this->baseQuery()->orderBy($this->sortColumn(), $this->sortDirection)->get();
         foreach ($rows as $r) {
             $r->stock_status = StockStatus::evaluate((int) $r->quantity_on_hand, (int) $r->min_stock, (int) $r->max_stock)->value;

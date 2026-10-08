@@ -48,7 +48,7 @@ class LowStockIndex extends Component
 
     public function export(): StreamedResponse
     {
-        $this->dispatch('toast', type: 'success', message: 'Export started.');
+        $this->dispatch('toast', type: 'success', message: __('Export started.'));
         $rows = $this->baseQuery()->orderBy('items.sku')->get();
 
         return response()->streamDownload(function () use ($rows): void {

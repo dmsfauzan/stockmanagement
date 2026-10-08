@@ -88,7 +88,7 @@ class StockOpnameCount extends Component
             }
         }
 
-        $this->dispatch('toast', type: 'success', message: 'Item kosong diisi dengan system qty.');
+        $this->dispatch('toast', type: 'success', message: __('Item kosong diisi dengan system qty.'));
     }
 
     public function clearAll(): void
@@ -98,7 +98,7 @@ class StockOpnameCount extends Component
             $this->items[$index]['difference'] = 0;
         }
 
-        $this->dispatch('toast', type: 'info', message: 'Semua physical qty dikosongkan.');
+        $this->dispatch('toast', type: 'info', message: __('Semua physical qty dikosongkan.'));
     }
 
     public function submit()
@@ -108,14 +108,14 @@ class StockOpnameCount extends Component
         $this->authorize('submit', $opname);
 
         if (! $opname->statusEnum()->canTransitionTo(OpnameStatus::Submitted)) {
-            $this->dispatch('toast', type: 'error', message: 'Status tidak dapat diubah.');
+            $this->dispatch('toast', type: 'error', message: __('Status tidak dapat diubah.'));
 
             return;
         }
 
         foreach ($this->items as $row) {
             if ($row['physical_quantity'] === null || $row['physical_quantity'] === '') {
-                $this->dispatch('toast', type: 'error', message: 'Lengkapi physical qty');
+                $this->dispatch('toast', type: 'error', message: __('Lengkapi physical qty'));
 
                 return;
             }
@@ -143,7 +143,7 @@ class StockOpnameCount extends Component
             AuditLogger::log('SUBMIT', 'stock_opname', $opname);
         });
 
-        $this->dispatch('toast', type: 'success', message: 'Opname berhasil diajukan.');
+        $this->dispatch('toast', type: 'success', message: __('Opname berhasil diajukan.'));
 
         return $this->redirect(route('stock-opnames.show', $opname), navigate: true);
     }

@@ -58,7 +58,7 @@ class GoodsIssueForm extends Component
             $this->authorize('update', $model);
 
             if ($model->status !== 'draft') {
-                abort(403, 'Hanya transaksi draft yang dapat diubah.');
+                abort(403, __('Hanya transaksi draft yang dapat diubah.'));
             }
 
             $this->issueId = $model->id;
@@ -197,7 +197,7 @@ class GoodsIssueForm extends Component
         $row = $this->items[$index] ?? null;
 
         if (! $row || $row['item_id'] === '' || $row['location_id'] === '' || $this->warehouse_id === '') {
-            $this->dispatch('toast', type: 'error', message: 'Pilih item dan lokasi dulu.');
+            $this->dispatch('toast', type: 'error', message: __('Pilih item dan lokasi dulu.'));
 
             return;
         }
@@ -205,7 +205,7 @@ class GoodsIssueForm extends Component
         $lots = LotService::availableLots((int) $row['item_id'], (int) $this->warehouse_id, (int) $row['location_id']);
 
         if ($lots->isEmpty()) {
-            $this->dispatch('toast', type: 'warning', message: 'Tidak ada lot tersedia untuk item ini.');
+            $this->dispatch('toast', type: 'warning', message: __('Tidak ada lot tersedia untuk item ini.'));
 
             return;
         }
@@ -220,7 +220,7 @@ class GoodsIssueForm extends Component
             $this->items[$index]['batch_number'] = (string) $first->batch_number;
         }
 
-        $this->dispatch('toast', type: 'success', message: 'FEFO: menggunakan lot '.($first->batch_number ?? $first->serial_number).' (expiry '.($first->expiry_date?->format('d M Y') ?? '-').').');
+        $this->dispatch('toast', type: 'success', message: __('FEFO: menggunakan lot ').($first->batch_number ?? $first->serial_number).' (expiry '.($first->expiry_date?->format('d M Y') ?? '-').').');
     }
 
     public function addByBarcode(): void
@@ -234,7 +234,7 @@ class GoodsIssueForm extends Component
         $item = Item::where('barcode', $code)->orWhere('sku', $code)->first();
 
         if (! $item) {
-            $this->dispatch('toast', type: 'error', message: 'Barang tidak ditemukan: '.$code);
+            $this->dispatch('toast', type: 'error', message: __('Barang tidak ditemukan: ').$code);
             $this->barcodeInput = '';
 
             return;
@@ -251,7 +251,7 @@ class GoodsIssueForm extends Component
         ];
 
         $this->barcodeInput = '';
-        $this->dispatch('toast', type: 'success', message: 'Barang ditambahkan: '.$item->name);
+        $this->dispatch('toast', type: 'success', message: __('Barang ditambahkan: ').$item->name);
     }
 
     public function save()
@@ -281,7 +281,7 @@ class GoodsIssueForm extends Component
                     ->exists();
 
                 if (! $belongs) {
-                    $this->addError("items.{$index}.location_id", 'Lokasi tidak termasuk warehouse yang dipilih.');
+                    $this->addError("items.{$index}.location_id", __('Lokasi tidak termasuk warehouse yang dipilih.'));
 
                     return;
                 }
@@ -296,20 +296,20 @@ class GoodsIssueForm extends Component
             }
 
             if ($item->tracking_type === TrackingType::Batch && trim((string) ($row['batch_number'] ?? '')) === '') {
-                $this->addError("items.{$index}.batch_number", 'Batch number wajib diisi untuk barang ini.');
+                $this->addError("items.{$index}.batch_number", __('Batch number wajib diisi untuk barang ini.'));
 
                 return;
             }
 
             if ($item->tracking_type === TrackingType::Serial) {
                 if (trim((string) ($row['serial_number'] ?? '')) === '') {
-                    $this->addError("items.{$index}.serial_number", 'Serial number wajib diisi untuk barang ini.');
+                    $this->addError("items.{$index}.serial_number", __('Serial number wajib diisi untuk barang ini.'));
 
                     return;
                 }
 
                 if ((int) $row['quantity'] !== 1) {
-                    $this->addError("items.{$index}.serial_number", 'Barang serial harus berkuantitas 1.');
+                    $this->addError("items.{$index}.serial_number", __('Barang serial harus berkuantitas 1.'));
 
                     return;
                 }
@@ -364,7 +364,7 @@ class GoodsIssueForm extends Component
             return $issue;
         });
 
-        $this->dispatch('toast', type: 'success', message: 'Barang keluar tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Barang keluar tersimpan.'));
 
         return $this->redirect(route('goods-issues.show', $issue), navigate: true);
     }

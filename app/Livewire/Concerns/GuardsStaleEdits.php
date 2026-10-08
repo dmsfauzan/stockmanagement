@@ -41,7 +41,7 @@ trait GuardsStaleEdits
             return false;
         }
 
-        $this->dispatch('toast', type: 'error', message: 'Perubahan tidak disimpan: data telah diubah pengguna lain. Muat ulang halaman lalu coba lagi.');
+        $this->dispatch('toast', type: 'error', message: __('Perubahan tidak disimpan: data telah diubah pengguna lain. Muat ulang halaman lalu coba lagi.'));
 
         return true;
     }

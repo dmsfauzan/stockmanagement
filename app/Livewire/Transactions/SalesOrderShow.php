@@ -31,7 +31,7 @@ class SalesOrderShow extends Component
         $this->authorize('submit', $order);
         try {
             DocumentWorkflow::submitSo($this->salesOrderId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil diajukan.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -43,7 +43,7 @@ class SalesOrderShow extends Component
         $this->authorize('approve', $order);
         try {
             DocumentWorkflow::approveSo($this->salesOrderId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil disetujui.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil disetujui.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -59,7 +59,7 @@ class SalesOrderShow extends Component
         try {
             DocumentWorkflow::rejectSo($this->salesOrderId, $this->rejectionReason);
             $this->rejectionReason = '';
-            $this->dispatch('toast', type: 'success', message: 'Ditolak.');
+            $this->dispatch('toast', type: 'success', message: __('Ditolak.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -71,7 +71,7 @@ class SalesOrderShow extends Component
         $this->authorize('close', $order);
         try {
             DocumentWorkflow::closeSo($this->salesOrderId);
-            $this->dispatch('toast', type: 'success', message: 'Sales order ditutup.');
+            $this->dispatch('toast', type: 'success', message: __('Sales order ditutup.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }

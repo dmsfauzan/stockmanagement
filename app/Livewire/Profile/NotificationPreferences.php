@@ -37,7 +37,7 @@ class NotificationPreferences extends Component
 
         NotificationPreferenceService::setEmailEnabled($user, NotificationPreferenceService::digestType(), $this->digest);
 
-        $this->dispatch('toast', type: 'success', message: 'Preferensi notifikasi disimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Preferensi notifikasi disimpan.'));
     }
 
     public function render()

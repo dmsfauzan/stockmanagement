@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <title>{{ $title }}</title>
@@ -22,10 +22,10 @@
 </head>
 <body>
     <h1>{{ $title }}</h1>
-    <p class="meta">Dibuat: {{ $generatedAt }}</p>
+    <p class="meta">{{ __('Dibuat:') }} {{ $generatedAt }}</p>
     @if (! empty($filters))
         <div class="filters">
-            <strong>Filter:</strong>
+            <strong>{{ __('Filter:') }}</strong>
             @foreach ($filters as $label => $value)
                 {{ $label }}: {{ $value }}@if (! $loop->last) &nbsp;|&nbsp; @endif
             @endforeach

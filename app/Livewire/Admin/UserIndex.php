@@ -122,7 +122,7 @@ class UserIndex extends Component
         $data = $this->validate($rules);
 
         if ($isEdit && auth()->id() === $userModel->id && strtolower($data['status']) === 'inactive') {
-            $this->dispatch('toast', type: 'error', message: 'Tidak dapat menonaktifkan akun sendiri.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak dapat menonaktifkan akun sendiri.'));
 
             return;
         }
@@ -145,12 +145,12 @@ class UserIndex extends Component
             $new = $userModel->fresh()->toArray();
             $new['role_ids'] = $userModel->fresh()->roles->pluck('id')->all();
             AuditLogger::logModel('update', $userModel, $old, $new);
-            $this->dispatch('toast', type: 'success', message: 'User diperbarui.');
+            $this->dispatch('toast', type: 'success', message: __('User diperbarui.'));
         } else {
             $user = User::create($payload);
             $user->roles()->sync($this->selectedRoles);
             AuditLogger::logModel('create', $user, null, $user->toArray());
-            $this->dispatch('toast', type: 'success', message: 'User dibuat.');
+            $this->dispatch('toast', type: 'success', message: __('User dibuat.'));
         }
 
         $this->showModal = false;
@@ -163,7 +163,7 @@ class UserIndex extends Component
         $this->authorize('update', $user);
 
         if (auth()->id() === $user->id) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak dapat mengubah status akun sendiri.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak dapat mengubah status akun sendiri.'));
 
             return;
         }
@@ -174,7 +174,7 @@ class UserIndex extends Component
 
         AuditLogger::logModel('update', $user, $old, $user->fresh()->toArray());
 
-        $this->dispatch('toast', type: 'success', message: 'Status user diperbarui.');
+        $this->dispatch('toast', type: 'success', message: __('Status user diperbarui.'));
     }
 
     public function delete(int $id): void
@@ -184,7 +184,7 @@ class UserIndex extends Component
         $this->authorize('delete', $user);
 
         if (auth()->id() === $user->id) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak dapat menghapus akun sendiri.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak dapat menghapus akun sendiri.'));
 
             return;
         }
@@ -195,7 +195,7 @@ class UserIndex extends Component
 
         AuditLogger::logModel('delete', $user, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'User dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('User dihapus.'));
     }
 
     protected function baseQuery()

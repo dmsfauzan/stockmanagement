@@ -1,4 +1,4 @@
-@include('reports.pdf.partials.header', ['title' => 'Laporan Sales Order', 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
+@include('reports.pdf.partials.header', ['title' => __('Laporan Sales Order'), 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
 <table>
     <thead>
         <tr>
@@ -9,7 +9,7 @@
             <th>SKU</th>
             <th>{{ __('Barang') }}</th>
             <th class="right">Qty</th>
-            <th class="right">Terpenuhi</th>
+            <th class="right">{ __('Terpenuhi') }</th>
             <th class="right">{{ __('Sisa') }}</th>
             <th class="right">{{ __('Harga') }}</th>
             <th>Status</th>
@@ -37,7 +37,7 @@
     </tbody>
 </table>
 @if (isset($totals))
-    <p class="totals">Baris: {{ number_format($totals['rows'] ?? 0) }} &middot; Total Qty: {{ number_format($totals['quantity'] ?? 0) }} &middot; Total Terpenuhi: {{ number_format($totals['fulfilled'] ?? 0) }}</p>
+    <p class="totals">{ __('Baris:') } {{ number_format($totals['rows'] ?? 0) }} &middot; Total Qty: {{ number_format($totals['quantity'] ?? 0) }} &middot; Total Terpenuhi: {{ number_format($totals['fulfilled'] ?? 0) }}</p>
 @endif
 </body>
 </html>

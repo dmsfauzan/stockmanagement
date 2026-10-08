@@ -83,7 +83,7 @@ class ApiTokensIndex extends Component
         $this->plainToken = $token->plainTextToken;
         $this->plainTokenUserId = $user->id;
         $this->showCreateModal = false;
-        $this->dispatch('toast', type: 'success', message: 'Token dibuat — salin sekarang, tidak bisa dilihat lagi.');
+        $this->dispatch('toast', type: 'success', message: __('Token dibuat — salin sekarang, tidak bisa dilihat lagi.'));
     }
 
     public function deleteToken(int $id): void
@@ -91,7 +91,7 @@ class ApiTokensIndex extends Component
         abort_unless(auth()->user()->hasPermission('settings.manage'), 403);
 
         PersonalAccessToken::whereKey($id)->delete();
-        $this->dispatch('toast', type: 'success', message: 'Token dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Token dihapus.'));
     }
 
     public function rotateToken(int $id): void
@@ -102,7 +102,7 @@ class ApiTokensIndex extends Component
         $user = $token->tokenable;
 
         if ($user === null) {
-            $this->dispatch('toast', type: 'error', message: 'Pemilik token tidak ditemukan.');
+            $this->dispatch('toast', type: 'error', message: __('Pemilik token tidak ditemukan.'));
 
             return;
         }
@@ -118,7 +118,7 @@ class ApiTokensIndex extends Component
         $this->plainToken = $new->plainTextToken;
         $this->plainTokenUserId = $user->id;
 
-        $this->dispatch('toast', type: 'success', message: 'Token di-rotate — salin token baru sekarang.');
+        $this->dispatch('toast', type: 'success', message: __('Token di-rotate — salin token baru sekarang.'));
     }
 
     public function render()

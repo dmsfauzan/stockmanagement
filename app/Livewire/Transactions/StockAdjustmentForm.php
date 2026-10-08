@@ -52,7 +52,7 @@ class StockAdjustmentForm extends Component
             $this->authorize('update', $model);
 
             if ($model->status !== 'draft') {
-                abort(403, 'Hanya transaksi draft yang dapat diubah.');
+                abort(403, __('Hanya transaksi draft yang dapat diubah.'));
             }
 
             $this->adjustmentId = $model->id;
@@ -190,7 +190,7 @@ class StockAdjustmentForm extends Component
         $item = Item::where('barcode', $code)->orWhere('sku', $code)->first();
 
         if (! $item) {
-            $this->dispatch('toast', type: 'error', message: 'Barang tidak ditemukan: '.$code);
+            $this->dispatch('toast', type: 'error', message: __('Barang tidak ditemukan: ').$code);
             $this->barcodeInput = '';
 
             return;
@@ -213,7 +213,7 @@ class StockAdjustmentForm extends Component
         ];
 
         $this->barcodeInput = '';
-        $this->dispatch('toast', type: 'success', message: 'Barang ditambahkan: '.$item->name);
+        $this->dispatch('toast', type: 'success', message: __('Barang ditambahkan: ').$item->name);
     }
 
     public function save()
@@ -245,7 +245,7 @@ class StockAdjustmentForm extends Component
                 ->exists();
 
             if (! $belongs) {
-                $this->addError('location_id', 'Lokasi tidak termasuk warehouse yang dipilih.');
+                $this->addError('location_id', __('Lokasi tidak termasuk warehouse yang dipilih.'));
 
                 return;
             }
@@ -314,7 +314,7 @@ class StockAdjustmentForm extends Component
             return $adjustment;
         });
 
-        $this->dispatch('toast', type: 'success', message: 'Stock adjustment tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Stock adjustment tersimpan.'));
 
         return $this->redirect(route('stock-adjustments.show', $adjustment), navigate: true);
     }

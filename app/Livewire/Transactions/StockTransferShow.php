@@ -31,7 +31,7 @@ class StockTransferShow extends Component
         $this->authorize('request', $transfer);
         try {
             DocumentWorkflow::requestTransfer($this->transferId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil diajukan.'));
         } catch (\Throwable $e) {
             $message = str_contains($e->getMessage(), 'reserve')
                 ? 'Stok tersedia tidak mencukupi untuk direservasi.'
@@ -47,7 +47,7 @@ class StockTransferShow extends Component
         $this->authorize('approve', $transfer);
         try {
             DocumentWorkflow::approveTransfer($this->transferId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil disetujui.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil disetujui.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -63,7 +63,7 @@ class StockTransferShow extends Component
         try {
             DocumentWorkflow::rejectTransfer($this->transferId, $this->rejectionReason);
             $this->rejectionReason = '';
-            $this->dispatch('toast', type: 'success', message: 'Ditolak.');
+            $this->dispatch('toast', type: 'success', message: __('Ditolak.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -75,7 +75,7 @@ class StockTransferShow extends Component
         $this->authorize('dispatch', $transfer);
         try {
             DocumentWorkflow::dispatchTransfer($this->transferId);
-            $this->dispatch('toast', type: 'success', message: 'Transfer keluar dari lokasi asal.');
+            $this->dispatch('toast', type: 'success', message: __('Transfer keluar dari lokasi asal.'));
         } catch (\Throwable $e) {
             $message = str_contains($e->getMessage(), 'Insufficient stock') ? 'Insufficient stock: stok tidak mencukupi di lokasi asal.' : $e->getMessage();
             $this->dispatch('toast', type: 'error', message: $message);
@@ -88,7 +88,7 @@ class StockTransferShow extends Component
         $this->authorize('receive', $transfer);
         try {
             DocumentWorkflow::receiveTransfer($this->transferId);
-            $this->dispatch('toast', type: 'success', message: 'Barang diterima di lokasi tujuan.');
+            $this->dispatch('toast', type: 'success', message: __('Barang diterima di lokasi tujuan.'));
         } catch (\Throwable $e) {
             $message = str_contains($e->getMessage(), 'Insufficient stock') ? 'Insufficient stock' : $e->getMessage();
             $this->dispatch('toast', type: 'error', message: $message);
@@ -101,7 +101,7 @@ class StockTransferShow extends Component
         $this->authorize('complete', $transfer);
         try {
             DocumentWorkflow::completeTransfer($this->transferId);
-            $this->dispatch('toast', type: 'success', message: 'Transfer selesai.');
+            $this->dispatch('toast', type: 'success', message: __('Transfer selesai.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }

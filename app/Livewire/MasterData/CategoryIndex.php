@@ -128,7 +128,7 @@ class CategoryIndex extends Component
         abort_unless(auth()->user()->hasPermission($permission), 403);
 
         if (! $this->editingId && $this->trashedConflict('categories', $this->code)) {
-            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+            $this->dispatch('toast', type: 'error', message: __('Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.'));
 
             return;
         }
@@ -153,7 +153,7 @@ class CategoryIndex extends Component
         }
 
         $this->showModal = false;
-        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+        $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
     }
 
     public function delete(int $id): void
@@ -163,7 +163,7 @@ class CategoryIndex extends Component
         $category = Category::findOrFail($id);
 
         if ($category->items()->exists()) {
-            $this->dispatch('toast', type: 'error', message: 'Kategori masih memiliki barang.');
+            $this->dispatch('toast', type: 'error', message: __('Kategori masih memiliki barang.'));
 
             return;
         }
@@ -173,7 +173,7 @@ class CategoryIndex extends Component
 
         AuditLogger::logModel('delete', $category, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Kategori dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Kategori dihapus.'));
     }
 
     public function bulkDelete(): void
@@ -181,7 +181,7 @@ class CategoryIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.delete'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -216,7 +216,7 @@ class CategoryIndex extends Component
 
         AuditLogger::logModel('restore', $category, null, $category->fresh()->toArray());
 
-        $this->dispatch('toast', type: 'success', message: 'Kategori dipulihkan.');
+        $this->dispatch('toast', type: 'success', message: __('Kategori dipulihkan.'));
     }
 
     public function bulkRestore(): void
@@ -224,7 +224,7 @@ class CategoryIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -262,7 +262,7 @@ class CategoryIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }

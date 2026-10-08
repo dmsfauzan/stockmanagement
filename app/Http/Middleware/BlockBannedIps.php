@@ -24,7 +24,7 @@ class BlockBannedIps
                 } catch (Throwable) {
                 }
 
-                abort(403, 'Access denied.');
+                abort(403, __('Access denied.'));
             }
         } catch (Throwable $e) {
             if ($e instanceof HttpExceptionInterface) {

@@ -33,7 +33,7 @@ class StockOpnameShow extends Component
         $this->authorize('submit', $opname);
         try {
             DocumentWorkflow::startCountingOpname($this->opnameId);
-            $this->dispatch('toast', type: 'success', message: 'Opname masuk tahap counting.');
+            $this->dispatch('toast', type: 'success', message: __('Opname masuk tahap counting.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -45,7 +45,7 @@ class StockOpnameShow extends Component
         $this->authorize('submit', $opname);
         try {
             DocumentWorkflow::submitOpname($this->opnameId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil diajukan.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -61,7 +61,7 @@ class StockOpnameShow extends Component
         try {
             DocumentWorkflow::rejectOpname($this->opnameId, $this->rejectionReason);
             $this->rejectionReason = '';
-            $this->dispatch('toast', type: 'success', message: 'Ditolak.');
+            $this->dispatch('toast', type: 'success', message: __('Ditolak.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -73,7 +73,7 @@ class StockOpnameShow extends Component
         $this->authorize('approve', $opname);
         try {
             DocumentWorkflow::approveAndCompleteOpname($this->opnameId);
-            $this->dispatch('toast', type: 'success', message: 'Opname disetujui & adjustment diposting');
+            $this->dispatch('toast', type: 'success', message: __('Opname disetujui & adjustment diposting'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -86,14 +86,14 @@ class StockOpnameShow extends Component
         $this->authorize('view', $opname);
 
         if ($opname->status !== OpnameStatus::Draft->value) {
-            $this->dispatch('toast', type: 'error', message: 'Hanya draft yang dapat dihapus.');
+            $this->dispatch('toast', type: 'error', message: __('Hanya draft yang dapat dihapus.'));
 
             return;
         }
 
         $opname->delete();
         AuditLogger::log('DELETE', 'stock_opname', $opname);
-        $this->dispatch('toast', type: 'success', message: 'Opname dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Opname dihapus.'));
         $this->redirect(route('stock-opnames.index'), navigate: true);
     }
 

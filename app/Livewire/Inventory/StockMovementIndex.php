@@ -102,7 +102,7 @@ class StockMovementIndex extends Component
 
     public function export(): StreamedResponse
     {
-        $this->dispatch('toast', type: 'success', message: 'Export started.');
+        $this->dispatch('toast', type: 'success', message: __('Export started.'));
         $rows = $this->baseQuery()->orderBy($this->sortColumn(), $this->sortDirection)->orderBy('stock_movements.id', 'desc')->get();
 
         return response()->streamDownload(function () use ($rows): void {

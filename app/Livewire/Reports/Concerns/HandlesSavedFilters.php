@@ -67,7 +67,7 @@ trait HandlesSavedFilters
 
         $this->savedFilterName = '';
 
-        $this->dispatch('toast', type: 'success', message: 'Filter tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Filter tersimpan.'));
     }
 
     public function applySavedFilter(int $id): void
@@ -88,7 +88,7 @@ trait HandlesSavedFilters
             $this->resetPage();
         }
 
-        $this->dispatch('toast', type: 'success', message: 'Filter diterapkan: '.$filter->name);
+        $this->dispatch('toast', type: 'success', message: __('Filter diterapkan: ').$filter->name);
     }
 
     public function deleteSavedFilter(int $id): void
@@ -98,6 +98,6 @@ trait HandlesSavedFilters
             ->whereKey($id)
             ->delete();
 
-        $this->dispatch('toast', type: 'success', message: 'Filter tersimpan dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Filter tersimpan dihapus.'));
     }
 }

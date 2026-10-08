@@ -40,13 +40,13 @@ class IntegrationsIndex extends Component
         AuditLogger::log('update', 'integration', null, null, ['webhook_secret' => 'updated']);
         $this->reset('webhookSecret');
 
-        $this->dispatch('toast', type: 'success', message: 'Webhook secret diperbarui.');
+        $this->dispatch('toast', type: 'success', message: __('Webhook secret diperbarui.'));
     }
 
     public function updatedEvents(): void
     {
         Setting::set('integration.webhook_events', implode(',', array_values($this->events)), 'integration');
-        $this->dispatch('toast', type: 'success', message: 'Event webhook disimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Event webhook disimpan.'));
     }
 
     public function sendTest(): void
@@ -56,12 +56,12 @@ class IntegrationsIndex extends Component
         $delivery = WebhookService::sendTest();
 
         if (! $delivery) {
-            $this->dispatch('toast', type: 'error', message: 'Isi Webhook URL dulu.');
+            $this->dispatch('toast', type: 'error', message: __('Isi Webhook URL dulu.'));
 
             return;
         }
 
-        $this->dispatch('toast', type: 'success', message: 'Test webhook dikirim (lihat daftar di bawah).');
+        $this->dispatch('toast', type: 'success', message: __('Test webhook dikirim (lihat daftar di bawah).'));
     }
 
     public function retry(int $id): void
@@ -71,7 +71,7 @@ class IntegrationsIndex extends Component
         $delivery = WebhookDelivery::findOrFail($id);
         SendWebhookJob::dispatch($delivery->id);
 
-        $this->dispatch('toast', type: 'success', message: 'Retry dijadwalkan.');
+        $this->dispatch('toast', type: 'success', message: __('Retry dijadwalkan.'));
     }
 
     public function render()

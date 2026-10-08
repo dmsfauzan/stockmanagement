@@ -34,7 +34,7 @@ class GoodsReceiptShow extends Component
         $this->authorize('submit', $receipt);
         try {
             DocumentWorkflow::submitReceipt($this->receiptId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil diajukan.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil diajukan.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -46,7 +46,7 @@ class GoodsReceiptShow extends Component
         $this->authorize('approve', $receipt);
         try {
             DocumentWorkflow::approveReceipt($this->receiptId);
-            $this->dispatch('toast', type: 'success', message: 'Berhasil disetujui.');
+            $this->dispatch('toast', type: 'success', message: __('Berhasil disetujui.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -62,7 +62,7 @@ class GoodsReceiptShow extends Component
         try {
             DocumentWorkflow::rejectReceipt($this->receiptId, $this->rejectionReason);
             $this->rejectionReason = '';
-            $this->dispatch('toast', type: 'success', message: 'Ditolak.');
+            $this->dispatch('toast', type: 'success', message: __('Ditolak.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -74,7 +74,7 @@ class GoodsReceiptShow extends Component
         $this->authorize('post', $receipt);
         try {
             DocumentWorkflow::postReceipt($this->receiptId);
-            $this->dispatch('toast', type: 'success', message: 'Posting berhasil.');
+            $this->dispatch('toast', type: 'success', message: __('Posting berhasil.'));
         } catch (\Throwable $e) {
             $this->dispatch('toast', type: 'error', message: $e->getMessage());
         }
@@ -92,7 +92,7 @@ class GoodsReceiptShow extends Component
 
         try {
             InventoryService::reverseGoodsReceipt($receipt, $this->reversalReason);
-            $this->dispatch('toast', type: 'success', message: 'Reversal berhasil.');
+            $this->dispatch('toast', type: 'success', message: __('Reversal berhasil.'));
         } catch (\Throwable $e) {
             $message = $e->getMessage();
 

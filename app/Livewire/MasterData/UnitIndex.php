@@ -119,7 +119,7 @@ class UnitIndex extends Component
         abort_unless(auth()->user()->hasPermission($permission), 403);
 
         if (! $this->editingId && $this->trashedConflict('units', $this->code)) {
-            $this->dispatch('toast', type: 'error', message: 'Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.');
+            $this->dispatch('toast', type: 'error', message: __('Kode sudah dipakai data terhapus. Pulihkan dari filter Terhapus.'));
 
             return;
         }
@@ -140,7 +140,7 @@ class UnitIndex extends Component
         }
 
         $this->showModal = false;
-        $this->dispatch('toast', type: 'success', message: 'Tersimpan');
+        $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
     }
 
     public function delete(int $id): void
@@ -150,7 +150,7 @@ class UnitIndex extends Component
         $unit = Unit::findOrFail($id);
 
         if ($unit->items()->exists()) {
-            $this->dispatch('toast', type: 'error', message: 'Unit masih digunakan barang.');
+            $this->dispatch('toast', type: 'error', message: __('Unit masih digunakan barang.'));
 
             return;
         }
@@ -160,7 +160,7 @@ class UnitIndex extends Component
 
         AuditLogger::logModel('delete', $unit, $old);
 
-        $this->dispatch('toast', type: 'success', message: 'Unit dihapus.');
+        $this->dispatch('toast', type: 'success', message: __('Unit dihapus.'));
     }
 
     public function bulkDelete(): void
@@ -168,7 +168,7 @@ class UnitIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.delete'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }
@@ -203,7 +203,7 @@ class UnitIndex extends Component
 
         AuditLogger::logModel('restore', $unit, null, $unit->fresh()->toArray());
 
-        $this->dispatch('toast', type: 'success', message: 'Unit dipulihkan.');
+        $this->dispatch('toast', type: 'success', message: __('Unit dipulihkan.'));
     }
 
     public function bulkRestore(): void
@@ -211,7 +211,7 @@ class UnitIndex extends Component
         abort_unless(auth()->user()->hasPermission('items.update'), 403);
 
         if ($this->selectedIds === []) {
-            $this->dispatch('toast', type: 'error', message: 'Tidak ada data terpilih.');
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
 
             return;
         }

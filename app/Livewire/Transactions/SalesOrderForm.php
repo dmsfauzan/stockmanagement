@@ -45,7 +45,7 @@ class SalesOrderForm extends Component
             $this->authorize('update', $model);
 
             if ($model->status !== 'draft') {
-                abort(403, 'Hanya SO draft yang dapat diubah.');
+                abort(403, __('Hanya SO draft yang dapat diubah.'));
             }
 
             $this->salesOrderId = $model->id;
@@ -195,7 +195,7 @@ class SalesOrderForm extends Component
             return $order;
         });
 
-        $this->dispatch('toast', type: 'success', message: 'Sales order tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Sales order tersimpan.'));
 
         return $this->redirect(route('sales-orders.show', $order), navigate: true);
     }

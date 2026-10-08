@@ -1,11 +1,11 @@
-@include('reports.pdf.partials.header', ['title' => 'Laporan Transfer', 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
+@include('reports.pdf.partials.header', ['title' => __('Laporan Transfer'), 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
 <table>
     <thead>
         <tr>
             <th>No. Transfer</th>
             <th>{{ __('Tanggal') }}</th>
             <th>{{ __('Dari') }}</th>
-            <th>Tujuan</th>
+            <th>{ __('Tujuan') }</th>
             <th>SKU</th>
             <th>{{ __('Barang') }}</th>
             <th class="right">Qty</th>
@@ -31,7 +31,7 @@
     </tbody>
 </table>
 @if (isset($totals))
-    <p class="totals">Baris: {{ number_format($totals['rows'] ?? 0) }} &middot; Total Qty: {{ number_format($totals['qty'] ?? 0) }}</p>
+    <p class="totals">{ __('Baris:') } {{ number_format($totals['rows'] ?? 0) }} &middot; Total Qty: {{ number_format($totals['qty'] ?? 0) }}</p>
 @endif
 </body>
 </html>

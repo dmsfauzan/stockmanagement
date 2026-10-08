@@ -46,7 +46,7 @@ class PurchaseOrderForm extends Component
             $this->authorize('update', $model);
 
             if ($model->status !== 'draft') {
-                abort(403, 'Hanya PO draft yang dapat diubah.');
+                abort(403, __('Hanya PO draft yang dapat diubah.'));
             }
 
             $this->purchaseOrderId = $model->id;
@@ -221,7 +221,7 @@ class PurchaseOrderForm extends Component
             return $order;
         });
 
-        $this->dispatch('toast', type: 'success', message: 'Purchase order tersimpan.');
+        $this->dispatch('toast', type: 'success', message: __('Purchase order tersimpan.'));
 
         return $this->redirect(route('purchase-orders.show', $order), navigate: true);
     }

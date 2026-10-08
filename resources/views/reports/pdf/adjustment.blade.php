@@ -1,4 +1,4 @@
-@include('reports.pdf.partials.header', ['title' => 'Laporan Adjustment', 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
+@include('reports.pdf.partials.header', ['title' => __('Laporan Adjustment'), 'generatedAt' => $generatedAt, 'filters' => $filters ?? []])
 <table>
     <thead>
         <tr>
@@ -10,7 +10,7 @@
             <th>{{ __('Barang') }}</th>
             <th class="right">System</th>
             <th class="right">Actual</th>
-            <th class="right">Selisih</th>
+            <th class="right">{ __('Selisih') }</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -35,7 +35,7 @@
     </tbody>
 </table>
 @if (isset($totals))
-    <p class="totals">Baris: {{ number_format($totals['rows'] ?? 0) }} &middot; Selisih Bersih: {{ number_format($totals['net'] ?? 0) }} &middot; Total Variance: {{ number_format($totals['abs'] ?? 0) }}</p>
+    <p class="totals">{ __('Baris:') } {{ number_format($totals['rows'] ?? 0) }} &middot; { __('Selisih Bersih:') } {{ number_format($totals['net'] ?? 0) }} &middot; Total Variance: {{ number_format($totals['abs'] ?? 0) }}</p>
 @endif
 </body>
 </html>
