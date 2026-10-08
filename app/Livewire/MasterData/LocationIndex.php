@@ -255,7 +255,7 @@ class LocationIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} lokasi, {$skipped} dilewati.");
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: __('Hapus :deleted lokasi, :skipped dilewati.', ['deleted' => $deleted, 'skipped' => $skipped]));
     }
 
     public function restore(int $id): void
@@ -289,7 +289,7 @@ class LocationIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} data.");
+        $this->dispatch('toast', type: 'success', message: __('Pulihkan :count data.', ['count' => $count]));
     }
 
     private function trashedConflict(string $table, string $code): bool

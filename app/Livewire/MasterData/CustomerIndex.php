@@ -225,7 +225,7 @@ class CustomerIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: 'success', message: "Hapus {$deleted} customer.");
+        $this->dispatch('toast', type: 'success', message: __('Hapus :deleted customer.', ['deleted' => $deleted]));
     }
 
     public function restore(int $id): void
@@ -260,7 +260,7 @@ class CustomerIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} data.");
+        $this->dispatch('toast', type: 'success', message: __('Pulihkan :count data.', ['count' => $count]));
     }
 
     private function trashedConflict(string $table, string $code): bool
@@ -299,7 +299,7 @@ class CustomerIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: 'success', message: "{$count} customer diperbarui menjadi {$status}.");
+        $this->dispatch('toast', type: 'success', message: __(':count customer diperbarui menjadi :status.', ['count' => $count, 'status' => $status]));
     }
 
     public function export(): StreamedResponse

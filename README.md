@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-289_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-293_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -89,6 +89,7 @@ flowchart LR
 | Email Report | `reports:mail --report=stock\|low\|movement\|valuation\|expiry --period=daily\|weekly\|monthly` (jadwal 06:30/06:45 Senin/1-an 07:00), penerima & batas baris di **Settings → Reports** |
 | Retensi Movements | `inventory:archive [--days= --dry-run --force]` memindah `stock_movements` lama ke `stock_movement_archives` (jadwal Minggu 02:30), ambang di **Settings → Inventory** |
 | OpenAPI Docs | Dokumentasi interaktif `/docs/api` + spec `/docs/api.json` (Scramble, auto-generate, gated `viewApiDocs`) |
+| i18n (ID/EN) | Bahasa per user (switcher di topbar) — chrome, tabel/tombol, status badge, toast/validasi, **pesan validasi + pagination**; kamus `lang/{id,en}` |
 | Security Monitor | Deteksi serangan app-layer (login gagal/lockout, 403/419/429, scanner path), geo-IP negara, auto-ban IP, halaman **Admin → Security** + export CSV |
 | API Token Abilities | Permission middleware **menegakkan abilities token Sanctum** (token terbatas benar-benar dibatasi, token tanpa abilities = akses penuh user) |
 | API Idempotency | Header **`Idempotency-Key`** pada request write — respons di-replay bila retry (`Idempotent-Replay`), payload beda → 409; retensi via `idempotency:purge` (TTL 24 jam) |

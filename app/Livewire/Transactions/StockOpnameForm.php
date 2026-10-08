@@ -142,7 +142,7 @@ class StockOpnameForm extends Component
             return;
         }
 
-        $this->dispatch('toast', type: 'success', message: "$inserted item berhasil di-generate.");
+        $this->dispatch('toast', type: 'success', message: __(':inserted item berhasil di-generate.', ['inserted' => $inserted]));
     }
 
     public function save()

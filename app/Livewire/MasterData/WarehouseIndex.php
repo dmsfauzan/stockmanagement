@@ -203,7 +203,7 @@ class WarehouseIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} warehouse, {$skipped} dilewati.");
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: __('Hapus :deleted warehouse, :skipped dilewati.', ['deleted' => $deleted, 'skipped' => $skipped]));
     }
 
     public function restore(int $id): void
@@ -237,7 +237,7 @@ class WarehouseIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} data.");
+        $this->dispatch('toast', type: 'success', message: __('Pulihkan :count data.', ['count' => $count]));
     }
 
     private function trashedConflict(string $table, string $code): bool
@@ -276,7 +276,7 @@ class WarehouseIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: 'success', message: "{$count} warehouse diperbarui menjadi {$status}.");
+        $this->dispatch('toast', type: 'success', message: __(':count warehouse diperbarui menjadi :status.', ['count' => $count, 'status' => $status]));
     }
 
     public function export(): StreamedResponse

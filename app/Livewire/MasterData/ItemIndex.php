@@ -162,7 +162,7 @@ class ItemIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: "Hapus {$deleted} barang, {$skipped} dilewati.");
+        $this->dispatch('toast', type: $deleted > 0 ? 'success' : 'error', message: __('Hapus :deleted barang, :skipped dilewati.', ['deleted' => $deleted, 'skipped' => $skipped]));
     }
 
     public function restore(int $id): void
@@ -197,7 +197,7 @@ class ItemIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: 'success', message: "Pulihkan {$count} barang.");
+        $this->dispatch('toast', type: 'success', message: __('Pulihkan :count barang.', ['count' => $count]));
     }
 
     public function bulkActivate(): void
@@ -235,7 +235,7 @@ class ItemIndex extends Component
 
         $this->reset('selectedIds', 'selectAll');
 
-        $this->dispatch('toast', type: 'success', message: "{$count} barang diperbarui menjadi {$status}.");
+        $this->dispatch('toast', type: 'success', message: __(':count barang diperbarui menjadi :status.', ['count' => $count, 'status' => $status]));
     }
 
     public function openImportModal(): void

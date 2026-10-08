@@ -116,7 +116,7 @@ class SecurityIndex extends Component
         SecurityMonitor::ban($ip, 'Manual ban dari daftar offender', 'manual', 1440, (int) auth()->id());
         AuditLogger::log('BAN', 'security', null, null, ['ip' => $ip, 'minutes' => 1440]);
 
-        $this->dispatch('toast', type: 'success', message: "IP {$ip} diblokir 24 jam.");
+        $this->dispatch('toast', type: 'success', message: __('IP :ip diblokir 24 jam.', ['ip' => $ip]));
     }
 
     public function manualBan(): void
@@ -152,7 +152,7 @@ class SecurityIndex extends Component
         SecurityMonitor::unban($ip);
         AuditLogger::log('UNBAN', 'security', null, null, ['ip' => $ip]);
 
-        $this->dispatch('toast', type: 'success', message: "IP {$ip} dibuka.");
+        $this->dispatch('toast', type: 'success', message: __('IP :ip dibuka.', ['ip' => $ip]));
     }
 
     public function purge(): void
@@ -166,7 +166,7 @@ class SecurityIndex extends Component
 
         AuditLogger::log('PURGE', 'security', null, null, ['events' => $removed, 'days' => $days]);
 
-        $this->dispatch('toast', type: 'success', message: "Bersihkan {$removed} event lama.");
+        $this->dispatch('toast', type: 'success', message: __('Bersihkan :removed event lama.', ['removed' => $removed]));
     }
 
     protected function eventsQuery(): Builder
