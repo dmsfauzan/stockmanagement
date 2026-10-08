@@ -35,11 +35,13 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -64,11 +66,11 @@ class AppServiceProvider extends ServiceProvider
 
         if (is_string($trusted) && trim($trusted) !== '') {
             $proxies = trim($trusted) === '*' ? '*' : array_map('trim', explode(',', $trusted));
-            \Illuminate\Http\Middleware\TrustProxies::at($proxies);
+            TrustProxies::at($proxies);
         }
 
         if (config('app.force_https')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+            URL::forceScheme('https');
         }
 
         RateLimiter::for('api', function (Request $request): Limit {
