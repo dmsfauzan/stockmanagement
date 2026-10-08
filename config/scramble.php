@@ -51,11 +51,140 @@ return [
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
         'description' => <<<'MD'
-        REST API untuk **Warehouse Stock Management**.
+        # Warehouse Stock Management — REST API
 
-        **Autentikasi**: Bearer token (Laravel Sanctum). Buat token via `php artisan api:token <email> --abilities=...` atau halaman **Admin → API Tokens**, lalu kirim header `Authorization: Bearer <token>`.
+        > Kelola gudang *end-to-end* lewat HTTP: master data, transaksi (Barang Masuk/Keluar, Adjustment, Opname, Transfer, PO, SO), laporan, dan posting **ledger** yang sama persis dengan UI — atomik, anti double-post, dan cek stok.
 
-        Semua respons memakai envelope `{ "success": bool, "data": mixed, "meta": {...} }`. Endpoint read dibatasi permission (mis. `items.view`), endpoint write dibatasi permission transaksi (mis. `goods_receipt.post`).
+        ![version](https://img.shields.io/badge/version-1.0.0-blue) ![auth](https://img.shields.io/badge/auth-Bearer%20token-6f42c1) ![rate-limit](https://img.shields.io/badge/rate%20limit-60%20req%2Fmenit-orange) ![format](https://img.shields.io/badge/format-JSON%20envelope-2ea043)
+
+        ## Base URL
+
+        Setiap path di bawah ini relatif terhadap:
+
+        ```
+        {APP_URL}/api
+        ```
+
+        ## Autentikasi
+
+        API memakai **Laravel Sanctum bearer token** dengan otorisasi berbasis **permission slug** yang sama dengan aplikasi web.
+
+        1. Buat token lewat **Admin → API Tokens**, atau via CLI:
+
+        ```bash
+        php artisan api:token admin@stock.test \
+          --abilities=items.view goods_receipt.post \
+          --expires=30
+        ```
+
+        2. Kirim token di setiap request:
+
+        ```
+        Authorization: Bearer <PLAIN_TEXT_TOKEN>
+        Accept: application/json
+        ```
+
+        > Token hanya ditampilkan **sekali** saat dibuat. Bila `--abilities` dikosongkan, token mewarisi seluruh permission user. Cek identitas dengan `GET /me`.
+
+        ## Format Respons
+
+        Semua respons memakai envelope yang konsisten. **Sukses:**
+
+        ```json
+        {
+          "success": true,
+          "message": "OK",
+          "data": {},
+          "meta": { "current_page": 1, "per_page": 15, "total": 42, "last_page": 3 }
+        }
+        ```
+
+        **Error:**
+
+        ```json
+        { "success": false, "message": "Insufficient stock", "errors": {} }
+        ```
+
+        | Status | Arti |
+        | --- | --- |
+        | `200` | OK |
+        | `201` | Data/dokumen dibuat |
+        | `401` | Belum terautentikasi / token tidak valid |
+        | `403` | Tidak punya permission |
+        | `404` | Data tidak ditemukan |
+        | `422` | Validasi gagal atau aturan bisnis dilanggar (mis. stok kurang) |
+        | `429` | Melebihi rate limit |
+
+        ## Pagination & Filter Umum
+
+        Endpoint *list* mendukung:
+
+        | Parameter | Deskripsi |
+        | --- | --- |
+        | `page` | Nomor halaman (default `1`) |
+        | `per_page` | Jumlah per halaman (maks `100`) |
+        | `date_from` / `date_to` | Rentang tanggal `YYYY-MM-DD` (endpoint transaksi & laporan) |
+        | `search` | Pencarian teks |
+        | `warehouse_id`, `category_id`, `status`, dll | Filter spesifik per endpoint (lihat tiap operasi) |
+
+        ## Peta Endpoint
+
+        | Grup | Prefiks | Permission |
+        | --- | --- | --- |
+        | Identitas | `/me` | — |
+        | Master data | `/items`, `/categories`, `/units`, `/suppliers`, `/customers`, `/warehouses`, `/locations` | `items.view`, `warehouse.view`, `location.view` |
+        | Stok | `/stock`, `/stock/movements`, `/stock/low` | `stock.view` |
+        | Transaksi | `/goods-receipts`, `/goods-issues`, `/stock-adjustments`, `/stock-opnames`, `/stock-transfers`, `/purchase-orders`, `/sales-orders` | `*.view` / `*.create` |
+        | Laporan | `/reports/*`, `/accounting/*` | `reports.view` |
+
+        ## Quick start
+
+        ```bash
+        export APP_URL="http://stockmanagement.test"
+        export TOKEN="<token-anda>"
+
+        # 1) cek identitas & permission
+        curl "$APP_URL/api/me" -H "Authorization: Bearer $TOKEN" -H "Accept: application/json"
+
+        # 2) daftar barang
+        curl "$APP_URL/api/items?search=mouse&per_page=5" -H "Authorization: Bearer $TOKEN" -H "Accept: application/json"
+
+        # 3) laporan stok rendah
+        curl "$APP_URL/api/stock/low" -H "Authorization: Bearer $TOKEN" -H "Accept: application/json"
+        ```
+
+        ## Alur Transaksi (Write)
+
+        Pola semua dokumen: **buat** (status `draft`) → jalankan **workflow** (`submit → approve → post`). Posting memakai `LedgerService` yang sama dengan UI.
+
+        ```bash
+        # Buat Barang Masuk
+        curl -X POST "$APP_URL/api/goods-receipts" \
+          -H "Authorization: Bearer $TOKEN" -H "Accept: application/json" -H "Content-Type: application/json" \
+          -d '{
+            "transaction_date": "2026-10-07",
+            "supplier_id": 1,
+            "warehouse_id": 1,
+            "items": [
+              { "item_id": 1, "quantity": 10, "unit_id": 1, "location_id": 1, "unit_cost": 15000 }
+            ]
+          }'
+
+        # Jalankan workflow
+        curl -X POST "$APP_URL/api/goods-receipts/1/submit"  -H "Authorization: Bearer $TOKEN" -H "Accept: application/json"
+        curl -X POST "$APP_URL/api/goods-receipts/1/approve" -H "Authorization: Bearer $TOKEN" -H "Accept: application/json"
+        curl -X POST "$APP_URL/api/goods-receipts/1/post"    -H "Authorization: Bearer $TOKEN" -H "Accept: application/json"
+        ```
+
+        Setelah `post`, `stock_balances` bertambah dan satu baris `stock_movements` (ledger) tercatat. Aksi `reject` memerlukan body `{ "reason": "..." }`.
+
+        ## Integrasi Lanjutan
+
+        - **Webhook keluar** — event `goods_receipt.posted`, `goods_issue.posted`, `adjustment.posted`, `stock_opname.completed`, `transfer.dispatched`, `transfer.received`, `sales_order.fulfilled`. Body ditandatangani **HMAC-SHA256** (`X-Signature`), header `X-Webhook-Event` & `X-Timestamp`. Atur di **Admin → Integrations**.
+        - **Ekspor jurnal terjadwal** — `accounting:export --period=daily|monthly` menulis CSV/XLSX ke `storage/app/accounting-exports` dan opsional email lampiran.
+        - **Rate limit** — `60` request/menit per token/user (header `Retry-After` saat `429`).
+
+        Dokumentasi statis tambahan: lihat [`API.md`](/API.md) di repositori.
         MD,
     ],
 
