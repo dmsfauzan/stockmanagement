@@ -83,7 +83,7 @@ class StockAdjustmentForm extends Component
             'location_id' => ['required', 'exists:locations,id'],
             'reason' => ['required', 'string', 'max:150'],
             'notes' => ['nullable', 'string'],
-            'attachment' => ['nullable', 'file', 'max:4096'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:4096'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.item_id' => ['required', 'exists:items,id'],
             'items.*.system_quantity' => ['required', 'integer'],
@@ -257,7 +257,10 @@ class StockAdjustmentForm extends Component
         $attachmentPath = $this->existingAttachment;
 
         if ($this->attachment) {
-            $attachmentPath = $this->attachment->store('adjustments', 'public');
+            $extension = strtolower($this->attachment->extension() ?: '');
+            $extension = in_array($extension, ['pdf', 'jpg', 'jpeg', 'png', 'webp'], true) ? $extension : 'pdf';
+            $filename = uniqid('adj_', true).'.'.$extension;
+            $attachmentPath = $this->attachment->storeAs('adjustments', $filename, 'public');
         }
 
         $header = [

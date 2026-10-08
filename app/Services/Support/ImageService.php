@@ -19,8 +19,10 @@ class ImageService
      */
     public function store(UploadedFile $file, string $folder): string
     {
-        $extension = strtolower($file->getClientOriginalExtension());
-        $filename = uniqid('img_', true).'.'.($extension !== '' ? $extension : 'jpg');
+        $extension = strtolower($file->extension() ?: $file->getClientOriginalExtension());
+        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        $extension = in_array($extension, $allowed, true) ? $extension : 'jpg';
+        $filename = uniqid('img_', true).'.'.$extension;
         $path = trim($folder, '/').'/'.$filename;
 
         Storage::disk($this->disk)->putFileAs($folder, $file, $filename);
