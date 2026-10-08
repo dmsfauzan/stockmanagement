@@ -18,7 +18,14 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             MasterDataSeeder::class,
-            DemoDataSeeder::class,
         ]);
+
+        if (app()->isProduction() && ! filter_var(env('SEED_DEMO', false), FILTER_VALIDATE_BOOL)) {
+            $this->command?->warn('DemoDataSeeder dilewati di produksi (set SEED_DEMO=true untuk memaksa).');
+
+            return;
+        }
+
+        $this->call([DemoDataSeeder::class]);
     }
 }
