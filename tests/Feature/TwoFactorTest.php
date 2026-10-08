@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Services\Support\TwoFactorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FA\Google2FA;
 use Tests\TestCase;
 
@@ -24,7 +26,7 @@ class TwoFactorTest extends TestCase
 
         $user->forceFill([
             'two_factor_secret' => $secret,
-            'two_factor_recovery_codes' => ['RC1'],
+            'two_factor_recovery_codes' => TwoFactorService::hashRecoveryCodes(['RC1']),
             'two_factor_confirmed_at' => now(),
         ])->save();
 
@@ -62,7 +64,7 @@ class TwoFactorTest extends TestCase
     {
         $admin = User::where('email', 'admin@stock.test')->firstOrFail();
         $secret = $this->enableTwoFactorFor($admin);
-        $admin->forceFill(['two_factor_recovery_codes' => ['RCX1234567']])->save();
+        $admin->forceFill(['two_factor_recovery_codes' => TwoFactorService::hashRecoveryCodes(['RCX1234567'])])->save();
 
         $this->post('/login', ['email' => $admin->email, 'password' => 'password']);
 
@@ -70,7 +72,23 @@ class TwoFactorTest extends TestCase
             ->assertRedirect(route('dashboard'));
 
         $this->assertAuthenticatedAs($admin);
-        $this->assertDatabaseMissing('users', ['id' => $admin->id, 'two_factor_recovery_codes' => json_encode(['RCX1234567'])]);
+        $this->assertSame([], (array) $admin->fresh()->two_factor_recovery_codes);
+    }
+
+    public function test_recovery_codes_are_stored_hashed(): void
+    {
+        $user = User::where('email', 'admin@stock.test')->firstOrFail();
+
+        $plain = TwoFactorService::generateRecoveryCodes(2);
+        $user->forceFill(['two_factor_recovery_codes' => TwoFactorService::hashRecoveryCodes($plain)])->save();
+
+        $stored = (array) $user->fresh()->two_factor_recovery_codes;
+
+        $this->assertCount(2, $stored);
+        foreach ($plain as $code) {
+            $this->assertNotContains($code, $stored, 'Recovery code stored in plain text.');
+        }
+        $this->assertTrue(Hash::check($plain[0], $stored[0]));
     }
 
     public function test_invalid_two_factor_code_is_rejected(): void

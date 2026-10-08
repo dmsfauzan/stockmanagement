@@ -53,7 +53,7 @@ class ApiTokensIndex extends Component
         $this->reset(['selectedUserId', 'plainToken', 'plainTokenUserId']);
         $this->tokenName = 'api-token';
         $this->abilities = [];
-        $this->expiresAt = null;
+        $this->expiresAt = now()->addMonth()->toDateString();
         $this->showCreateModal = true;
     }
 
@@ -92,6 +92,33 @@ class ApiTokensIndex extends Component
 
         PersonalAccessToken::whereKey($id)->delete();
         $this->dispatch('toast', type: 'success', message: 'Token dihapus.');
+    }
+
+    public function rotateToken(int $id): void
+    {
+        abort_unless(auth()->user()->hasPermission('settings.manage'), 403);
+
+        $token = PersonalAccessToken::findOrFail($id);
+        $user = $token->tokenable;
+
+        if ($user === null) {
+            $this->dispatch('toast', type: 'error', message: 'Pemilik token tidak ditemukan.');
+
+            return;
+        }
+
+        $name = (string) $token->name;
+        $abilities = (array) ($token->abilities ?? []);
+        $expiresAt = $token->expires_at;
+
+        $token->delete();
+
+        $new = $user->createToken($name, $abilities, $expiresAt);
+
+        $this->plainToken = $new->plainTextToken;
+        $this->plainTokenUserId = $user->id;
+
+        $this->dispatch('toast', type: 'success', message: 'Token di-rotate — salin token baru sekarang.');
     }
 
     public function render()

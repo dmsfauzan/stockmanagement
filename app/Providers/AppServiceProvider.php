@@ -30,6 +30,7 @@ use App\Policies\UserPolicy;
 use App\Policies\WarehousePolicy;
 use App\Services\Security\SecurityMonitor;
 use App\Services\Support\AuditLogger;
+use App\Services\Support\NotificationService;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
@@ -83,6 +84,24 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(Login::class, function (Login $event): void {
             AuditLogger::log('LOGIN', 'auth', $event->user);
+
+            $user = $event->user;
+
+            if ($user instanceof User && $user->getKey() !== null) {
+                try {
+                    $ip = request()->ip();
+                    $agent = mb_substr((string) request()->userAgent(), 0, 200);
+                    NotificationService::notify(
+                        (int) $user->getKey(),
+                        'security.login',
+                        'Login baru',
+                        (is_string($ip) && $ip !== '' ? 'Login dari '.$ip : 'Login baru').($agent !== '' ? ' · '.$agent : ''),
+                        User::class,
+                        (int) $user->getKey(),
+                    );
+                } catch (Throwable) {
+                }
+            }
         });
 
         Event::listen(Logout::class, function (Logout $event): void {

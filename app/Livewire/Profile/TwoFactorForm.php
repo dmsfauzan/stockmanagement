@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Profile;
 
+use App\Models\User;
 use App\Services\Barcode\LabelService;
+use App\Services\Support\NotificationService;
 use App\Services\Support\TwoFactorService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -80,7 +82,7 @@ class TwoFactorForm extends Component
         $codes = TwoFactorService::generateRecoveryCodes();
 
         $user->forceFill([
-            'two_factor_recovery_codes' => $codes,
+            'two_factor_recovery_codes' => TwoFactorService::hashRecoveryCodes($codes),
             'two_factor_confirmed_at' => now(),
         ])->save();
 
@@ -89,6 +91,15 @@ class TwoFactorForm extends Component
         $this->recoveryCodes = $codes;
         $this->showRecovery = true;
         $this->reset('code');
+
+        NotificationService::notify(
+            (int) $user->getKey(),
+            'security.2fa',
+            'Two-factor diaktifkan',
+            'Two-factor authentication diaktifkan untuk akun Anda.',
+            User::class,
+            (int) $user->getKey(),
+        );
 
         $this->dispatch('toast', type: 'success', message: 'Two-factor diaktifkan. Simpan recovery codes Anda.');
     }
@@ -101,7 +112,7 @@ class TwoFactorForm extends Component
 
         $codes = TwoFactorService::generateRecoveryCodes();
 
-        auth()->user()->forceFill(['two_factor_recovery_codes' => $codes])->save();
+        auth()->user()->forceFill(['two_factor_recovery_codes' => TwoFactorService::hashRecoveryCodes($codes)])->save();
 
         $this->recoveryCodes = $codes;
         $this->showRecovery = true;
@@ -126,6 +137,15 @@ class TwoFactorForm extends Component
         $this->needsConfirm = false;
         $this->showRecovery = false;
         $this->reset('code', 'disablePassword', 'secret', 'qrSvg', 'recoveryCodes');
+
+        NotificationService::notify(
+            (int) auth()->id(),
+            'security.2fa',
+            'Two-factor dimatikan',
+            'Two-factor authentication dimatikan untuk akun Anda.',
+            User::class,
+            (int) auth()->id(),
+        );
 
         $this->dispatch('toast', type: 'success', message: 'Two-factor dimatikan.');
     }

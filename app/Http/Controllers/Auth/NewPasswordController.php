@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Support\NotificationService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,6 +50,18 @@ class NewPasswordController extends Controller
                 ])->save();
 
                 event(new PasswordReset($user));
+
+                try {
+                    NotificationService::notify(
+                        (int) $user->getKey(),
+                        'security.password',
+                        'Password direset',
+                        'Password akun Anda baru saja direset. Jika bukan Anda, hubungi admin segera.',
+                        User::class,
+                        (int) $user->getKey(),
+                    );
+                } catch (\Throwable) {
+                }
             }
         );
 

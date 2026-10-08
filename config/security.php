@@ -1,5 +1,8 @@
 <?php
 
+$defaultCsp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com unpkg.com; font-src 'self' data: fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' unpkg.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'";
+$customCsp = env('SECURITY_CSP');
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -25,6 +28,18 @@ return [
     ],
 
     'retention_days' => 90,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Content Security Policy (moderate)
+    |--------------------------------------------------------------------------
+    | Emitted by the SecurityHeaders middleware. Allows same-origin plus the
+    | known third-party CDNs used by the app (ApexCharts, Google Fonts,
+    | Scramble docs) and inline/eval scripts required by Livewire & Alpine.
+    | Set to null to disable.
+    */
+
+    'csp' => is_string($customCsp) && trim($customCsp) !== '' ? $customCsp : $defaultCsp,
 
     'geoip' => [
         'enabled' => env('SECURITY_GEOIP_ENABLED', true),
