@@ -19,6 +19,7 @@ Schedule::command('accounting:export --period=monthly')->monthlyOn(1, '03:30')->
 Schedule::command('inventory:archive')->weeklyOn(0, '02:30')->withoutOverlapping()->onOneServer()->runInBackground();
 Schedule::command('security:purge')->dailyAt('02:45')->withoutOverlapping()->onOneServer()->runInBackground();
 Schedule::command('security:resolve-geo')->hourly()->withoutOverlapping()->onOneServer()->runInBackground();
+Schedule::command('idempotency:purge')->dailyAt('04:00')->withoutOverlapping()->onOneServer()->runInBackground();
 Schedule::command('backup:run --only-db')->dailyAt('01:00')->withoutOverlapping()->onOneServer()->runInBackground();
 Schedule::command('backup:clean')->dailyAt('02:00')->withoutOverlapping()->onOneServer()->runInBackground();
 Schedule::command('backup:monitor')->dailyAt('01:30')->withoutOverlapping()->onOneServer()->runInBackground();

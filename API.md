@@ -35,9 +35,29 @@ Error:
 { "success": false, "message": "Insufficient stock", "errors": { } }
 ```
 
-Status: `200` OK · `201` dibuat · `401` belum auth · `403` tanpa permission · `422` validasi/aturan bisnis.
+Status: `200` OK · `201` dibuat · `401` belum auth · `403` tanpa permission · `409` konflik idempotency · `422` validasi/aturan bisnis · `429` rate limit.
 
 Query umum untuk endpoint list: `?page=`, `?per_page=` (maks 100), plus filter spesifik (lihat tabel).
+
+## Idempotency (aman retry)
+
+Untuk mencegah dokumen ganda saat retry/network, kirim header **`Idempotency-Key`** (bebas, unik) pada request **write** (POST/PUT/PATCH/DELETE):
+
+```
+POST /api/goods-receipts HTTP/1.1
+Authorization: Bearer <token>
+Idempotency-Key: 6f1e2c3a-...
+```
+
+- Request pertama diproses; respons disimpan.
+- Request ulang dengan key **sama & payload sama** → respons asli di-replay + header `Idempotent-Replay: true` (tidak membuat dokumen baru).
+- Key sama tapi **payload/endpoint berbeda** → `409 Conflict`.
+- Tanpa header → perilaku normal (tanpa proteksi idempotency).
+- Kunci disimpan `IDEMPOTENCY_TTL_HOURS` (default 24 jam); respons `2xx` & `4xx` di-cache, `5xx` tidak (agar bisa retry).
+
+## CORS
+
+Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = semua). Endpoint: `/api/*`, `sanctum/csrf-cookie`. Header `Idempotent-Replay` diekspos ke browser.
 
 ## Endpoint — Read
 

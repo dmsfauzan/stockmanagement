@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\BlockBannedIps;
 use App\Http\Middleware\EnsureAccountActive;
+use App\Http\Middleware\EnsureIdempotency;
 use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsureTwoFactorForAdmin;
 use App\Http\Middleware\RecordSecurityEvents;
@@ -24,6 +25,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => EnsurePermission::class,
             'active' => EnsureAccountActive::class,
+            'idempotent' => EnsureIdempotency::class,
             'twofactor.admin' => EnsureTwoFactorForAdmin::class,
         ]);
         $middleware->throttleApi();
