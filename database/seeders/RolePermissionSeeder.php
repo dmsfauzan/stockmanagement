@@ -69,6 +69,7 @@ class RolePermissionSeeder extends Seeder
             'users.manage' => 'users',
             'roles.manage' => 'roles',
             'settings.manage' => 'settings',
+            'security.manage' => 'security',
             'audit_logs.view' => 'audit_logs',
         ];
 

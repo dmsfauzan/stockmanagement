@@ -86,6 +86,7 @@ class PageSmokeTest extends TestCase
             'admin.audit-logs',
             'admin.settings',
             'admin.integrations',
+            'admin.security',
         ];
 
         $params = [

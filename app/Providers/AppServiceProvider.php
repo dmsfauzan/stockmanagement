@@ -28,7 +28,10 @@ use App\Policies\StockOpnamePolicy;
 use App\Policies\StockTransferPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WarehousePolicy;
+use App\Services\Security\SecurityMonitor;
 use App\Services\Support\AuditLogger;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -71,6 +74,18 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(Logout::class, function (Logout $event): void {
             AuditLogger::log('LOGOUT', 'auth', $event->user);
+        });
+
+        Event::listen(Failed::class, function (Failed $event): void {
+            $email = is_array($event->credentials) ? ($event->credentials['email'] ?? null) : null;
+
+            SecurityMonitor::record('login_failed', 'warning', null, ['guard' => $event->guard], is_string($email) ? $email : null, $event->user?->id);
+        });
+
+        Event::listen(Lockout::class, function (Lockout $event): void {
+            $email = $event->request->input('email');
+
+            SecurityMonitor::record('login_lockout', 'high', $event->request, [], is_string($email) ? $email : null);
         });
 
         Gate::before(function (?User $user, string $ability): ?bool {

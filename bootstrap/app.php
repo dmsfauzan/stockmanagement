@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\BlockBannedIps;
 use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsureTwoFactorForAdmin;
+use App\Http\Middleware\RecordSecurityEvents;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -24,7 +26,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'twofactor.admin' => EnsureTwoFactorForAdmin::class,
         ]);
         $middleware->throttleApi();
+        $middleware->prepend(BlockBannedIps::class);
         $middleware->append(SecurityHeaders::class);
+        $middleware->append(RecordSecurityEvents::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

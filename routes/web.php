@@ -7,6 +7,7 @@ use App\Livewire\Admin\ApiTokensIndex;
 use App\Livewire\Admin\AuditLogIndex;
 use App\Livewire\Admin\IntegrationsIndex;
 use App\Livewire\Admin\RoleIndex;
+use App\Livewire\Admin\SecurityIndex;
 use App\Livewire\Admin\SettingIndex;
 use App\Livewire\Admin\UserIndex;
 use App\Livewire\Dashboard\DashboardIndex;
@@ -174,6 +175,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:users.manage')->get('/admin/users', UserIndex::class)->name('admin.users');
     Route::middleware('permission:roles.manage')->get('/admin/roles', RoleIndex::class)->name('admin.roles');
     Route::middleware('permission:audit_logs.view')->get('/admin/audit-logs', AuditLogIndex::class)->name('admin.audit-logs');
+    Route::middleware('permission:security.manage')->get('/admin/security', SecurityIndex::class)->name('admin.security');
     Route::middleware('permission:settings.manage')->get('/admin/api-tokens', ApiTokensIndex::class)->name('admin.api-tokens');
     Route::middleware('permission:settings.manage')->get('/admin/settings', SettingIndex::class)->name('admin.settings');
     Route::middleware('permission:settings.manage')->get('/admin/integrations', IntegrationsIndex::class)->name('admin.integrations');

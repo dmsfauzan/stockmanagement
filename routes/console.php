@@ -17,6 +17,8 @@ Schedule::command('reports:mail --period=monthly')->monthlyOn(1, '07:00');
 Schedule::command('accounting:export --period=daily')->dailyAt('03:00');
 Schedule::command('accounting:export --period=monthly')->monthlyOn(1, '03:30');
 Schedule::command('inventory:archive')->weeklyOn(0, '02:30');
+Schedule::command('security:purge')->dailyAt('02:45');
+Schedule::command('security:resolve-geo')->hourly();
 Schedule::command('backup:run --only-db')->dailyAt('01:00');
 Schedule::command('backup:clean')->dailyAt('02:00');
 Schedule::command('backup:monitor')->dailyAt('01:30');

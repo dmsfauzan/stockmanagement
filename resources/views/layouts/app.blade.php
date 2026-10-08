@@ -36,6 +36,7 @@
         request()->routeIs('admin.users') => 'Users',
         request()->routeIs('admin.roles') => 'Roles & Permissions',
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
+        request()->routeIs('admin.security') => 'Security',
         request()->routeIs('admin.api-tokens') => 'API Tokens',
         request()->routeIs('admin.integrations') => 'Integrations',
         request()->routeIs('admin.settings') => 'Settings',
@@ -335,6 +336,12 @@
                 <a href="{{ route('admin.integrations') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.integrations'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.integrations')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>
                     <span x-show="!collapsed" class="truncate">Integrations</span>
+                </a>
+                @endcan
+                @canany(['settings.manage', 'security.manage'])
+                <a href="{{ route('admin.security') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.security'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.security')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11.25v-1.5M12 14.25h.008v.008H12v-.008zM9 21.75h6a2.25 2.25 0 002.25-2.25v-7.5A2.25 2.25 0 0015 9.75H9A2.25 2.25 0 006.75 12v7.5A2.25 2.25 0 009 21.75zM9 9.75V6.75A2.25 2.25 0 0111.25 4.5h1.5A2.25 2.25 0 0115 6.75V9.75"/></svg>
+                    <span x-show="!collapsed" class="truncate">Security</span>
                 </a>
                 @endcan
                 @can('settings.manage')
