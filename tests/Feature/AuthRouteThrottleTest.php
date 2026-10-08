@@ -10,24 +10,26 @@ class AuthRouteThrottleTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_sensitive_auth_routes_are_throttled(): void
+    /** @return array<int, array{0: string, 1: string}> */
+    private function throttledPostRoutes(): array
     {
-        $names = ['login', 'two-factor.verify', 'password.email', 'password.store'];
-
-        foreach ($names as $name) {
-            $route = Route::getRoutes()->getByName($name);
-
-            $this->assertNotNull($route, "Route {$name} missing.");
-            $this->assertContains('throttle:6,1', $route->gatherMiddleware(), "Route {$name} not throttled.");
-        }
+        return [
+            ['login', 'POST'],
+            ['two-factor-challenge', 'POST'],
+            ['forgot-password', 'POST'],
+            ['reset-password', 'POST'],
+            ['confirm-password', 'POST'],
+        ];
     }
 
-    public function test_confirm_password_route_is_throttled(): void
+    public function test_sensitive_auth_routes_are_throttled(): void
     {
-        $route = collect(Route::getRoutes()->getRoutes())
-            ->first(fn ($r) => in_array('POST', $r->methods(), true) && $r->uri() === 'confirm-password');
+        foreach ($this->throttledPostRoutes() as [$uri, $method]) {
+            $route = collect(Route::getRoutes()->getRoutes())
+                ->first(fn ($r) => in_array($method, $r->methods(), true) && $r->uri() === $uri);
 
-        $this->assertNotNull($route);
-        $this->assertContains('throttle:6,1', $route->gatherMiddleware());
+            $this->assertNotNull($route, "Route {$method} {$uri} missing.");
+            $this->assertContains('throttle:6,1', $route->gatherMiddleware(), "Route {$method} {$uri} not throttled.");
+        }
     }
 }
