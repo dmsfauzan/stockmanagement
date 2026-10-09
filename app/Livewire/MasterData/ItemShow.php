@@ -8,6 +8,7 @@ use App\Models\StockBalance;
 use App\Models\StockLot;
 use App\Models\StockMovement;
 use App\Services\Inventory\StockStatusService;
+use App\Services\Inventory\UnitConversionService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -69,6 +70,7 @@ class ItemShow extends Component
             'balances' => $balances,
             'movements' => $movements,
             'lots' => $lots,
+            'conversions' => UnitConversionService::conversions($item->id),
             'totalOnHand' => $totalOnHand,
             'totalReserved' => $totalReserved,
             'totalAvailable' => $totalOnHand - $totalReserved,

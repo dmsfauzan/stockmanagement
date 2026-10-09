@@ -75,7 +75,7 @@
                                     @error("items.{$index}.item_id")<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                                 </td>
                                 <td><input type="number" min="1" wire:model="items.{{ $index }}.quantity" class="app-input w-20 px-2 py-2 text-right text-sm">@error("items.{$index}.quantity")<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror</td>
-                                <td><select wire:model="items.{{ $index }}.unit_id" class="app-select w-24 px-2 py-2 text-sm"><option value="">—</option>@foreach ($units as $u)<option value="{{ $u->id }}">{{ $u->code }}</option>@endforeach</select></td>
+                                <td>@php $allowedUnits = $unitMap[(int) ($row['item_id'] ?? 0)] ?? null; @endphp<select wire:model="items.{{ $index }}.unit_id" class="app-select w-24 px-2 py-2 text-sm"><option value="">—</option>@foreach ($units as $u)@if ($allowedUnits === null || in_array((int) $u->id, $allowedUnits, true) || (string) $u->id === (string) ($row['unit_id'] ?? ''))<option value="{{ $u->id }}">{{ $u->code }}</option>@endif@endforeach</select></td>
                                 <td><select wire:model="items.{{ $index }}.location_id" class="app-select w-28 px-2 py-2 text-sm"><option value="">—</option>@foreach ($locations as $loc)<option value="{{ $loc->id }}">{{ $loc->code }}</option>@endforeach</select></td>
                                 <td><input type="number" min="0" step="0.01" wire:model="items.{{ $index }}.unit_cost" class="app-input w-28 px-2 py-2 text-right text-sm"></td>
                                 <td><input type="text" wire:model="items.{{ $index }}.batch_number" class="app-input w-28 px-2 py-2 text-sm"></td>

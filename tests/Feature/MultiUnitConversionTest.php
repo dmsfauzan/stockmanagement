@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Livewire\MasterData\ItemForm;
+use App\Livewire\MasterData\ItemShow;
 use App\Models\Category;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
@@ -109,5 +110,45 @@ class MultiUnitConversionTest extends TestCase
 
         $item = Item::where('sku', 'BRG-UOM-FORM')->firstOrFail();
         $this->assertDatabaseHas('item_unit_conversions', ['item_id' => $item->id, 'unit_id' => $box->id]);
+    }
+
+    public function test_allowed_unit_ids_includes_base_and_conversions(): void
+    {
+        $item = $this->makeItem();
+        $pcs = Unit::where('code', 'PCS')->firstOrFail();
+        $box = Unit::where('code', 'BOX')->firstOrFail();
+
+        UnitConversionService::saveConversion($item->id, $box->id, 12);
+
+        $allowed = UnitConversionService::allowedUnitIds($item->id);
+
+        $this->assertContains($pcs->id, $allowed);
+        $this->assertContains($box->id, $allowed);
+        $this->assertCount(2, $allowed);
+    }
+
+    public function test_item_show_renders_conversions(): void
+    {
+        $item = $this->makeItem();
+        $box = Unit::where('code', 'BOX')->firstOrFail();
+
+        UnitConversionService::saveConversion($item->id, $box->id, 12);
+
+        Livewire::test(ItemShow::class, ['item' => $item->id])
+            ->assertSee('Konversi Satuan')
+            ->assertSee('BOX');
+    }
+
+    public function test_api_item_show_includes_conversions(): void
+    {
+        $item = $this->makeItem();
+        $box = Unit::where('code', 'BOX')->firstOrFail();
+
+        UnitConversionService::saveConversion($item->id, $box->id, 12);
+
+        $this->getJson("/api/items/{$item->id}?include=conversions")
+            ->assertOk()
+            ->assertJsonPath('data.conversions.0.unit_code', 'BOX')
+            ->assertJsonPath('data.conversions.0.factor', 12);
     }
 }

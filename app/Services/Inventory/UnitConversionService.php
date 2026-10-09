@@ -42,6 +42,28 @@ class UnitConversionService
         ];
     }
 
+    /**
+     * Unit ids valid for an item: its base unit plus every registered conversion.
+     *
+     * @return array<int, int>
+     */
+    public static function allowedUnitIds(int $itemId): array
+    {
+        $item = Item::find($itemId);
+
+        if (! $item) {
+            return [];
+        }
+
+        $ids = [(int) $item->unit_id];
+
+        foreach (ItemUnitConversion::where('item_id', $itemId)->pluck('unit_id') as $unitId) {
+            $ids[] = (int) $unitId;
+        }
+
+        return array_values(array_unique($ids));
+    }
+
     public static function saveConversion(int $itemId, int $unitId, float $factor): ItemUnitConversion
     {
         if ($factor <= 0) {

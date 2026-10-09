@@ -129,10 +129,13 @@
                                     @error("items.{$index}.unit_cost") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                                 </td>
                                 <td>
+                                    @php $allowedUnits = $unitMap[(int) ($row['item_id'] ?? 0)] ?? null; @endphp
                                     <select wire:model="items.{{ $index }}.unit_id" class="app-select w-32 px-2 py-2 text-sm">
                                         <option value="">--</option>
                                         @foreach ($units as $unit)
-                                            <option value="{{ $unit->id }}">{{ $unit->code ?: $unit->name }}</option>
+                                            @if ($allowedUnits === null || in_array((int) $unit->id, $allowedUnits, true) || (string) $unit->id === (string) ($row['unit_id'] ?? ''))
+                                                <option value="{{ $unit->id }}">{{ $unit->code ?: $unit->name }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                     @error("items.{$index}.unit_id") <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror

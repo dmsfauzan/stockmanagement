@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Transactions;
 
+use App\Livewire\Concerns\FiltersUnitsByConversion;
 use App\Models\Customer;
 use App\Models\CustomerReturn;
 use App\Models\GoodsIssue;
@@ -21,6 +22,8 @@ use Livewire\Component;
 #[Title('Form Retur Penjualan')]
 class CustomerReturnForm extends Component
 {
+    use FiltersUnitsByConversion;
+
     public ?int $returnId = null;
 
     public string $transaction_date = '';
@@ -258,6 +261,7 @@ class CustomerReturnForm extends Component
             'locations' => Location::orderBy('code')->get(['id', 'code']),
             'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name']),
+            'unitMap' => $this->conversionUnitMap(),
         ]);
     }
 }

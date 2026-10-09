@@ -64,7 +64,7 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 | Method | Path | Permission | Filter |
 |---|---|---|---|
 | GET | `/me` | — | |
-| GET | `/items` · `/items/{id}` | `items.view` | `search`, `category_id`, `status` |
+| GET | `/items` · `/items/{id}` | `items.view` | `search`, `category_id`, `status`, `include=conversions` |
 | GET | `/categories` | `items.view` | `search` |
 | GET | `/units` | `items.view` | `search` |
 | GET | `/suppliers` | `items.view` | `search`, `status` |

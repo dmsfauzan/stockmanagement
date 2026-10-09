@@ -31,9 +31,15 @@ class ItemController extends ApiController
         return $this->paginated(ItemResource::collection($paginator));
     }
 
-    public function show(Item $item): JsonResponse
+    public function show(Request $request, Item $item): JsonResponse
     {
-        $item->loadMissing(['category', 'unit']);
+        $with = ['category', 'unit'];
+
+        if ((string) $request->string('include') === 'conversions') {
+            $with[] = 'conversions.unit';
+        }
+
+        $item->loadMissing($with);
 
         return $this->ok(new ItemResource($item));
     }

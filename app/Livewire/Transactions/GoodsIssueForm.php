@@ -3,6 +3,7 @@
 namespace App\Livewire\Transactions;
 
 use App\Enums\TrackingType;
+use App\Livewire\Concerns\FiltersUnitsByConversion;
 use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\Customer;
 use App\Models\GoodsIssue;
@@ -24,7 +25,7 @@ use Livewire\Component;
 #[Title('Form Barang Keluar')]
 class GoodsIssueForm extends Component
 {
-    use GuardsStaleEdits;
+    use FiltersUnitsByConversion, GuardsStaleEdits;
 
     public ?int $issueId = null;
 
@@ -415,6 +416,7 @@ class GoodsIssueForm extends Component
             'locations' => $locations,
             'stockMap' => $stockMap,
             'lotMap' => $lotMap,
+            'unitMap' => $this->conversionUnitMap(),
         ]);
     }
 }

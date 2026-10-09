@@ -3,6 +3,7 @@
 namespace App\Livewire\Transactions;
 
 use App\Enums\TrackingType;
+use App\Livewire\Concerns\FiltersUnitsByConversion;
 use App\Livewire\Concerns\GuardsStaleEdits;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
@@ -22,7 +23,7 @@ use Livewire\Component;
 #[Title('Form Barang Masuk')]
 class GoodsReceiptForm extends Component
 {
-    use GuardsStaleEdits;
+    use FiltersUnitsByConversion, GuardsStaleEdits;
 
     public ?int $receiptId = null;
 
@@ -381,6 +382,7 @@ class GoodsReceiptForm extends Component
             'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name']),
             'locations' => $locations,
+            'unitMap' => $this->conversionUnitMap(),
         ]);
     }
 }

@@ -49,6 +49,38 @@
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Min / Max</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->minimum_stock }} / {{ $itemModel->maximum_stock }}</dd></div>
                     <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Deskripsi') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->description ?? '-' }}</dd></div>
                 </dl>
+
+                @if ($conversions->isNotEmpty())
+                    <div class="mt-6">
+                        <h3 class="app-card-title mb-3">{{ __('Konversi Satuan') }}</h3>
+                        <div class="overflow-x-auto">
+                            <table class="app-table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ __('Satuan') }}</th>
+                                        <th>{{ __('Kode') }}</th>
+                                        <th class="text-right">{{ __('Faktor') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-app-text">{{ $itemModel->unit?->name ?? '-' }}</td>
+                                        <td class="text-app-muted">{{ $itemModel->unit?->code ?? '-' }}</td>
+                                        <td class="text-right text-app-muted">1 {{ __('(satuan dasar)') }}</td>
+                                    </tr>
+                                    @foreach ($conversions as $conversion)
+                                        <tr>
+                                            <td class="text-app-text">{{ $conversion->unit?->name ?? '-' }}</td>
+                                            <td class="text-app-muted">{{ $conversion->unit?->code ?? '-' }}</td>
+                                            <td class="text-right font-medium text-app-text">{{ (float) $conversion->factor }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-2 text-xs text-app-muted">{{ __('Faktor = jumlah satuan dasar per 1 satuan tersebut.') }}</p>
+                    </div>
+                @endif
             @elseif ($tab === 'inventory')
                 @if ($balances->isEmpty())
                     <x-ui.empty-state title="Belum ada stok" message="Tidak ada stock balance untuk barang ini." />
