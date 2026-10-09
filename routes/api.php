@@ -54,6 +54,10 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
         Route::post('/quarantine/{id}/reject', [QualityController::class, 'reject'])->name('api.quarantine.reject');
     });
 
+    Route::middleware('permission:stock.movement')->group(function (): void {
+        Route::get('/traceability/{type}/{value}', [StockController::class, 'traceability'])->where(['type' => 'batch|lot|serial'])->name('api.traceability');
+    });
+
     Route::middleware('permission:goods_receipt.view')->group(function (): void {
         Route::get('/goods-receipts', [TransactionController::class, 'receipts'])->name('api.goods-receipts.index');
         Route::get('/goods-receipts/{receipt}', [TransactionController::class, 'receipt'])->name('api.goods-receipts.show');

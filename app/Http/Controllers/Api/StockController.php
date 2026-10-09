@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\StockStatus;
 use App\Http\Resources\Api\StockBalanceResource;
 use App\Http\Resources\Api\StockMovementResource;
+use App\Services\Inventory\TraceabilityService;
 use App\Services\Support\WarehouseAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -86,6 +87,21 @@ class StockController extends ApiController
         $paginator = $query->paginate($perPage)->withQueryString();
 
         return $this->paginated(StockMovementResource::collection($paginator));
+    }
+
+    public function traceability(string $type, string $value): JsonResponse
+    {
+        $result = match ($type) {
+            'serial' => TraceabilityService::forSerial($value),
+            'batch', 'lot' => TraceabilityService::forBatch($value),
+            default => null,
+        };
+
+        if ($result === null) {
+            return $this->error('Unknown traceability type. Use batch or serial.', 422);
+        }
+
+        return $this->ok($result, 'OK');
     }
 
     protected function balanceQuery(Request $request)

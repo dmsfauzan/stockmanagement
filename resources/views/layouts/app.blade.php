@@ -21,6 +21,7 @@
         request()->routeIs('stock.movements') => 'Stock Movement',
                 request()->routeIs('stock.low') => 'Low Stock',
                 request()->routeIs('stock.quarantine') => 'Karantina',
+                request()->routeIs('stock.trace') => 'Lacak Lot / Serial',
         request()->routeIs('scan') => 'Scan',
         request()->routeIs('reports.stock') => __('Laporan Stock'),
         request()->routeIs('reports.incoming') => __('Laporan Barang Masuk'),
@@ -157,6 +158,12 @@
                 <a href="{{ route('stock.quarantine') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('stock.quarantine'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('stock.quarantine')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0h.01M12 21a9 9 0 100-18 9 9 0 000 18z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6"/></svg>
                     <span x-show="!collapsed" class="truncate">Karantina</span>
+                </a>
+                @endcan
+                @can('stock.movement')
+                <a href="{{ route('stock.trace') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('stock.trace'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('stock.trace')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.2-5.2M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z"/></svg>
+                    <span x-show="!collapsed" class="truncate">{{ __('Lacak Lot') }}</span>
                 </a>
                 @endcan
             </x-sidebar-group>
