@@ -1,6 +1,7 @@
 @php
     $sizes = \App\Http\Controllers\LabelController::sizes();
     $dim = $sizes[$size] ?? $sizes['85x54'];
+    $opts = \App\Http\Controllers\LabelController::labelOptions();
     $qrPx = match ($size) {
         '50x30' => 56,
         '70x40' => 68,
@@ -59,9 +60,17 @@
         <div class="label-card rounded-xl border border-slate-300 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800" style="width: {{ $dim['width'] }}mm; min-height: {{ $dim['height'] }}mm;">
             <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0 flex-1">
-                    <p class="truncate text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ $item->brand ?? '—' }}</p>
+                    @if ($opts['company_text'] !== '')
+                        <p class="truncate text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ $opts['company_text'] }}</p>
+                    @endif
+                    @if ($opts['show_brand'])
+                        <p class="truncate text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ $item->brand ?? '—' }}</p>
+                    @endif
                     <p class="mt-0.5 line-clamp-2 text-[13px] font-semibold leading-tight text-slate-900 dark:text-slate-100">{{ $item->name }}</p>
                     <p class="mt-0.5 font-mono text-[11px] text-slate-600 dark:text-slate-300">{{ $item->sku }}</p>
+                    @if ($opts['show_price'] && (float) $item->price > 0)
+                        <p class="text-[12px] font-bold text-slate-900 dark:text-slate-100">{{ number_format((float) $item->price, 0, ',', '.') }}</p>
+                    @endif
                     <p class="font-mono text-[10px] text-slate-500 dark:text-slate-400">{{ $barcodeValue }}</p>
                 </div>
                 @if (in_array($format, ['qr', 'both'], true))

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Location;
+use App\Models\Setting;
 use App\Models\StockBalance;
 use App\Models\Warehouse;
 use App\Services\Barcode\LabelService;
@@ -14,12 +15,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LabelController extends Controller
 {
+    public static function labelOptions(): array
+    {
+        return [
+            'size' => (string) (Setting::get('label.default_size', '85x54') ?? '85x54'),
+            'show_brand' => (string) (Setting::get('label.show_brand', '1') ?? '1') === '1',
+            'show_price' => (string) (Setting::get('label.show_price', '0') ?? '0') === '1',
+            'company_text' => (string) (Setting::get('label.company_text', '') ?? ''),
+        ];
+    }
+
     public function item(Item $item, Request $request, LabelService $service): Response
     {
         Gate::authorize('view', $item);
 
         $format = $request->query('format', 'both');
-        $size = $this->sizeParam($request->query('size'));
+        $size = $this->sizeParam($request->query('size') ?? self::labelOptions()['size']);
 
         [$barcodeValue, $qrData, $qrSvg, $barcodeSvg] = $this->buildForItem($item, $service, $format, $size);
 
