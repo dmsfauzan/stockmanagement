@@ -142,6 +142,8 @@
                 </div>
             </x-ui.card>
 
+            <x-ui.approval-history :model="$order" />
+
             <x-ui.card>
                 <h2 class="app-card-title">Audit</h2>
                 <dl class="mt-3 space-y-2 text-sm">
@@ -162,7 +164,7 @@
                         @endif
                     @endcan
                     @can('approve', $order)
-                        @if($order->status === 'submitted')
+                        @if($order->status === 'submitted' && \App\Services\Workflow\DocumentApproval::canApprove($order, auth()->user()))
                             <x-ui.confirm action="approve" title="Setujui SO" message="SO akan disetujui." confirm-label="Approve" class="app-btn app-btn-primary w-full">{{ __('Approve') }}</x-ui.confirm>
                             <div class="rounded-lg border border-app-border bg-app-surface-2/50 p-3">
                                 <label class="app-label">Rejection reason</label>

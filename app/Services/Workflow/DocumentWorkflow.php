@@ -18,6 +18,7 @@ use App\Services\Inventory\InventoryService;
 use App\Services\Inventory\ReservationService;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\NotificationService;
+use Illuminate\Database\Eloquent\Model;
 
 class DocumentWorkflow
 {
@@ -51,6 +52,17 @@ class DocumentWorkflow
         }
     }
 
+    /** Notify the role responsible for the current pending approval level. */
+    protected static function notifyApprovalLevel(Model $doc, string $titleBase): void
+    {
+        try {
+            $role = DocumentApproval::nextRole($doc);
+            $level = ((int) ($doc->current_level ?? 0)) + 1;
+            NotificationService::notifyRole($role, 'approval.request', $titleBase, $doc->number.' menunggu persetujuan level '.$level, $doc::class, $doc->id);
+        } catch (\Throwable $e) {
+        }
+    }
+
     public static function submitReceipt(int $id): void
     {
         $receipt = GoodsReceipt::findOrFail($id);
@@ -63,9 +75,11 @@ class DocumentWorkflow
             'submitted_at' => now(),
         ]);
 
+        DocumentApproval::snapshot($receipt);
+
         AuditLogger::log('SUBMIT', 'goods_receipt', $receipt);
 
-        static::notifyApprovers('approval.request', 'Approval Barang Masuk', $receipt->number.' menunggu persetujuan', GoodsReceipt::class, $receipt->id);
+        static::notifyApprovalLevel($receipt, 'Approval Barang Masuk');
     }
 
     public static function approveReceipt(int $id): void
@@ -74,15 +88,13 @@ class DocumentWorkflow
 
         static::ensure($receipt->statusEnum()->canTransitionTo(TransactionStatus::Approved));
 
-        $receipt->update([
-            'status' => TransactionStatus::Approved->value,
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-        ]);
-
-        AuditLogger::log('APPROVE', 'goods_receipt', $receipt);
-
-        static::notifyUser($receipt->created_by, 'approval.result', 'Barang Masuk disetujui', $receipt->number.' telah disetujui', GoodsReceipt::class, $receipt->id);
+        if (DocumentApproval::approve($receipt)) {
+            AuditLogger::log('APPROVE', 'goods_receipt', $receipt);
+            static::notifyUser($receipt->created_by, 'approval.result', 'Barang Masuk disetujui', $receipt->number.' telah disetujui', GoodsReceipt::class, $receipt->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'goods_receipt', $receipt);
+            static::notifyApprovalLevel($receipt, 'Approval Barang Masuk');
+        }
     }
 
     public static function rejectReceipt(int $id, string $reason): void
@@ -91,6 +103,7 @@ class DocumentWorkflow
 
         static::ensure($receipt->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
         static::ensureReason($reason);
+        DocumentApproval::reject($receipt, $reason);
 
         $receipt->update([
             'status' => TransactionStatus::Rejected->value,
@@ -132,9 +145,11 @@ class DocumentWorkflow
             'submitted_at' => now(),
         ]);
 
+        DocumentApproval::snapshot($issue);
+
         AuditLogger::log('SUBMIT', 'goods_issue', $issue);
 
-        static::notifyApprovers('approval.request', 'Approval Barang Keluar', $issue->number.' menunggu persetujuan', GoodsIssue::class, $issue->id);
+        static::notifyApprovalLevel($issue, 'Approval Barang Keluar');
     }
 
     public static function approveIssue(int $id): void
@@ -143,15 +158,13 @@ class DocumentWorkflow
 
         static::ensure($issue->statusEnum()->canTransitionTo(TransactionStatus::Approved));
 
-        $issue->update([
-            'status' => TransactionStatus::Approved->value,
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-        ]);
-
-        AuditLogger::log('APPROVE', 'goods_issue', $issue);
-
-        static::notifyUser($issue->created_by, 'approval.result', 'Barang Keluar disetujui', $issue->number.' telah disetujui', GoodsIssue::class, $issue->id);
+        if (DocumentApproval::approve($issue)) {
+            AuditLogger::log('APPROVE', 'goods_issue', $issue);
+            static::notifyUser($issue->created_by, 'approval.result', 'Barang Keluar disetujui', $issue->number.' telah disetujui', GoodsIssue::class, $issue->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'goods_issue', $issue);
+            static::notifyApprovalLevel($issue, 'Approval Barang Keluar');
+        }
     }
 
     public static function rejectIssue(int $id, string $reason): void
@@ -160,6 +173,7 @@ class DocumentWorkflow
 
         static::ensure($issue->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
         static::ensureReason($reason);
+        DocumentApproval::reject($issue, $reason);
 
         $issue->update([
             'status' => TransactionStatus::Rejected->value,
@@ -199,9 +213,11 @@ class DocumentWorkflow
             'submitted_at' => now(),
         ]);
 
+        DocumentApproval::snapshot($adjustment);
+
         AuditLogger::log('SUBMIT', 'stock_adjustment', $adjustment);
 
-        static::notifyApprovers('approval.request', 'Approval Adjustment', $adjustment->number.' menunggu persetujuan', StockAdjustment::class, $adjustment->id);
+        static::notifyApprovalLevel($adjustment, 'Approval Adjustment');
     }
 
     public static function approveAdjustment(int $id): void
@@ -210,15 +226,13 @@ class DocumentWorkflow
 
         static::ensure($adjustment->statusEnum()->canTransitionTo(TransactionStatus::Approved));
 
-        $adjustment->update([
-            'status' => TransactionStatus::Approved->value,
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-        ]);
-
-        AuditLogger::log('APPROVE', 'stock_adjustment', $adjustment);
-
-        static::notifyUser($adjustment->created_by, 'approval.result', 'Adjustment disetujui', $adjustment->number.' telah disetujui', StockAdjustment::class, $adjustment->id);
+        if (DocumentApproval::approve($adjustment)) {
+            AuditLogger::log('APPROVE', 'stock_adjustment', $adjustment);
+            static::notifyUser($adjustment->created_by, 'approval.result', 'Adjustment disetujui', $adjustment->number.' telah disetujui', StockAdjustment::class, $adjustment->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'stock_adjustment', $adjustment);
+            static::notifyApprovalLevel($adjustment, 'Approval Adjustment');
+        }
     }
 
     public static function rejectAdjustment(int $id, string $reason): void
@@ -227,6 +241,7 @@ class DocumentWorkflow
 
         static::ensure($adjustment->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
         static::ensureReason($reason);
+        DocumentApproval::reject($adjustment, $reason);
 
         $adjustment->update([
             'status' => TransactionStatus::Rejected->value,
@@ -274,9 +289,10 @@ class DocumentWorkflow
             'submitted_by' => auth()->id(),
             'submitted_at' => now(),
         ]);
+        DocumentApproval::snapshot($opname);
         AuditLogger::log('SUBMIT', 'stock_opname', $opname);
 
-        static::notifyApprovers('approval.request', 'Approval Opname', $opname->number.' menunggu persetujuan', StockOpname::class, $opname->id);
+        static::notifyApprovalLevel($opname, 'Approval Opname');
     }
 
     public static function rejectOpname(int $id, string $reason): void
@@ -285,6 +301,7 @@ class DocumentWorkflow
 
         static::ensure($opname->statusEnum()->canTransitionTo(OpnameStatus::Rejected));
         static::ensureReason($reason);
+        DocumentApproval::reject($opname, $reason);
 
         $opname->update([
             'status' => OpnameStatus::Rejected->value,
@@ -307,16 +324,16 @@ class DocumentWorkflow
             throw new \RuntimeException('Opname belum lengkap');
         }
 
-        $opname->update([
-            'status' => OpnameStatus::Approved->value,
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-        ]);
-        AuditLogger::log('APPROVE', 'stock_opname', $opname);
+        if (DocumentApproval::approve($opname)) {
+            AuditLogger::log('APPROVE', 'stock_opname', $opname);
 
-        InventoryService::completeStockOpname($opname->fresh('items'));
+            InventoryService::completeStockOpname($opname->fresh('items'));
 
-        static::notifyUser($opname->created_by, 'opname.completed', 'Opname selesai', $opname->number.' telah selesai', StockOpname::class, $opname->id);
+            static::notifyUser($opname->created_by, 'opname.completed', 'Opname selesai', $opname->number.' telah selesai', StockOpname::class, $opname->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'stock_opname', $opname);
+            static::notifyApprovalLevel($opname, 'Approval Opname');
+        }
     }
 
     public static function requestTransfer(int $id): void
@@ -338,9 +355,11 @@ class DocumentWorkflow
             'requested_at' => now(),
         ]);
 
+        DocumentApproval::snapshot($transfer);
+
         AuditLogger::log('REQUEST', 'stock_transfer', $transfer);
 
-        static::notifyApprovers('approval.request', 'Approval Transfer', $transfer->number.' menunggu persetujuan', StockTransfer::class, $transfer->id);
+        static::notifyApprovalLevel($transfer, 'Approval Transfer');
     }
 
     public static function approveTransfer(int $id): void
@@ -349,15 +368,13 @@ class DocumentWorkflow
 
         static::ensure($transfer->statusEnum()->canTransitionTo(TransferStatus::Approved));
 
-        $transfer->update([
-            'status' => TransferStatus::Approved->value,
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-        ]);
-
-        AuditLogger::log('APPROVE', 'stock_transfer', $transfer);
-
-        static::notifyUser($transfer->created_by, 'approval.result', 'Transfer disetujui', $transfer->number.' telah disetujui', StockTransfer::class, $transfer->id);
+        if (DocumentApproval::approve($transfer)) {
+            AuditLogger::log('APPROVE', 'stock_transfer', $transfer);
+            static::notifyUser($transfer->created_by, 'approval.result', 'Transfer disetujui', $transfer->number.' telah disetujui', StockTransfer::class, $transfer->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'stock_transfer', $transfer);
+            static::notifyApprovalLevel($transfer, 'Approval Transfer');
+        }
     }
 
     public static function rejectTransfer(int $id, string $reason): void
@@ -366,6 +383,7 @@ class DocumentWorkflow
 
         static::ensure($transfer->statusEnum()->canTransitionTo(TransferStatus::Rejected));
         static::ensureReason($reason);
+        DocumentApproval::reject($transfer, $reason);
 
         $transfer->update([
             'status' => TransferStatus::Rejected->value,
@@ -429,26 +447,26 @@ class DocumentWorkflow
             'submitted_at' => now(),
         ]);
 
+        DocumentApproval::snapshot($order);
+
         AuditLogger::log('SUBMIT', 'purchase_order', $order);
 
-        static::notifyApprovers('approval.request', 'Approval Purchase Order', $order->number.' menunggu persetujuan', PurchaseOrder::class, $order->id);
+        static::notifyApprovalLevel($order, 'Approval Purchase Order');
     }
 
     public static function approvePo(int $id): void
     {
-        $order = PurchaseOrder::findOrFail($id);
+        $order = PurchaseOrder::findOrFail($id)->load('items');
 
         static::ensure($order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Approved));
 
-        $order->update([
-            'status' => PurchaseOrderStatus::Approved->value,
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-        ]);
-
-        AuditLogger::log('APPROVE', 'purchase_order', $order);
-
-        static::notifyUser($order->created_by, 'approval.result', 'Purchase Order disetujui', $order->number.' telah disetujui', PurchaseOrder::class, $order->id);
+        if (DocumentApproval::approve($order)) {
+            AuditLogger::log('APPROVE', 'purchase_order', $order);
+            static::notifyUser($order->created_by, 'approval.result', 'Purchase Order disetujui', $order->number.' telah disetujui', PurchaseOrder::class, $order->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'purchase_order', $order);
+            static::notifyApprovalLevel($order, 'Approval Purchase Order');
+        }
     }
 
     public static function rejectPo(int $id, string $reason): void
@@ -458,11 +476,10 @@ class DocumentWorkflow
         static::ensure($order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Rejected));
         static::ensureReason($reason);
 
+        DocumentApproval::reject($order, $reason);
+
         $order->update([
-            'status' => PurchaseOrderStatus::Rejected->value,
-            'rejected_by' => auth()->id(),
             'rejected_at' => now(),
-            'rejection_reason' => $reason,
         ]);
 
         AuditLogger::log('REJECT', 'purchase_order', $order);
@@ -497,26 +514,26 @@ class DocumentWorkflow
             'submitted_at' => now(),
         ]);
 
+        DocumentApproval::snapshot($order);
+
         AuditLogger::log('SUBMIT', 'sales_order', $order);
 
-        static::notifyApprovers('approval.request', 'Approval Sales Order', $order->number.' menunggu persetujuan', SalesOrder::class, $order->id);
+        static::notifyApprovalLevel($order, 'Approval Sales Order');
     }
 
     public static function approveSo(int $id): void
     {
-        $order = SalesOrder::findOrFail($id);
+        $order = SalesOrder::findOrFail($id)->load('items');
 
         static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Approved));
 
-        $order->update([
-            'status' => SalesOrderStatus::Approved->value,
-            'approved_by' => auth()->id(),
-            'approved_at' => now(),
-        ]);
-
-        AuditLogger::log('APPROVE', 'sales_order', $order);
-
-        static::notifyUser($order->created_by, 'approval.result', 'Sales Order disetujui', $order->number.' telah disetujui. Silakan buat Barang Keluar dari SO ini.', SalesOrder::class, $order->id);
+        if (DocumentApproval::approve($order)) {
+            AuditLogger::log('APPROVE', 'sales_order', $order);
+            static::notifyUser($order->created_by, 'approval.result', 'Sales Order disetujui', $order->number.' telah disetujui. Silakan buat Barang Keluar dari SO ini.', SalesOrder::class, $order->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'sales_order', $order);
+            static::notifyApprovalLevel($order, 'Approval Sales Order');
+        }
     }
 
     public static function rejectSo(int $id, string $reason): void
@@ -526,11 +543,11 @@ class DocumentWorkflow
         static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Rejected));
         static::ensureReason($reason);
 
+        DocumentApproval::reject($order, $reason);
+
         $order->update([
             'status' => SalesOrderStatus::Rejected->value,
-            'rejected_by' => auth()->id(),
             'rejected_at' => now(),
-            'rejection_reason' => $reason,
         ]);
 
         AuditLogger::log('REJECT', 'sales_order', $order);

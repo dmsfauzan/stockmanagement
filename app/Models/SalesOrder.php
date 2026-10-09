@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\SalesOrderStatus;
+use App\Models\Concerns\HasApprovalFlow;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,10 +11,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'order_date', 'expected_date', 'customer_id', 'warehouse_id', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'closed_by', 'submitted_at', 'approved_at', 'rejected_at', 'closed_at', 'rejection_reason'])]
+#[Fillable(['number', 'order_date', 'expected_date', 'customer_id', 'warehouse_id', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'closed_by', 'submitted_at', 'approved_at', 'rejected_at', 'closed_at', 'rejection_reason', 'required_levels', 'current_level', 'approval_total'])]
 class SalesOrder extends Model
 {
-    use HasFactory;
+    use HasApprovalFlow, HasFactory;
 
     protected function casts(): array
     {

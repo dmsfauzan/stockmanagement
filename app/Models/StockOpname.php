@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OpnameStatus;
+use App\Models\Concerns\HasApprovalFlow;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,10 +11,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'opname_date', 'warehouse_id', 'location_id', 'type', 'zone_id', 'rack_id', 'scheduled_date', 'status', 'notes', 'created_by', 'submitted_by', 'approved_by', 'rejected_by', 'submitted_at', 'approved_at', 'rejected_at', 'rejection_reason', 'stock_adjustment_id'])]
+#[Fillable(['number', 'opname_date', 'warehouse_id', 'location_id', 'type', 'zone_id', 'rack_id', 'scheduled_date', 'status', 'notes', 'created_by', 'submitted_by', 'approved_by', 'rejected_by', 'submitted_at', 'approved_at', 'rejected_at', 'rejection_reason', 'stock_adjustment_id', 'required_levels', 'current_level', 'approval_total'])]
 class StockOpname extends Model
 {
-    use HasFactory;
+    use HasApprovalFlow, HasFactory;
 
     protected function casts(): array
     {

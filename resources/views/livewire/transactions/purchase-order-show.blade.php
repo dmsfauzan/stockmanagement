@@ -142,6 +142,8 @@
                 </div>
             </x-ui.card>
 
+            <x-ui.approval-history :model="$order" />
+
             <x-ui.card>
                 <h2 class="app-card-title">Audit</h2>
                 <dl class="mt-3 space-y-2 text-sm">
@@ -162,8 +164,9 @@
                         @endif
                     @endcan
                     @can('approve', $order)
-                        @if($order->status === 'submitted')
-                            <x-ui.confirm action="approve" title="Setujui PO" message="PO akan disetujui." confirm-label="Approve" class="app-btn app-btn-primary w-full">{{ __('Approve') }}</x-ui.confirm>
+                        @if($order->status === 'submitted' && \App\Services\Workflow\DocumentApproval::canApprove($order, auth()->user()))
+                            <p class="mb-1 text-xs text-app-muted">Approval {{ $order->current_level + 1 }}/{{ max(1, $order->required_levels) }} (peran: {{ \App\Services\Workflow\DocumentApproval::nextRole($order) }})</p>
+                            <x-ui.confirm action="approve" title="Setujui PO" message="PO akan disetujui (level {{ $order->current_level + 1 }} dari {{ max(1, $order->required_levels) }})." confirm-label="Approve" class="app-btn app-btn-primary w-full">{{ __('Approve') }}</x-ui.confirm>
                             <div class="rounded-lg border border-app-border bg-app-surface-2/50 p-3">
                                 <label class="app-label">Rejection reason</label>
                                 <textarea wire:model="rejectionReason" rows="2" class="app-textarea mt-1" placeholder="Alasan penolakan..."></textarea>

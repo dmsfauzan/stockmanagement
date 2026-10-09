@@ -117,6 +117,8 @@
                 </x-ui.card>
             @endif
 
+            <x-ui.approval-history :model="$opname" />
+
             <x-ui.card>
                 <h2 class="app-card-title">Audit</h2>
                 <dl class="mt-3 space-y-2 text-sm">
@@ -146,7 +148,7 @@
                     @endif
 
                     @can('approve', $opname)
-                        @if($opname->status === 'submitted')
+                        @if($opname->status === 'submitted' && \App\Services\Workflow\DocumentApproval::canApprove($opname, auth()->user()))
                             <x-ui.confirm action="approveAndComplete" title="Setujui & Posting" message="Opname akan disetujui, adjustment dibuat otomatis, dan stok diposting. Lanjutkan?" confirm-label="Approve & Complete" class="app-btn app-btn-primary w-full">Approve &amp; Complete</x-ui.confirm>
                             <div class="rounded-lg border border-app-border bg-app-surface-2/50 p-3">
                                 <label class="app-label">Rejection reason</label>

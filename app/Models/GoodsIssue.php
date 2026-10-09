@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TransactionStatus;
+use App\Models\Concerns\HasApprovalFlow;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,10 +11,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'transaction_date', 'customer_id', 'destination', 'sales_order_number', 'sales_order_id', 'warehouse_id', 'issued_by', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'posted_by', 'submitted_at', 'approved_at', 'rejected_at', 'posted_at', 'rejection_reason', 'reversed_at', 'reversed_by', 'reversal_reason'])]
+#[Fillable(['number', 'transaction_date', 'customer_id', 'destination', 'sales_order_number', 'sales_order_id', 'warehouse_id', 'issued_by', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'posted_by', 'submitted_at', 'approved_at', 'rejected_at', 'posted_at', 'rejection_reason', 'reversed_at', 'reversed_by', 'reversal_reason', 'required_levels', 'current_level', 'approval_total'])]
 class GoodsIssue extends Model
 {
-    use HasFactory;
+    use HasApprovalFlow, HasFactory;
 
     protected function casts(): array
     {

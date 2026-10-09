@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TransferStatus;
+use App\Models\Concerns\HasApprovalFlow;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,10 +11,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'transfer_date', 'from_warehouse_id', 'from_location_id', 'to_warehouse_id', 'to_location_id', 'status', 'notes', 'created_by', 'updated_by', 'requested_by', 'approved_by', 'shipped_by', 'received_by', 'completed_by', 'rejected_by', 'requested_at', 'approved_at', 'shipped_at', 'received_at', 'completed_at', 'rejected_at', 'rejection_reason'])]
+#[Fillable(['number', 'transfer_date', 'from_warehouse_id', 'from_location_id', 'to_warehouse_id', 'to_location_id', 'status', 'notes', 'created_by', 'updated_by', 'requested_by', 'approved_by', 'shipped_by', 'received_by', 'completed_by', 'rejected_by', 'requested_at', 'approved_at', 'shipped_at', 'received_at', 'completed_at', 'rejected_at', 'rejection_reason', 'required_levels', 'current_level', 'approval_total'])]
 class StockTransfer extends Model
 {
-    use HasFactory;
+    use HasApprovalFlow, HasFactory;
 
     protected function casts(): array
     {
