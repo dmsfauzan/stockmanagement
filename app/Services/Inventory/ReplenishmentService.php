@@ -20,6 +20,7 @@ class ReplenishmentService
             })
             ->whereNull('items.deleted_at')
             ->where('items.status', 'active')
+            ->forAccessibleWarehouses('stock_balances.warehouse_id')
             ->when($warehouseId !== null, fn ($query) => $query->where('stock_balances.warehouse_id', $warehouseId))
             ->when($categoryId !== null, fn ($query) => $query->where('categories.id', $categoryId))
             ->when($search !== null && $search !== '', function ($query) use ($search): void {

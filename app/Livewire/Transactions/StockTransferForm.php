@@ -10,6 +10,7 @@ use App\Models\StockTransfer;
 use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -289,7 +290,7 @@ class StockTransferForm extends Component
             ->get();
 
         return view('livewire.transactions.stock-transfer-form', [
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'fromLocations' => $fromLocations,
             'toLocations' => $toLocations,
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name', 'unit_id']),

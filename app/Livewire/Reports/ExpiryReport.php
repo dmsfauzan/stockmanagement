@@ -9,6 +9,7 @@ use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Location;
 use App\Models\Warehouse;
 use App\Services\Inventory\ExpiryService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -232,7 +233,7 @@ class ExpiryReport extends Component
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
             'counts' => ExpiryService::counts(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'locations' => Location::orderBy('code')->get(['id', 'code']),
         ]);
     }

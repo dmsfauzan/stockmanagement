@@ -5,6 +5,7 @@ use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\EnsureIdempotency;
 use App\Http\Middleware\EnsurePermission;
 use App\Http\Middleware\EnsureTwoFactorForAdmin;
+use App\Http\Middleware\EnsureWarehouseAccess;
 use App\Http\Middleware\RecordSecurityEvents;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
@@ -27,12 +28,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'active' => EnsureAccountActive::class,
             'idempotent' => EnsureIdempotency::class,
             'twofactor.admin' => EnsureTwoFactorForAdmin::class,
+            'warehouse.scope' => EnsureWarehouseAccess::class,
         ]);
         $middleware->throttleApi();
         $middleware->prepend(BlockBannedIps::class);
         $middleware->append(SecurityHeaders::class);
         $middleware->append(RecordSecurityEvents::class);
-        $middleware->web(append: [SetLocale::class]);
+        $middleware->web(append: [SetLocale::class, EnsureWarehouseAccess::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

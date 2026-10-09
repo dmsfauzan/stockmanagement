@@ -14,6 +14,7 @@ use App\Models\Warehouse;
 use App\Services\Inventory\ReplenishmentService;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -247,7 +248,7 @@ class ReplenishmentReport extends Component
 
         return view('livewire.reports.replenishment-report', [
             'rows' => $rows,
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'suppliers' => Supplier::where('status', 'active')->orderBy('name')->get(['id', 'name']),
             'totals' => [

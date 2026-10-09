@@ -4,6 +4,7 @@ namespace App\Livewire\Inventory;
 
 use App\Models\Category;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -79,6 +80,7 @@ class LowStockIndex extends Component
             ->join('locations', 'stock_balances.location_id', '=', 'locations.id')
             ->join('categories', 'items.category_id', '=', 'categories.id')
             ->whereNull('items.deleted_at')
+            ->whereIn('warehouses.id', WarehouseAccess::ids())
             ->whereColumn('stock_balances.quantity_on_hand', '<=', 'items.minimum_stock')
             ->select([
                 'stock_balances.id',
@@ -116,7 +118,7 @@ class LowStockIndex extends Component
 
         return view('livewire.inventory.low-stock-index', [
             'rows' => $paginator,
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'badgeOut' => (int) ($counts->out_count ?? 0),
             'badgeLow' => (int) ($counts->low_count ?? 0),

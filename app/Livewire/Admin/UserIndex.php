@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -41,6 +42,11 @@ class UserIndex extends Component
     /** @var array<int> */
     public array $selectedRoles = [];
 
+    public bool $allWarehouses = true;
+
+    /** @var array<int> */
+    public array $selectedWarehouses = [];
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('users.manage'), 403);
@@ -71,14 +77,15 @@ class UserIndex extends Component
         $this->authorize('create', User::class);
 
         $this->resetValidation();
-        $this->reset(['editingId', 'name', 'email', 'password', 'selectedRoles']);
+        $this->reset(['editingId', 'name', 'email', 'password', 'selectedRoles', 'selectedWarehouses']);
         $this->status = 'active';
+        $this->allWarehouses = true;
         $this->showModal = true;
     }
 
     public function openEdit(int $id): void
     {
-        $user = User::with('roles')->findOrFail($id);
+        $user = User::with(['roles', 'warehouses'])->findOrFail($id);
 
         $this->authorize('update', $user);
 
@@ -89,6 +96,8 @@ class UserIndex extends Component
         $this->password = '';
         $this->status = (string) $user->status;
         $this->selectedRoles = $user->roles->pluck('id')->map(fn ($v) => (int) $v)->all();
+        $this->allWarehouses = (bool) $user->all_warehouses;
+        $this->selectedWarehouses = $user->warehouses->pluck('id')->map(fn ($v) => (int) $v)->all();
         $this->showModal = true;
     }
 
@@ -111,6 +120,9 @@ class UserIndex extends Component
             'status' => ['required', 'in:active,inactive'],
             'selectedRoles' => ['array'],
             'selectedRoles.*' => ['integer', Rule::exists('roles', 'id')],
+            'allWarehouses' => ['boolean'],
+            'selectedWarehouses' => ['array'],
+            'selectedWarehouses.*' => ['integer', Rule::exists('warehouses', 'id')],
         ];
 
         if ($isEdit) {
@@ -131,6 +143,7 @@ class UserIndex extends Component
             'name' => $data['name'],
             'email' => $data['email'],
             'status' => $data['status'],
+            'all_warehouses' => (bool) $data['allWarehouses'],
         ];
 
         if ($data['password'] !== null && $data['password'] !== '') {
@@ -140,15 +153,19 @@ class UserIndex extends Component
         if ($isEdit) {
             $old = $userModel->toArray();
             $old['role_ids'] = $userModel->roles->pluck('id')->all();
+            $old['warehouse_ids'] = $userModel->warehouses->pluck('id')->all();
             $userModel->update($payload);
             $userModel->roles()->sync($this->selectedRoles);
+            $userModel->warehouses()->sync($this->allWarehouses ? [] : $this->selectedWarehouses);
             $new = $userModel->fresh()->toArray();
             $new['role_ids'] = $userModel->fresh()->roles->pluck('id')->all();
+            $new['warehouse_ids'] = $userModel->fresh()->warehouses->pluck('id')->all();
             AuditLogger::logModel('update', $userModel, $old, $new);
             $this->dispatch('toast', type: 'success', message: __('User diperbarui.'));
         } else {
             $user = User::create($payload);
             $user->roles()->sync($this->selectedRoles);
+            $user->warehouses()->sync($this->allWarehouses ? [] : $this->selectedWarehouses);
             AuditLogger::logModel('create', $user, null, $user->toArray());
             $this->dispatch('toast', type: 'success', message: __('User dibuat.'));
         }
@@ -218,6 +235,7 @@ class UserIndex extends Component
         return view('livewire.admin.user-index', [
             'users' => $this->baseQuery()->paginate($this->perPage),
             'roles' => Role::orderBy('name')->get(['id', 'name', 'slug']),
+            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name', 'code']),
         ]);
     }
 }

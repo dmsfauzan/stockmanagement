@@ -9,7 +9,15 @@ class StoreGoodsIssueRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasPermission('goods_issue.create') ?? false;
+        $user = $this->user();
+
+        if (! ($user?->hasPermission('goods_issue.create') ?? false)) {
+            return false;
+        }
+
+        $warehouseId = (int) ($this->input('warehouse_id') ?? 0);
+
+        return $warehouseId <= 0 || $user->canAccessWarehouse($warehouseId);
     }
 
     public function rules(): array

@@ -11,6 +11,7 @@ use App\Models\Unit;
 use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -230,7 +231,7 @@ class PurchaseOrderForm extends Component
     {
         return view('livewire.transactions.purchase-order-form', [
             'suppliers' => Supplier::where('status', 'active')->orderBy('name')->get(['id', 'name']),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name']),
         ]);

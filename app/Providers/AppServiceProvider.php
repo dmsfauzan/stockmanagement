@@ -35,11 +35,13 @@ use App\Policies\WarehousePolicy;
 use App\Services\Security\SecurityMonitor;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\NotificationService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +69,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Builder::macro('forAccessibleWarehouses', function (string $column = 'warehouse_id') {
+            /** @var Builder $this */
+            return $this->whereIn($column, WarehouseAccess::ids());
+        });
+
         $trusted = config('app.trusted_proxies');
 
         if (is_string($trusted) && trim($trusted) !== '') {

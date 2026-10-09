@@ -7,6 +7,7 @@ use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -203,7 +204,11 @@ class TransferReport extends Component
 
     protected function baseQuery(): QueryBuilder
     {
+        $ids = WarehouseAccess::ids();
+
         return DB::table('stock_transfers')
+            ->whereIn('stock_transfers.from_warehouse_id', $ids)
+            ->whereIn('stock_transfers.to_warehouse_id', $ids)
             ->join('stock_transfer_items', 'stock_transfer_items.stock_transfer_id', '=', 'stock_transfers.id')
             ->join('items', 'items.id', '=', 'stock_transfer_items.item_id')
             ->join('warehouses as fw', 'fw.id', '=', 'stock_transfers.from_warehouse_id')
@@ -259,7 +264,7 @@ class TransferReport extends Component
         return view('livewire.reports.transfer-report', [
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
         ]);
     }
 }

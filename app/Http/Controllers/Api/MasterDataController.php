@@ -13,6 +13,7 @@ use App\Models\Location;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -119,6 +120,7 @@ class MasterDataController extends ApiController
     public function warehouses(Request $request): JsonResponse
     {
         $query = Warehouse::query()
+            ->whereIn('id', WarehouseAccess::ids())
             ->when($request->filled('search'), fn ($q) => $q->where(function ($inner) use ($request): void {
                 $term = '%'.$request->string('search').'%';
                 $inner->where('code', 'like', $term)->orWhere('name', 'like', $term);
@@ -133,6 +135,7 @@ class MasterDataController extends ApiController
     {
         $query = Location::query()
             ->with('rack.zone.warehouse')
+            ->whereHas('rack.zone', fn ($q) => $q->whereIn('warehouse_id', WarehouseAccess::ids()))
             ->when($request->filled('search'), fn ($q) => $q->where(function ($inner) use ($request): void {
                 $term = '%'.$request->string('search').'%';
                 $inner->where('code', 'like', $term)->orWhere('name', 'like', $term);

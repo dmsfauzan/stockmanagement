@@ -8,7 +8,15 @@ class StorePurchaseOrderRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasPermission('purchase_order.create') ?? false;
+        $user = $this->user();
+
+        if (! ($user?->hasPermission('purchase_order.create') ?? false)) {
+            return false;
+        }
+
+        $warehouseId = (int) ($this->input('warehouse_id') ?? 0);
+
+        return $warehouseId <= 0 || $user->canAccessWarehouse($warehouseId);
     }
 
     public function rules(): array

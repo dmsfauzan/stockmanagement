@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\StockStatus;
 use App\Http\Resources\Api\StockBalanceResource;
 use App\Http\Resources\Api\StockMovementResource;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,7 @@ class StockController extends ApiController
             ->leftJoin('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('locations', 'stock_movements.location_id', '=', 'locations.id')
             ->leftJoin('users', 'stock_movements.created_by', '=', 'users.id')
+            ->whereIn('stock_movements.warehouse_id', WarehouseAccess::ids())
             ->select([
                 'stock_movements.id',
                 'stock_movements.created_at',
@@ -96,6 +98,7 @@ class StockController extends ApiController
             ->join('zones', 'racks.zone_id', '=', 'zones.id')
             ->join('categories', 'items.category_id', '=', 'categories.id')
             ->whereNull('items.deleted_at')
+            ->whereIn('warehouses.id', WarehouseAccess::ids())
             ->select([
                 'stock_balances.id',
                 'stock_balances.quantity_on_hand',

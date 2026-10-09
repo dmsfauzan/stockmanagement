@@ -9,7 +9,15 @@ class StoreStockAdjustmentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasPermission('stock.adjustment') ?? false;
+        $user = $this->user();
+
+        if (! ($user?->hasPermission('stock.adjustment') ?? false)) {
+            return false;
+        }
+
+        $warehouseId = (int) ($this->input('warehouse_id') ?? 0);
+
+        return $warehouseId <= 0 || $user->canAccessWarehouse($warehouseId);
     }
 
     public function rules(): array

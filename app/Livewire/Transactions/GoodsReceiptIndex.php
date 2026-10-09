@@ -4,6 +4,7 @@ namespace App\Livewire\Transactions;
 
 use App\Models\GoodsReceipt;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -125,7 +126,7 @@ class GoodsReceiptIndex extends Component
                 ->orderBy('transaction_date', $this->sortDirection)
                 ->orderByDesc('id')
                 ->paginate($this->perPage),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'statuses' => ['draft', 'submitted', 'approved', 'rejected', 'posted'],
         ]);
     }

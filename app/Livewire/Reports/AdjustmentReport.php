@@ -7,6 +7,7 @@ use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -184,6 +185,7 @@ class AdjustmentReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('stock_adjustments')
+            ->forAccessibleWarehouses('stock_adjustments.warehouse_id')
             ->join('stock_adjustment_items', 'stock_adjustment_items.stock_adjustment_id', '=', 'stock_adjustments.id')
             ->join('items', 'items.id', '=', 'stock_adjustment_items.item_id')
             ->join('warehouses', 'warehouses.id', '=', 'stock_adjustments.warehouse_id')
@@ -236,7 +238,7 @@ class AdjustmentReport extends Component
         return view('livewire.reports.adjustment-report', [
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
         ]);
     }
 }

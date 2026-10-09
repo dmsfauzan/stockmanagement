@@ -10,6 +10,7 @@ use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Item;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -208,6 +209,7 @@ class MovementReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('stock_movements')
+            ->forAccessibleWarehouses('stock_movements.warehouse_id')
             ->leftJoin('items', 'stock_movements.item_id', '=', 'items.id')
             ->leftJoin('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('locations', 'stock_movements.location_id', '=', 'locations.id')
@@ -250,7 +252,7 @@ class MovementReport extends Component
         return view('livewire.reports.movement-report', [
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'items' => Item::orderBy('name')->get(['id', 'sku', 'name']),
             'users' => User::orderBy('name')->get(['id', 'name']),
             'transactionTypes' => TransactionType::cases(),

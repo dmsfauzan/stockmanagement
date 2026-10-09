@@ -14,6 +14,7 @@ use App\Models\Unit;
 use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -272,6 +273,8 @@ class GoodsReceiptForm extends Component
 
         $data = $this->validate();
 
+        abort_unless(auth()->user()?->canAccessWarehouse((int) $data['warehouse_id']), 403, __('Anda tidak memiliki akses ke gudang ini.'));
+
         if ($this->warehouse_id !== '') {
             foreach ($this->items as $index => $row) {
                 $belongs = Location::whereKey($row['location_id'])
@@ -383,7 +386,7 @@ class GoodsReceiptForm extends Component
 
         return view('livewire.transactions.goods-receipt-form', [
             'suppliers' => Supplier::where('status', 'active')->orderBy('name')->get(['id', 'name']),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name']),
             'locations' => $locations,

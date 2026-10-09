@@ -13,6 +13,7 @@ use App\Models\Warehouse;
 use App\Services\Inventory\ReturnService;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -257,7 +258,7 @@ class CustomerReturnForm extends Component
         return view('livewire.transactions.customer-return-form', [
             'customers' => Customer::where('status', 'active')->orderBy('name')->get(['id', 'name']),
             'issues' => GoodsIssue::where('status', 'posted')->orderByDesc('id')->limit(100)->get(['id', 'number']),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'locations' => Location::orderBy('code')->get(['id', 'code']),
             'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name']),

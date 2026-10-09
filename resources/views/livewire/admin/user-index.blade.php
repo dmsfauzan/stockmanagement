@@ -137,6 +137,24 @@
                         </div>
                         @error('selectedRoles') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
+                    <div>
+                        <label class="app-label mb-1">Akses Gudang</label>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" wire:model.live="allWarehouses" value="1" class="h-4 w-4 rounded border-app-border bg-app-surface text-primary-600 focus:ring-primary-500">
+                            <span class="text-app-text">Semua gudang</span>
+                        </label>
+                        @if (! $allWarehouses)
+                            <div class="mt-2 grid max-h-40 grid-cols-1 gap-2 overflow-y-auto sm:grid-cols-2">
+                                @foreach ($warehouses as $warehouse)
+                                    <label class="flex items-center gap-2 rounded-lg border border-app-border bg-app-surface px-3 py-2 text-sm hover:bg-app-surface-2">
+                                        <input type="checkbox" value="{{ $warehouse->id }}" wire:model.live="selectedWarehouses" class="h-4 w-4 rounded border-app-border bg-app-surface text-primary-600 focus:ring-primary-500">
+                                        <span class="text-app-text">{{ $warehouse->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @endif
+                        @error('selectedWarehouses') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                    </div>
                     <div class="flex justify-end gap-2">
                         <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
                         <button type="submit" class="app-btn app-btn-primary">{{ __('Simpan') }}</button>

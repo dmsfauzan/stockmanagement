@@ -6,6 +6,7 @@ use App\Enums\StockStatus;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -120,6 +121,7 @@ class StockOnHandIndex extends Component
             ->join('racks', 'locations.rack_id', '=', 'racks.id')
             ->join('zones', 'racks.zone_id', '=', 'zones.id')
             ->join('categories', 'items.category_id', '=', 'categories.id')
+            ->whereIn('warehouses.id', WarehouseAccess::ids())
             ->when($this->search !== '', function (QueryBuilder $query): void {
                 $term = '%'.$this->search.'%';
                 $query->where(function (QueryBuilder $inner) use ($term): void {
@@ -195,7 +197,7 @@ class StockOnHandIndex extends Component
         return view('livewire.inventory.stock-on-hand-index', [
             'rows' => $paginator,
             'totals' => $totalsArray,
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'locations' => Location::orderBy('code')->get(['id', 'code', 'name']),
         ]);

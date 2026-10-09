@@ -8,6 +8,7 @@ use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Category;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -160,6 +161,7 @@ class ValuationReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('inventory_valuations')
+            ->forAccessibleWarehouses('inventory_valuations.warehouse_id')
             ->join('items', 'inventory_valuations.item_id', '=', 'items.id')
             ->join('warehouses', 'inventory_valuations.warehouse_id', '=', 'warehouses.id')
             ->join('categories', 'items.category_id', '=', 'categories.id')
@@ -193,7 +195,7 @@ class ValuationReport extends Component
         return view('livewire.reports.valuation-report', [
             'rows' => $this->baseQuery()->orderBy('items.sku')->paginate($this->perPage),
             'totals' => $this->totals(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
         ]);
     }

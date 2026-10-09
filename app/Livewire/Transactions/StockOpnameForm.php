@@ -12,6 +12,7 @@ use App\Models\Warehouse;
 use App\Models\Zone;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -247,7 +248,7 @@ class StockOpnameForm extends Component
             ->get(['id', 'name', 'zone_id']);
 
         return view('livewire.transactions.stock-opname-form', [
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'locations' => $locations,
             'zones' => $zones,
             'racks' => $racks,

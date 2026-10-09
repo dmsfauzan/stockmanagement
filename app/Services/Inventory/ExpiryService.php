@@ -30,6 +30,7 @@ class ExpiryService
             ->join('items', 'stock_movements.item_id', '=', 'items.id')
             ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
             ->join('locations', 'stock_movements.location_id', '=', 'locations.id')
+            ->forAccessibleWarehouses('stock_movements.warehouse_id')
             ->where('stock_movements.transaction_type', 'incoming')
             ->whereNotNull('stock_movements.expiry_date')
             ->select([
@@ -92,6 +93,7 @@ class ExpiryService
         $todayStr = $today->toDateString();
 
         $row = DB::table('stock_movements')
+            ->forAccessibleWarehouses('warehouse_id')
             ->where('transaction_type', 'incoming')
             ->whereNotNull('expiry_date')
             ->selectRaw(

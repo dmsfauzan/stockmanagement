@@ -8,6 +8,7 @@ use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Supplier;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -183,6 +184,7 @@ class IncomingReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('goods_receipt_items')
+            ->forAccessibleWarehouses('goods_receipts.warehouse_id')
             ->join('goods_receipts', 'goods_receipt_items.goods_receipt_id', '=', 'goods_receipts.id')
             ->join('items', 'goods_receipt_items.item_id', '=', 'items.id')
             ->leftJoin('suppliers', 'goods_receipts.supplier_id', '=', 'suppliers.id')
@@ -223,7 +225,7 @@ class IncomingReport extends Component
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
             'suppliers' => Supplier::orderBy('name')->get(['id', 'name']),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
         ]);
     }
 }

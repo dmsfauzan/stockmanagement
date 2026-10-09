@@ -9,6 +9,7 @@ use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Customer;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -197,6 +198,7 @@ class SalesOrderReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('sales_orders')
+            ->forAccessibleWarehouses('sales_orders.warehouse_id')
             ->join('sales_order_items', 'sales_order_items.sales_order_id', '=', 'sales_orders.id')
             ->join('items', 'items.id', '=', 'sales_order_items.item_id')
             ->join('customers', 'customers.id', '=', 'sales_orders.customer_id')
@@ -241,7 +243,7 @@ class SalesOrderReport extends Component
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
             'customers' => Customer::orderBy('name')->get(['id', 'name']),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'statuses' => SalesOrderStatus::cases(),
         ]);
     }

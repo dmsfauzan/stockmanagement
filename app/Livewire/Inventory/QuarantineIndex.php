@@ -4,6 +4,7 @@ namespace App\Livewire\Inventory;
 
 use App\Models\Warehouse;
 use App\Services\Inventory\QualityService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -112,6 +113,7 @@ class QuarantineIndex extends Component
             ->join('racks', 'locations.rack_id', '=', 'racks.id')
             ->join('zones', 'racks.zone_id', '=', 'zones.id')
             ->whereNull('items.deleted_at')
+            ->whereIn('warehouses.id', WarehouseAccess::ids())
             ->where('stock_balances.quantity_quarantine', '>', 0)
             ->when($this->search !== '', function ($q): void {
                 $term = '%'.$this->search.'%';
@@ -148,7 +150,7 @@ class QuarantineIndex extends Component
 
         return view('livewire.inventory.quarantine-index', [
             'rows' => $rows,
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'summary' => $summary,
         ]);
     }

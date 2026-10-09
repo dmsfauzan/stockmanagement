@@ -5,6 +5,7 @@ namespace App\Livewire\Inventory;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -155,6 +156,7 @@ class StockMovementIndex extends Component
                     $inner->where('items.sku', 'like', $term)->orWhere('items.name', 'like', $term);
                 });
             })
+            ->whereIn('stock_movements.warehouse_id', WarehouseAccess::ids())
             ->when($this->warehouseFilter !== '', fn (QueryBuilder $q) => $q->where('stock_movements.warehouse_id', $this->warehouseFilter))
             ->when($this->locationFilter !== '', fn (QueryBuilder $q) => $q->where('stock_movements.location_id', $this->locationFilter))
             ->when($this->transactionTypeFilter !== '', fn (QueryBuilder $q) => $q->where('stock_movements.transaction_type', $this->transactionTypeFilter))
@@ -175,7 +177,7 @@ class StockMovementIndex extends Component
     {
         return view('livewire.inventory.stock-movement-index', [
             'rows' => $this->baseQuery()->orderBy($this->sortColumn(), $this->sortDirection)->orderBy('stock_movements.id', 'desc')->paginate($this->perPage),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'locations' => Location::orderBy('code')->get(['id', 'code', 'name']),
             'users' => User::orderBy('name')->get(['id', 'name']),
         ]);

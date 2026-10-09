@@ -9,7 +9,22 @@ class StoreStockTransferRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasPermission('transfer.create') ?? false;
+        $user = $this->user();
+
+        if (! ($user?->hasPermission('transfer.create') ?? false)) {
+            return false;
+        }
+
+        $from = (int) ($this->input('from_warehouse_id') ?? 0);
+        $to = (int) ($this->input('to_warehouse_id') ?? 0);
+
+        foreach ([$from, $to] as $warehouseId) {
+            if ($warehouseId > 0 && ! $user->canAccessWarehouse($warehouseId)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function rules(): array

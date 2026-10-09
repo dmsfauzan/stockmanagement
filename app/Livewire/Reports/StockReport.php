@@ -10,6 +10,7 @@ use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Category;
 use App\Models\Location;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -210,6 +211,7 @@ class StockReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         $q = DB::table('stock_balances')
+            ->forAccessibleWarehouses('stock_balances.warehouse_id')
             ->join('items', 'stock_balances.item_id', '=', 'items.id')
             ->join('warehouses', 'stock_balances.warehouse_id', '=', 'warehouses.id')
             ->join('locations', 'stock_balances.location_id', '=', 'locations.id')
@@ -279,7 +281,7 @@ class StockReport extends Component
         return view('livewire.reports.stock-report', [
             'rows' => $paginator,
             'totals' => $this->totals(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
             'locations' => Location::orderBy('code')->get(['id', 'code']),
             'statuses' => StockStatus::cases(),

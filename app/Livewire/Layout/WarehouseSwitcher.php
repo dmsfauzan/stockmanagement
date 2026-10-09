@@ -3,6 +3,7 @@
 namespace App\Livewire\Layout;
 
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -16,6 +17,7 @@ class WarehouseSwitcher extends Component
     public function mount(): void
     {
         $this->warehouses = Warehouse::where('status', 'active')
+            ->whereIn('id', WarehouseAccess::ids())
             ->orderBy('name')
             ->get(['id', 'code', 'name']);
 
@@ -48,8 +50,8 @@ class WarehouseSwitcher extends Component
     #[On('warehouse-changed')]
     public function syncFromSession(): void
     {
-        $id = session('active_warehouse_id');
-        $this->activeWarehouseId = ($id === null || $id === '') ? null : (int) $id;
+        $id = WarehouseAccess::activeId();
+        $this->activeWarehouseId = $id;
     }
 
     public function render()

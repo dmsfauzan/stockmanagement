@@ -6,6 +6,7 @@ use App\Models\DashboardPreference;
 use App\Models\Item;
 use App\Models\Warehouse;
 use App\Services\Inventory\ExpiryService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -170,16 +171,10 @@ class DashboardIndex extends Component
     protected function activeWarehouseId(): ?int
     {
         try {
-            $id = session('active_warehouse_id');
+            return WarehouseAccess::activeId();
         } catch (\Throwable) {
             return $this->warehouseFilter;
         }
-
-        if ($id === null || $id === '' || $id === 0 || $id === '0') {
-            return null;
-        }
-
-        return (int) $id;
     }
 
     public function render()

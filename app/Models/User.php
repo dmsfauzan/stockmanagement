@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'status', 'locale', 'last_login_at', 'avatar_path', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at'])]
+#[Fillable(['name', 'email', 'password', 'status', 'all_warehouses', 'locale', 'last_login_at', 'avatar_path', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -30,6 +30,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'all_warehouses' => 'boolean',
             'last_login_at' => 'datetime',
             'two_factor_secret' => 'encrypted',
             'two_factor_recovery_codes' => 'encrypted:array',
@@ -44,6 +45,36 @@ class User extends Authenticatable
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_role');
+    }
+
+    public function warehouses(): BelongsToMany
+    {
+        return $this->belongsToMany(Warehouse::class, 'user_warehouse');
+    }
+
+    /**
+     * Whether the user may see every warehouse (admins always can).
+     */
+    public function allowsAllWarehouses(): bool
+    {
+        return (bool) $this->all_warehouses || $this->hasRole('admin');
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function accessibleWarehouseIds(): array
+    {
+        if ($this->allowsAllWarehouses()) {
+            return Warehouse::query()->pluck('id')->map(fn ($id) => (int) $id)->all();
+        }
+
+        return $this->warehouses()->pluck('warehouses.id')->map(fn ($id) => (int) $id)->all();
+    }
+
+    public function canAccessWarehouse(int $warehouseId): bool
+    {
+        return in_array($warehouseId, $this->accessibleWarehouseIds(), true);
     }
 
     public function roleSlugs(): array

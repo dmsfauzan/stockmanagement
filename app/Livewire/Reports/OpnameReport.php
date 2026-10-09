@@ -7,6 +7,7 @@ use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -186,6 +187,7 @@ class OpnameReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('stock_opnames')
+            ->forAccessibleWarehouses('stock_opnames.warehouse_id')
             ->join('stock_opname_items', 'stock_opname_items.stock_opname_id', '=', 'stock_opnames.id')
             ->join('items', 'items.id', '=', 'stock_opname_items.item_id')
             ->join('warehouses', 'warehouses.id', '=', 'stock_opnames.warehouse_id')
@@ -238,7 +240,7 @@ class OpnameReport extends Component
         return view('livewire.reports.opname-report', [
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
         ]);
     }
 }

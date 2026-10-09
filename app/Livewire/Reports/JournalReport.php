@@ -8,6 +8,7 @@ use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
 use App\Services\Accounting\JournalService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -200,6 +201,7 @@ class JournalReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('stock_movements')
+            ->forAccessibleWarehouses('stock_movements.warehouse_id')
             ->join('items', 'stock_movements.item_id', '=', 'items.id')
             ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
             ->whereNull('items.deleted_at')
@@ -241,7 +243,7 @@ class JournalReport extends Component
         return view('livewire.reports.journal-report', [
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
         ]);
     }
 }

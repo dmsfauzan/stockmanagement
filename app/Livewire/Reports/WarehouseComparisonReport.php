@@ -138,6 +138,7 @@ class WarehouseComparisonReport extends Component
         $soon = "SELECT COUNT(*) FROM stock_movements sm WHERE sm.warehouse_id = warehouses.id AND sm.transaction_type = 'incoming' AND sm.expiry_date IS NOT NULL AND sm.expiry_date >= '{$today}' AND sm.expiry_date <= '{$warn}'";
 
         return DB::table('warehouses')
+            ->forAccessibleWarehouses('warehouses.id')
             ->leftJoin('stock_balances', 'stock_balances.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('items', function ($join): void {
                 $join->on('items.id', '=', 'stock_balances.item_id')->whereNull('items.deleted_at');

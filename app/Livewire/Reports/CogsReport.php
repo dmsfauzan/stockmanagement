@@ -7,6 +7,7 @@ use App\Livewire\Reports\Concerns\HandlesReportColumns;
 use App\Livewire\Reports\Concerns\HandlesReportExport;
 use App\Livewire\Reports\Concerns\HandlesSavedFilters;
 use App\Models\Warehouse;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -170,6 +171,7 @@ class CogsReport extends Component
     protected function baseQuery(): QueryBuilder
     {
         return DB::table('stock_movements')
+            ->forAccessibleWarehouses('stock_movements.warehouse_id')
             ->join('items', 'stock_movements.item_id', '=', 'items.id')
             ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
             ->whereIn('stock_movements.transaction_type', ['outgoing', 'adjustment_out', 'transfer_out'])
@@ -208,7 +210,7 @@ class CogsReport extends Component
         return view('livewire.reports.cogs-report', [
             'rows' => $this->baseQuery()->paginate($this->perPage),
             'totals' => $this->totals(),
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
         ]);
     }
 }

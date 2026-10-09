@@ -10,6 +10,7 @@ use App\Models\StockBalance;
 use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -328,7 +329,7 @@ class StockAdjustmentForm extends Component
             ->get();
 
         return view('livewire.transactions.stock-adjustment-form', [
-            'warehouses' => Warehouse::orderBy('name')->get(['id', 'name']),
+            'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'locations' => $locations,
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name']),
             'reasons' => ['Stock Count Error', 'Damage', 'Expired', 'Theft / Loss', 'Found', 'Other'],
