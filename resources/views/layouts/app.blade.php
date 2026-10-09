@@ -8,6 +8,7 @@
         request()->routeIs('customers.*') => 'Customer / Department',
         request()->routeIs('warehouses.*') => 'Warehouse',
         request()->routeIs('locations.*') => 'Location / Rack',
+        request()->routeIs('requisitions.*') => 'Requisition',
         request()->routeIs('purchase-orders.*') => 'Purchase Order',
         request()->routeIs('sales-orders.*') => 'Sales Order',
         request()->routeIs('goods-receipts.*') => __('Barang Masuk'),
@@ -174,8 +175,14 @@
             </x-sidebar-group>
             @endcanany
 
-            @canany(['purchase_order.view', 'sales_order.view', 'goods_receipt.view', 'goods_issue.view', 'picking.view', 'assembly.view', 'stock.adjustment', 'stock_opname.view', 'transfer.view'])
+            @canany(['purchase_order.view', 'sales_order.view', 'goods_receipt.view', 'goods_issue.view', 'picking.view', 'assembly.view', 'requisition.view', 'stock.adjustment', 'stock_opname.view', 'transfer.view'])
             <x-sidebar-group group-key="transactions" label="Transactions">
+                @can('requisition.view')
+                <a href="{{ route('requisitions.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('requisitions.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('requisitions.*')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    <span x-show="!collapsed" class="truncate">Requisition</span>
+                </a>
+                @endcan
                 @can('purchase_order.view')
                 <a href="{{ route('purchase-orders.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('purchase-orders.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('purchase-orders.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6M9 17h4"/></svg>

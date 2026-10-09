@@ -71,6 +71,8 @@ use App\Livewire\Transactions\GoodsReceiptShow;
 use App\Livewire\Transactions\PurchaseOrderForm;
 use App\Livewire\Transactions\PurchaseOrderIndex;
 use App\Livewire\Transactions\PurchaseOrderShow;
+use App\Livewire\Transactions\PurchaseRequisitionForm;
+use App\Livewire\Transactions\PurchaseRequisitionIndex;
 use App\Livewire\Transactions\SalesOrderForm;
 use App\Livewire\Transactions\SalesOrderIndex;
 use App\Livewire\Transactions\SalesOrderShow;
@@ -198,6 +200,9 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:picking.view')->get('/picking/{pickList}', PickListShow::class)->name('picking.show');
     Route::middleware('permission:assembly.view')->get('/assembly-orders', AssemblyOrderIndex::class)->name('assembly-orders.index');
     Route::middleware('permission:assembly.create')->get('/assembly-orders/create', AssemblyOrderForm::class)->name('assembly-orders.create');
+    Route::middleware('permission:requisition.view')->get('/requisitions', PurchaseRequisitionIndex::class)->name('requisitions.index');
+    Route::middleware('permission:requisition.create')->get('/requisitions/create', PurchaseRequisitionForm::class)->name('requisitions.create');
+    Route::middleware('permission:requisition.update')->get('/requisitions/{purchaseRequisition}/edit', PurchaseRequisitionForm::class)->name('requisitions.edit');
 
     Route::middleware('permission:reports.view')->get('/reports/stock', StockReport::class)->name('reports.stock');
     Route::middleware('permission:reports.view')->get('/reports/incoming', IncomingReport::class)->name('reports.incoming');

@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-370_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-375_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -91,6 +91,7 @@ flowchart LR
 | Kapasitas Gudang | **Kapasitas BIN** opsional per lokasi + report utilisasi (normal/penuh/padat), API `/reports/capacity` + saran penempatan `/put-away-suggestion` |
 | Multi-Mata Uang | Mata uang + kurs (histori `exchange_rates`) dikelola di **Admin → Mata Uang**; PO menyimpan mata uang & kurs ke dasar; API `/currencies` + `/currency/convert` |
 | Konsinyasi | **Kepemilikan** per barang (Milik Sendiri / Konsinyasi + pemilik); filter di Daftar Barang & Laporan Valuasi; ownership tampil di Detail Barang & API |
+| Purchase Requisition | Requisition (`PR-...`): Draf → Diajukan → Disetujui/Ditolak → **Konversi ke PO**; web + API `/requisitions/*` |
 | Cycle Counting | Opname parsial per zona/rak (`type=cycle`), command `inventory:cycle-count` terjadwal mingguan |
 | Landed Cost | Biaya kirim/lainnya pada Barang Masuk dialokasikan (by value/qty) ke average cost |
 | FEFO Picking | Barang Keluar pilih lot/serial otomatis dari expiry terdekat (`applyFefo`) |

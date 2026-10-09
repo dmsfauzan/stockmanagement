@@ -114,6 +114,9 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 | GET | `/items/{id}?include=bom` | `items.view` | |
 | GET | `/assembly-orders` · `/assembly-orders/{id}` | `assembly.view` | `status`, `warehouse_id` |
 | POST | `/assembly-orders` | `assembly.create` | `type`, `item_id`, `quantity`, `warehouse_id`, `location_id` |
+| GET | `/requisitions` · `/requisitions/{id}` | `requisition.view` | `status`, `warehouse_id` |
+| POST | `/requisitions` | `requisition.create` | `request_date`, `warehouse_id`, `items[]`, `submit` |
+| POST | `/requisitions/{id}/submit` · `/approve` · `/reject` · `/convert` | `requisition.submit/approve/convert` | `reason`, `supplier_id` |
 | GET | `/accounting/journal` | `reports.view` | `date_from`, `date_to`, `warehouse_id`, `transaction_type` |
 | GET | `/accounting/summary` | `reports.view` | `date_from`, `date_to`, `warehouse_id` |
 

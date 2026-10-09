@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\QualityController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ReturnController;
 use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\TransactionController;
@@ -90,6 +91,28 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
 
     Route::middleware('permission:assembly.create')->group(function (): void {
         Route::post('/assembly-orders', [AssemblyController::class, 'store'])->name('api.assembly-orders.store');
+    });
+
+    Route::middleware('permission:requisition.view')->group(function (): void {
+        Route::get('/requisitions', [RequisitionController::class, 'index'])->name('api.requisitions.index');
+        Route::get('/requisitions/{id}', [RequisitionController::class, 'show'])->name('api.requisitions.show');
+    });
+
+    Route::middleware('permission:requisition.create')->group(function (): void {
+        Route::post('/requisitions', [RequisitionController::class, 'store'])->name('api.requisitions.store');
+    });
+
+    Route::middleware('permission:requisition.submit')->group(function (): void {
+        Route::post('/requisitions/{id}/submit', [RequisitionController::class, 'submit'])->name('api.requisitions.submit');
+    });
+
+    Route::middleware('permission:requisition.approve')->group(function (): void {
+        Route::post('/requisitions/{id}/approve', [RequisitionController::class, 'approve'])->name('api.requisitions.approve');
+        Route::post('/requisitions/{id}/reject', [RequisitionController::class, 'reject'])->name('api.requisitions.reject');
+    });
+
+    Route::middleware('permission:requisition.convert')->group(function (): void {
+        Route::post('/requisitions/{id}/convert', [RequisitionController::class, 'convert'])->name('api.requisitions.convert');
     });
 
     Route::middleware('permission:goods_receipt.view')->group(function (): void {
