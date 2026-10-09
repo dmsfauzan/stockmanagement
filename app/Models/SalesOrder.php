@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['number', 'order_date', 'expected_date', 'customer_id', 'warehouse_id', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'closed_by', 'submitted_at', 'approved_at', 'rejected_at', 'closed_at', 'rejection_reason', 'required_levels', 'current_level', 'approval_total'])]
+#[Fillable(['number', 'currency_code', 'exchange_rate', 'order_date', 'expected_date', 'customer_id', 'warehouse_id', 'status', 'notes', 'created_by', 'updated_by', 'submitted_by', 'approved_by', 'rejected_by', 'closed_by', 'submitted_at', 'approved_at', 'rejected_at', 'closed_at', 'rejection_reason', 'required_levels', 'current_level', 'approval_total'])]
 class SalesOrder extends Model
 {
     use HasApprovalFlow, HasFactory;
@@ -21,6 +21,7 @@ class SalesOrder extends Model
         return [
             'order_date' => 'date',
             'expected_date' => 'date',
+            'exchange_rate' => 'decimal:8',
             'submitted_at' => 'datetime',
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',

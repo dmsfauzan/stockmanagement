@@ -7,6 +7,7 @@ use App\Http\Controllers\PickSlipController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\Admin\ApiTokensIndex;
 use App\Livewire\Admin\AuditLogIndex;
+use App\Livewire\Admin\CurrencyIndex;
 use App\Livewire\Admin\IntegrationsIndex;
 use App\Livewire\Admin\RoleIndex;
 use App\Livewire\Admin\SecurityIndex;
@@ -224,6 +225,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:settings.manage')->get('/admin/api-tokens', ApiTokensIndex::class)->name('admin.api-tokens');
     Route::middleware('permission:settings.manage')->get('/admin/settings', SettingIndex::class)->name('admin.settings');
     Route::middleware('permission:settings.manage')->get('/admin/integrations', IntegrationsIndex::class)->name('admin.integrations');
+    Route::middleware('permission:settings.manage')->get('/admin/currencies', CurrencyIndex::class)->name('admin.currencies');
     Route::middleware('permission:settings.manage')->get('/admin/health', [HealthController::class, 'check'])->name('admin.health');
 
     Route::middleware('permission:items.view')->get('/scan', ScanIndex::class)->name('scan');

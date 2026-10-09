@@ -3,6 +3,7 @@
 namespace App\Livewire\Transactions;
 
 use App\Livewire\Concerns\GuardsStaleEdits;
+use App\Models\Currency;
 use App\Models\Item;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
@@ -10,6 +11,7 @@ use App\Models\SupplierItemPrice;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use App\Services\Support\AuditLogger;
+use App\Services\Support\CurrencyService;
 use App\Services\Support\DocumentNumberService;
 use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +35,8 @@ class PurchaseOrderForm extends Component
 
     public string $warehouse_id = '';
 
+    public string $currency_code = '';
+
     public string $notes = '';
 
     public array $items = [];
@@ -40,6 +44,7 @@ class PurchaseOrderForm extends Component
     public function mount($purchaseOrder = null): void
     {
         $this->order_date = now()->format('Y-m-d');
+        $this->currency_code = app(CurrencyService::class)::baseCode();
 
         $model = $purchaseOrder instanceof PurchaseOrder ? $purchaseOrder : ($purchaseOrder ? PurchaseOrder::findOrFail($purchaseOrder) : null);
 
@@ -56,6 +61,7 @@ class PurchaseOrderForm extends Component
             $this->expected_date = $model->expected_date?->format('Y-m-d') ?? '';
             $this->supplier_id = (string) $model->supplier_id;
             $this->warehouse_id = (string) $model->warehouse_id;
+            $this->currency_code = (string) ($model->currency_code ?? app(CurrencyService::class)::baseCode());
             $this->notes = (string) ($model->notes ?? '');
 
             $this->items = $model->items->map(fn ($row) => [
@@ -79,6 +85,7 @@ class PurchaseOrderForm extends Component
             'expected_date' => ['nullable', 'date', 'after_or_equal:order_date'],
             'supplier_id' => ['required', 'exists:suppliers,id'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
+            'currency_code' => ['required', 'string', 'max:10', 'exists:currencies,code'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.item_id' => ['required', 'exists:items,id'],
@@ -178,6 +185,8 @@ class PurchaseOrderForm extends Component
             'expected_date' => $data['expected_date'] !== '' && $data['expected_date'] !== null ? $data['expected_date'] : null,
             'supplier_id' => $data['supplier_id'],
             'warehouse_id' => $data['warehouse_id'],
+            'currency_code' => $data['currency_code'],
+            'exchange_rate' => app(CurrencyService::class)::rate($data['currency_code'], $data['order_date']),
             'notes' => $data['notes'] !== '' && $data['notes'] !== null ? $data['notes'] : null,
         ];
 
@@ -234,6 +243,8 @@ class PurchaseOrderForm extends Component
             'warehouses' => Warehouse::whereIn('id', WarehouseAccess::ids())->orderBy('name')->get(['id', 'name']),
             'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
             'itemsList' => Item::where('status', 'active')->orderBy('name')->get(['id', 'sku', 'name']),
+            'currencies' => Currency::active(),
+            'baseCode' => app(CurrencyService::class)::baseCode(),
         ]);
     }
 }

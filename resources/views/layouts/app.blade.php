@@ -48,8 +48,9 @@
         request()->routeIs('admin.audit-logs') => 'Audit Logs',
         request()->routeIs('admin.security') => 'Security',
         request()->routeIs('admin.api-tokens') => 'API Tokens',
-        request()->routeIs('admin.integrations') => 'Integrations',
-        request()->routeIs('admin.settings') => 'Settings',
+                request()->routeIs('admin.currencies') => 'Mata Uang',
+                request()->routeIs('admin.integrations') => 'Integrations',
+                request()->routeIs('admin.settings') => 'Settings',
         request()->routeIs('profile.*') => 'Profile',
         default => 'Warehouse',
     };
@@ -398,6 +399,10 @@
                 <a href="{{ route('admin.integrations') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.integrations'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.integrations')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>
                     <span x-show="!collapsed" class="truncate">Integrations</span>
+                </a>
+                <a href="{{ route('admin.currencies') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('admin.currencies'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('admin.currencies')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span x-show="!collapsed" class="truncate">{{ __('Mata Uang') }}</span>
                 </a>
                 @endcan
                 @canany(['settings.manage', 'security.manage'])

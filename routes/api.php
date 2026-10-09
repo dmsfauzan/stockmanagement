@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AssemblyController;
+use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\QualityController;
@@ -41,6 +42,11 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
 
     Route::middleware('permission:location.view')->group(function (): void {
         Route::get('/locations', [MasterDataController::class, 'locs'])->name('api.locations.index');
+    });
+
+    Route::middleware('permission:items.view')->group(function (): void {
+        Route::get('/currencies', [CurrencyController::class, 'index'])->name('api.currencies.index');
+        Route::get('/currency/convert', [CurrencyController::class, 'convert'])->name('api.currency.convert');
     });
 
     Route::middleware('permission:stock.view')->group(function (): void {

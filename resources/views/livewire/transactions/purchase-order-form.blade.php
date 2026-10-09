@@ -39,6 +39,15 @@
                     </select>
                     @error('warehouse_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
+                <div>
+                    <label for="currency_code" class="app-label mb-1.5">{{ __('Mata Uang') }}</label>
+                    <select id="currency_code" wire:model="currency_code" class="app-select">
+                        @foreach ($currencies as $currency)
+                            <option value="{{ $currency->code }}">{{ $currency->code }} — {{ $currency->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('currency_code') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
                 <div class="sm:col-span-2 lg:col-span-3">
                     <label for="notes" class="app-label mb-1.5">{{ __('Catatan') }}</label>
                     <textarea id="notes" wire:model="notes" rows="2" class="app-textarea" placeholder="Catatan PO..."></textarea>

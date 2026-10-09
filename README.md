@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-362_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-366_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -89,6 +89,7 @@ flowchart LR
 | Kitting / BOM | **Bill of Materials** per barang (tab di form Barang) + perintah **Perakitan/Pembongkaran** (`ASM/DIS-...`) yang mengonsumsi & menghasilkan via ledger atomik, dengan reversal; web + API `/assembly-orders` |
 | Prakiraan Permintaan | Forecast berbasis riwayat keluar (rata-rata bergerak + tren), **safety stock** (service-level z-score) & **reorder point**; web + export; ambang di **Settings → Inventory**; API `/reports/forecast|/reports/forecast/{id}` |
 | Kapasitas Gudang | **Kapasitas BIN** opsional per lokasi + report utilisasi (normal/penuh/padat), API `/reports/capacity` + saran penempatan `/put-away-suggestion` |
+| Multi-Mata Uang | Mata uang + kurs (histori `exchange_rates`) dikelola di **Admin → Mata Uang**; PO menyimpan mata uang & kurs ke dasar; API `/currencies` + `/currency/convert` |
 | Cycle Counting | Opname parsial per zona/rak (`type=cycle`), command `inventory:cycle-count` terjadwal mingguan |
 | Landed Cost | Biaya kirim/lainnya pada Barang Masuk dialokasikan (by value/qty) ke average cost |
 | FEFO Picking | Barang Keluar pilih lot/serial otomatis dari expiry terdekat (`applyFefo`) |
