@@ -5,6 +5,7 @@ namespace App\Livewire\Transactions;
 use App\Models\GoodsReceipt;
 use App\Models\Warehouse;
 use App\Services\Support\WarehouseAccess;
+use App\Services\Workflow\DocumentWorkflow;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -32,9 +33,98 @@ class GoodsReceiptIndex extends Component
 
     public int $perPage = 10;
 
+    public array $selectedIds = [];
+
+    public bool $selectAll = false;
+
     public function mount(): void
     {
         $this->authorize('viewAny', GoodsReceipt::class);
+    }
+
+    public function updatedSelectAll(): void
+    {
+        $this->toggleSelectAll();
+    }
+
+    public function toggleSelectAll(): void
+    {
+        if (! $this->selectAll) {
+            $this->selectedIds = [];
+
+            return;
+        }
+
+        $this->selectedIds = $this->baseQuery()
+            ->orderBy('transaction_date', $this->sortDirection)
+            ->orderByDesc('id')
+            ->paginate($this->perPage)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
+    public function bulkApprove(): void
+    {
+        $this->bulkAction('approve');
+    }
+
+    public function bulkReject(): void
+    {
+        $this->bulkAction('reject');
+    }
+
+    public function bulkPost(): void
+    {
+        $this->bulkAction('post');
+    }
+
+    protected function bulkAction(string $action): void
+    {
+        if ($this->selectedIds === []) {
+            $this->dispatch('toast', type: 'error', message: __('Tidak ada data terpilih.'));
+
+            return;
+        }
+
+        $permission = match ($action) {
+            'approve', 'reject' => 'goods_receipt.approve',
+            'post' => 'goods_receipt.post',
+            default => null,
+        };
+
+        if ($permission) {
+            abort_unless(auth()->user()->hasPermission($permission), 403);
+        }
+
+        $succeeded = 0;
+        $skipped = 0;
+
+        foreach ($this->selectedIds as $id) {
+            try {
+                $receipt = GoodsReceipt::whereIn('warehouse_id', WarehouseAccess::ids())->findOrFail($id);
+                match ($action) {
+                    'approve' => DocumentWorkflow::approveReceipt($receipt->id),
+                    'reject' => DocumentWorkflow::rejectReceipt($receipt->id, 'Bulk reject'),
+                    'post' => DocumentWorkflow::postReceipt($receipt->id),
+                    default => null,
+                };
+                $succeeded++;
+            } catch (\Throwable) {
+                $skipped++;
+            }
+        }
+
+        $this->reset('selectedIds', 'selectAll');
+
+        $label = match ($action) {
+            'approve' => 'Disetujui',
+            'reject' => 'Ditolak',
+            'post' => 'Diposting',
+            default => 'Diproses',
+        };
+
+        $this->dispatch('toast', type: $succeeded > 0 ? 'success' : 'error', message: __(':succeeded berhasil :label, :skipped dilewati.', ['succeeded' => $succeeded, 'label' => $label, 'skipped' => $skipped]));
     }
 
     public function updatedSearch(): void
@@ -78,6 +168,7 @@ class GoodsReceiptIndex extends Component
         return GoodsReceipt::query()
             ->with(['supplier', 'warehouse', 'creator'])
             ->withCount('receiptItems')
+            ->whereIn('warehouse_id', WarehouseAccess::ids())
             ->when($this->search !== '', function (Builder $query): void {
                 $term = '%'.$this->search.'%';
                 $query->where(function (Builder $inner) use ($term): void {

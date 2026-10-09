@@ -57,12 +57,25 @@
                     <button type="button" wire:click="$set('dateFrom',''); $set('dateTo','')" class="text-xs font-medium app-link">{{ __('Reset tanggal') }}</button>
                 @endif
             </div>
+            @if (count($selectedIds) > 0)
+                <div class="flex flex-wrap items-center gap-2 border-t border-app-border px-4 py-3">
+                    <span class="text-xs text-app-muted">{{ __(':count dipilih', ['count' => count($selectedIds)]) }}</span>
+                    @can('goods_receipt.approve')
+                        <button type="button" wire:click="bulkApprove" wire:confirm="{{ __('Setujui yang dipilih?') }}" class="app-btn app-btn-secondary !py-1.5 text-xs">{{ __('Setujui Massal') }}</button>
+                        <button type="button" wire:click="bulkReject" wire:confirm="{{ __('Tolak yang dipilih?') }}" class="app-btn app-btn-ghost !py-1.5 text-xs hover:!text-rose-600">{{ __('Tolak Massal') }}</button>
+                    @endcan
+                    @can('goods_receipt.post')
+                        <button type="button" wire:click="bulkPost" wire:confirm="{{ __('Posting yang dipilih?') }}" class="app-btn app-btn-primary !py-1.5 text-xs">{{ __('Posting Massal') }}</button>
+                    @endcan
+                </div>
+            @endif
         </div>
 
         <div class="overflow-x-auto">
             <table class="app-table">
                 <thead>
                     <tr>
+                        <th class="w-10"><input type="checkbox" wire:model.live="selectAll" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500" aria-label="Pilih semua"></th>
                         <th>Number</th>
                         <th>
                             <button type="button" wire:click="sortByDate" class="inline-flex items-center gap-1 hover:text-app-text">
@@ -81,6 +94,7 @@
                 <tbody>
                     @forelse ($receipts as $receipt)
                         <tr>
+                            <td><input type="checkbox" value="{{ $receipt->id }}" wire:model.live="selectedIds" class="rounded border-slate-300 text-primary-600 focus:ring-primary-500"></td>
                             <td class="whitespace-nowrap font-medium text-app-text">{{ $receipt->number }}</td>
                             <td class="whitespace-nowrap text-app-muted">{{ $receipt->transaction_date?->format('d M Y') }}</td>
                             <td class="whitespace-nowrap text-app-text">{{ $receipt->supplier?->name ?? '-' }}</td>
@@ -94,7 +108,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8">
+                            <td colspan="9">
                                 <x-ui.empty-state title="Tidak ada barang masuk" message="Belum ada transaksi yang cocok dengan filter." />
                             </td>
                         </tr>
