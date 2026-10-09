@@ -6,6 +6,7 @@ use App\Enums\StockStatus;
 use App\Services\Accounting\JournalService;
 use App\Services\Inventory\ExpiryService;
 use App\Services\Inventory\InventoryAnalyticsService;
+use App\Services\Inventory\InventoryForecastService;
 use App\Services\Inventory\ReplenishmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -670,6 +671,34 @@ class ReportController extends ApiController
             $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
             $request->filled('date_from') ? (string) $request->string('date_from') : null,
             $request->filled('date_to') ? (string) $request->string('date_to') : null,
+        ), 'OK');
+    }
+
+    public function forecast(Request $request): JsonResponse
+    {
+        $data = InventoryForecastService::topNeeds(
+            min(100, max(1, (int) $request->integer('limit', 20))),
+            $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
+        )->values();
+
+        $perPage = $this->perPage($request);
+        $page = max(1, (int) $request->integer('page', 1));
+
+        return $this->paginated(new LengthAwarePaginator(
+            $data->forPage($page, $perPage)->values(),
+            $data->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        ));
+    }
+
+    public function forecastItem(Request $request, int $itemId): JsonResponse
+    {
+        return $this->ok(InventoryForecastService::forecast(
+            $itemId,
+            30,
+            $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
         ), 'OK');
     }
 

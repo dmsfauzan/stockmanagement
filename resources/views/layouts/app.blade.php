@@ -38,6 +38,7 @@
         request()->routeIs('reports.sales-order') => 'Laporan Sales Order',
         request()->routeIs('reports.returns') => 'Laporan Retur',
                 request()->routeIs('reports.inventory-analytics') => __('Analitik Inventori'),
+                request()->routeIs('reports.forecast') => 'Prakiraan',
                 request()->routeIs('reports.valuation') => __('Valuasi Persediaan'),
                 request()->routeIs('reports.cogs') => __('Laporan COGS'),
         request()->routeIs('reports.journal') => __('Jurnal Akuntansi'),
@@ -330,6 +331,10 @@
                 <a href="{{ route('reports.inventory-analytics') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.inventory-analytics'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.inventory-analytics')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.5l4.5-4.5 3 3L15 8m6-4.5V8h-4.5M21 3l-6 6"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 20.25h18"/></svg>
                     <span x-show="!collapsed" class="truncate">{{ __('Analitik Inventori') }}</span>
+                </a>
+                <a href="{{ route('reports.forecast') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.forecast'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.forecast')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h12M12 3v3M12 21v-3M3 12l2-2 2 2 2-2 2 2M21 12a9 9 0 11-9 9"/><path stroke-linecap="round" stroke-linejoin="round" d="M18 9l3 3-3 3"/></svg>
+                    <span x-show="!collapsed" class="truncate">Prakiraan</span>
                 </a>
                 <a href="{{ route('reports.valuation') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.valuation'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.valuation')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1M12 19v1M3 12h1M20 12h1M5.6 5.6l.7.7M17.7 17.7l.7.7M5.6 18.4l.7-.7M17.7 6.3l.7-.7"/></svg>

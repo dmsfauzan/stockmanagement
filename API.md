@@ -101,6 +101,7 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 | GET | `/reports/abc` | `reports.view` | `warehouse_id`, `date_from`, `date_to` |
 | GET | `/reports/turnover` | `reports.view` | `warehouse_id`, `date_from`, `date_to` |
 | GET | `/reports/slow-moving` | `reports.view` | `warehouse_id`, `days` |
+| GET | `/reports/forecast` · `/reports/forecast/{itemId}` | `reports.view` | `warehouse_id`, `limit` |
 | GET | `/traceability/{batch|serial}/{value}` | `stock.movement` | |
 | GET | `/pick-lists` · `/pick-lists/{id}` | `picking.view` | `status`, `warehouse_id` |
 | POST | `/goods-issues/{id}/pick-list` | `picking.create` | `assigned_to` |
