@@ -98,7 +98,7 @@ class PickingTest extends TestCase
             ->call('confirmItem', $itemId)
             ->call('complete')
             ->call('pack')
-            ->assertSee('Packed');
+            ->assertSee(__('Dikemas'));
     }
 
     public function test_api_picking_endpoints(): void

@@ -38,7 +38,7 @@
     <x-ui.card padding="p-0">
         <div class="overflow-x-auto">
             <table class="app-table">
-                <thead><tr><th>Barang</th><th>Lokasi</th><th>Batch / Serial</th><th class="text-right">Diminta</th><th class="text-right">Dipicking</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>{{ __('Barang') }}</th><th>{{ __('Lokasi') }}</th><th>Batch / Serial</th><th class="text-right">{{ __('Diminta') }}</th><th class="text-right">{{ __('Dipicking') }}</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                     @foreach ($pickList->items as $line)
                         @php $lineStatus = $line->status instanceof \App\Enums\PickStatus ? $line->status : \App\Enums\PickStatus::from($line->status); @endphp

@@ -2,7 +2,7 @@
     <x-ui.page-header title="Pick List" subtitle="Daftar picking untuk pengeluaran barang">
         <x-slot:actions>
             @can('picking.create')
-                <a href="{{ route('picking.create') }}" class="app-btn app-btn-primary">Buat Pick List</a>
+                <a href="{{ route('picking.create') }}" class="app-btn app-btn-primary">{{ __('Buat Pick List') }}</a>
             @endcan
         </x-slot:actions>
     </x-ui.page-header>
