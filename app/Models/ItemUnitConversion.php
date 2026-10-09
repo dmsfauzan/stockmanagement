@@ -2,29 +2,21 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasBaseQuantity;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['stock_transfer_id', 'item_id', 'quantity', 'unit_id', 'conversion_factor', 'base_quantity', 'notes'])]
-class StockTransferItem extends Model
+#[Fillable(['item_id', 'unit_id', 'factor'])]
+class ItemUnitConversion extends Model
 {
-    use HasBaseQuantity, HasFactory;
+    use HasFactory;
 
     protected function casts(): array
     {
         return [
-            'quantity' => 'integer',
-            'conversion_factor' => 'decimal:6',
-            'base_quantity' => 'integer',
+            'factor' => 'decimal:6',
         ];
-    }
-
-    public function transfer(): BelongsTo
-    {
-        return $this->belongsTo(StockTransfer::class, 'stock_transfer_id');
     }
 
     public function item(): BelongsTo

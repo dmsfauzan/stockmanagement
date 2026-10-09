@@ -141,6 +141,45 @@
                 </div>
             </div>
 
+            <div class="rounded-lg border border-app-border p-4">
+                <h3 class="app-card-title mb-2">{{ __('Konversi Satuan') }}</h3>
+                <p class="mb-3 text-xs text-app-muted">{{ __('Satuan dasar') }}: <strong>{{ $units->firstWhere('id', (int) $baseUnitId)?->code ?? '-' }}</strong>. {{ __('Contoh: 1 Box = 12 Pcs → faktor 12.') }}</p>
+
+                <div class="flex flex-wrap items-end gap-2">
+                    <label><span class="app-label">{{ __('Satuan') }}</span>
+                        <select wire:model="conversionUnitId" class="app-select">
+                            <option value="">—</option>
+                            @foreach ($units as $u)
+                                <option value="{{ $u->id }}">{{ $u->code }} — {{ $u->name }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label><span class="app-label">{{ __('Faktor (satuan dasar per 1 satuan ini)') }}</span>
+                        <input type="number" min="0" step="0.000001" wire:model="conversionFactor" class="app-input">
+                    </label>
+                    <button type="button" wire:click="addConversion" class="app-btn app-btn-secondary">{{ __('Tambah') }}</button>
+                </div>
+                @error('conversionUnitId') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                @error('conversionFactor') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+
+                @if (count($conversionRows) > 0)
+                    <div class="mt-3 overflow-x-auto">
+                        <table class="app-table">
+                            <thead><tr><th>{{ __('Satuan') }}</th><th class="text-right">{{ __('Faktor') }}</th><th></th></tr></thead>
+                            <tbody>
+                                @foreach ($conversionRows as $i => $row)
+                                    <tr>
+                                        <td class="text-app-text">{{ $units->firstWhere('id', (int) $row['unit_id'])?->name ?? $row['unit_id'] }}</td>
+                                        <td class="text-right text-app-text">{{ $row['factor'] }}</td>
+                                        <td class="text-right"><button type="button" wire:click="removeConversion({{ $i }})" class="app-btn app-btn-ghost !p-1.5 hover:!text-rose-600" title="Hapus">✕</button></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+
             <div class="flex justify-end gap-2 pt-2">
                 <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
                 <button type="submit" wire:loading.attr="disabled" class="app-btn app-btn-primary gap-2">

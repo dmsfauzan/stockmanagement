@@ -4,6 +4,7 @@ namespace App\Livewire\MasterData;
 
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\ItemUnitConversion;
 use App\Models\Supplier;
 use App\Models\SupplierItemPrice;
 use App\Models\Unit;
@@ -57,6 +58,13 @@ class ItemForm extends Component
 
     public string $tracking_type = 'none';
 
+    /** @var array<int, array{id:int, unit_id:string, factor:string}> */
+    public array $conversionRows = [];
+
+    public string $conversionUnitId = '';
+
+    public string $conversionFactor = '';
+
     public function mount($item = null): void
     {
         $model = $item instanceof Item ? $item : ($item ? Item::findOrFail($item) : null);
@@ -80,6 +88,12 @@ class ItemForm extends Component
             $this->status = (string) $model->status;
             $this->tracking_type = $model->tracking_type?->value ?? 'none';
             $this->existingImagePath = $model->image_path;
+
+            $this->conversionRows = ItemUnitConversion::where('item_id', $model->id)
+                ->orderByDesc('factor')
+                ->get()
+                ->map(fn ($c) => ['id' => $c->id, 'unit_id' => (string) $c->unit_id, 'factor' => (string) $c->factor])
+                ->values()->all();
         } else {
             $this->authorize('create', Item::class);
         }
@@ -104,6 +118,35 @@ class ItemForm extends Component
             'tracking_type' => ['required', 'in:none,batch,serial'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
         ];
+    }
+
+    public function addConversion(): void
+    {
+        $this->validate([
+            'conversionUnitId' => ['required', 'exists:units,id'],
+            'conversionFactor' => ['required', 'numeric', 'gt:0'],
+        ]);
+
+        $this->conversionRows[] = [
+            'id' => 0,
+            'unit_id' => (string) $this->conversionUnitId,
+            'factor' => (string) $this->conversionFactor,
+        ];
+
+        $this->reset('conversionUnitId', 'conversionFactor');
+        $this->resetErrorBag(['conversionUnitId', 'conversionFactor']);
+    }
+
+    public function removeConversion(int $index): void
+    {
+        $row = $this->conversionRows[$index] ?? null;
+
+        if ($row && (int) $row['id'] > 0) {
+            ItemUnitConversion::whereKey($row['id'])->delete();
+        }
+
+        unset($this->conversionRows[$index]);
+        $this->conversionRows = array_values($this->conversionRows);
     }
 
     public function save()
@@ -165,6 +208,20 @@ class ItemForm extends Component
             );
         }
 
+        foreach ($this->conversionRows as $row) {
+            $factor = (float) $row['factor'];
+            $unitId = (int) $row['unit_id'];
+
+            if ($factor <= 0 || $unitId <= 0 || $unitId === (int) $item->unit_id) {
+                continue;
+            }
+
+            ItemUnitConversion::updateOrCreate(
+                ['item_id' => $item->id, 'unit_id' => $unitId],
+                ['factor' => $factor],
+            );
+        }
+
         $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
 
         return $this->redirect(route('items.index'), navigate: true);
@@ -173,6 +230,7 @@ class ItemForm extends Component
     public function render()
     {
         return view('livewire.master-data.item-form', [
+            'baseUnitId' => $this->itemId ? (Item::whereKey($this->itemId)->value('unit_id') ?? '') : $this->unit_id,
             'categories' => Category::where('status', 'active')->orderBy('name')->get(['id', 'name']),
             'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
             'suppliers' => Supplier::where('status', 'active')->orderBy('name')->get(['id', 'name']),

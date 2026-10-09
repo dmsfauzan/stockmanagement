@@ -39,7 +39,7 @@ class InventoryService
             $totalLanded = (float) ($locked->freight_cost ?? 0) + (float) ($locked->other_cost ?? 0);
             $method = (string) ($locked->landed_cost_method ?? 'value');
             $baseTotal = $method === 'quantity'
-                ? (float) $locked->receiptItems->sum('quantity')
+                ? (float) $locked->receiptItems->sum(fn ($row) => $row->baseQuantity())
                 : (float) $locked->receiptItems->sum(fn ($row) => (int) $row->quantity * (float) ($row->unit_cost ?? 0));
 
             foreach ($locked->receiptItems as $item) {
@@ -49,19 +49,21 @@ class InventoryService
                     : ($expiry !== null ? (string) $expiry : null);
 
                 $rowLanded = null;
+                $baseQty = $item->baseQuantity();
+                $factor = max(0.000001, (float) ($item->conversion_factor ?: 1));
 
                 if ($totalLanded > 0 && $baseTotal > 0) {
                     $rowBase = $method === 'quantity'
-                        ? (float) $item->quantity
+                        ? (float) $baseQty
                         : (float) $item->quantity * (float) ($item->unit_cost ?? 0);
 
                     $rowLanded = $totalLanded * $rowBase / $baseTotal;
                 }
 
-                $effectiveCost = (float) ($item->unit_cost ?? 0);
+                $effectiveCost = (float) ($item->unit_cost ?? 0) / $factor;
 
                 if ($rowLanded !== null) {
-                    $effectiveCost += $rowLanded / max(1, (int) $item->quantity);
+                    $effectiveCost += $rowLanded / max(1, $baseQty);
                 }
 
                 LedgerService::record(
@@ -71,7 +73,7 @@ class InventoryService
                     TransactionType::Incoming,
                     GoodsReceipt::class,
                     (int) $locked->id,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     0,
                     $item->batch_number,
                     $expiryDate,
@@ -142,7 +144,7 @@ class InventoryService
                     GoodsIssue::class,
                     (int) $locked->id,
                     0,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     $item->batch_number ?? null,
                     null,
                     $item->notes,
@@ -333,7 +335,7 @@ class InventoryService
                     StockTransfer::class,
                     (int) $locked->id,
                     0,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     null,
                     null,
                     $item->notes
@@ -369,7 +371,7 @@ class InventoryService
                     TransactionType::TransferIn,
                     StockTransfer::class,
                     (int) $locked->id,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     0,
                     null,
                     null,
@@ -424,7 +426,7 @@ class InventoryService
                     GoodsReceipt::class,
                     (int) $locked->id,
                     0,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     $item->batch_number,
                     $expiryDate,
                     "Reversal of {$locked->number} — {$reason}"
@@ -470,7 +472,7 @@ class InventoryService
                     TransactionType::Incoming,
                     GoodsIssue::class,
                     (int) $locked->id,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     0,
                     null,
                     null,
@@ -585,7 +587,7 @@ class InventoryService
                     TransactionType::ReturnIn,
                     CustomerReturn::class,
                     (int) $locked->id,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     0,
                     $item->batch_number,
                     null,
@@ -625,7 +627,7 @@ class InventoryService
                     SupplierReturn::class,
                     (int) $locked->id,
                     0,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     null,
                     null,
                     $item->notes,
@@ -669,7 +671,7 @@ class InventoryService
                     CustomerReturn::class,
                     (int) $locked->id,
                     0,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     $item->batch_number,
                     null,
                     "Reversal of {$locked->number} — {$reason}"
@@ -708,7 +710,7 @@ class InventoryService
                     TransactionType::ReturnIn,
                     SupplierReturn::class,
                     (int) $locked->id,
-                    (int) $item->quantity,
+                    $item->baseQuantity(),
                     0,
                     $item->batch_number,
                     null,

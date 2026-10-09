@@ -42,6 +42,11 @@ class Item extends Model
         return $this->belongsTo(Supplier::class, 'primary_supplier_id');
     }
 
+    public function conversions(): HasMany
+    {
+        return $this->hasMany(ItemUnitConversion::class);
+    }
+
     public function customerPrices(): HasMany
     {
         return $this->hasMany(CustomerItemPrice::class);
