@@ -36,6 +36,7 @@ use App\Livewire\Reports\AdjustmentReport;
 use App\Livewire\Reports\CogsReport;
 use App\Livewire\Reports\ExpiryReport;
 use App\Livewire\Reports\IncomingReport;
+use App\Livewire\Reports\InventoryAnalyticsReport;
 use App\Livewire\Reports\JournalReport;
 use App\Livewire\Reports\MovementReport;
 use App\Livewire\Reports\OpnameReport;
@@ -190,6 +191,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:reports.view')->get('/reports/adjustment', AdjustmentReport::class)->name('reports.adjustment');
     Route::middleware('permission:reports.view')->get('/reports/transfer', TransferReport::class)->name('reports.transfer');
     Route::middleware('permission:reports.view')->get('/reports/warehouse-comparison', WarehouseComparisonReport::class)->name('reports.warehouse-comparison');
+    Route::middleware('permission:reports.view')->get('/reports/inventory-analytics', InventoryAnalyticsReport::class)->name('reports.inventory-analytics');
     Route::middleware('permission:reports.view')->get('/reports/valuation', ValuationReport::class)->name('reports.valuation');
     Route::middleware('permission:reports.view')->get('/reports/cogs', CogsReport::class)->name('reports.cogs');
     Route::middleware('permission:reports.view')->get('/reports/journal', JournalReport::class)->name('reports.journal');

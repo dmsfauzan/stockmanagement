@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\StockStatus;
 use App\Services\Accounting\JournalService;
 use App\Services\Inventory\ExpiryService;
+use App\Services\Inventory\InventoryAnalyticsService;
 use App\Services\Inventory\ReplenishmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -622,6 +623,73 @@ class ReportController extends ApiController
             'totals' => $totals,
             'accounts' => JournalService::accounts(),
         ], 'OK');
+    }
+
+    public function aging(Request $request): JsonResponse
+    {
+        $rows = InventoryAnalyticsService::aging(
+            $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
+            $request->filled('category_id') ? $request->integer('category_id') : null,
+        )->values();
+
+        $perPage = $this->perPage($request);
+        $page = max(1, (int) $request->integer('page', 1));
+
+        return $this->paginated(new LengthAwarePaginator(
+            $rows->forPage($page, $perPage)->values(),
+            $rows->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        ));
+    }
+
+    public function abc(Request $request): JsonResponse
+    {
+        $rows = InventoryAnalyticsService::abc(
+            $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
+            $request->filled('date_from') ? (string) $request->string('date_from') : null,
+            $request->filled('date_to') ? (string) $request->string('date_to') : null,
+        )->values();
+
+        $perPage = $this->perPage($request);
+        $page = max(1, (int) $request->integer('page', 1));
+
+        return $this->paginated(new LengthAwarePaginator(
+            $rows->forPage($page, $perPage)->values(),
+            $rows->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        ));
+    }
+
+    public function turnover(Request $request): JsonResponse
+    {
+        return $this->ok(InventoryAnalyticsService::turnover(
+            $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
+            $request->filled('date_from') ? (string) $request->string('date_from') : null,
+            $request->filled('date_to') ? (string) $request->string('date_to') : null,
+        ), 'OK');
+    }
+
+    public function slowMoving(Request $request): JsonResponse
+    {
+        $rows = InventoryAnalyticsService::slowMoving(
+            $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
+            $request->filled('days') ? $request->integer('days') : null,
+        )->values();
+
+        $perPage = $this->perPage($request);
+        $page = max(1, (int) $request->integer('page', 1));
+
+        return $this->paginated(new LengthAwarePaginator(
+            $rows->forPage($page, $perPage)->values(),
+            $rows->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        ));
     }
 
     public function replenishment(Request $request): JsonResponse

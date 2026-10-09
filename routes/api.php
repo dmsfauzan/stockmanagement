@@ -103,6 +103,10 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
         Route::get('/reports/cogs', [ReportController::class, 'cogs'])->name('api.reports.cogs');
         Route::get('/reports/journal', [ReportController::class, 'journal'])->name('api.reports.journal');
         Route::get('/reports/replenishment', [ReportController::class, 'replenishment'])->name('api.reports.replenishment');
+        Route::get('/reports/aging', [ReportController::class, 'aging'])->name('api.reports.aging');
+        Route::get('/reports/abc', [ReportController::class, 'abc'])->name('api.reports.abc');
+        Route::get('/reports/turnover', [ReportController::class, 'turnover'])->name('api.reports.turnover');
+        Route::get('/reports/slow-moving', [ReportController::class, 'slowMoving'])->name('api.reports.slow-moving');
         Route::get('/reports/returns', [ReturnController::class, 'report'])->name('api.reports.returns');
         Route::get('/accounting/journal', [ReportController::class, 'journal'])->name('api.accounting.journal');
         Route::get('/accounting/summary', [ReportController::class, 'accountingSummary'])->name('api.accounting.summary');
