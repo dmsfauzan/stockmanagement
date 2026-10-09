@@ -7,6 +7,7 @@ enum QualityStatus: string
     case Good = 'good';
     case Quarantine = 'quarantine';
     case Rejected = 'rejected';
+    case Recalled = 'recalled';
 
     public function label(): string
     {
@@ -14,6 +15,7 @@ enum QualityStatus: string
             self::Good => 'Baik',
             self::Quarantine => 'Karantina',
             self::Rejected => 'Ditolak',
+            self::Recalled => 'Ditarik',
         };
     }
 }

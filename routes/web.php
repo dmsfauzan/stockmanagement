@@ -14,6 +14,7 @@ use App\Livewire\Admin\SecurityIndex;
 use App\Livewire\Admin\SettingIndex;
 use App\Livewire\Admin\UserIndex;
 use App\Livewire\Dashboard\DashboardIndex;
+use App\Livewire\Inventory\BatchRecallIndex;
 use App\Livewire\Inventory\LowStockIndex;
 use App\Livewire\Inventory\QuarantineIndex;
 use App\Livewire\Inventory\StockMovementIndex;
@@ -194,6 +195,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:stock.view')->get('/stock/low-stock', LowStockIndex::class)->name('stock.low');
     Route::middleware('permission:stock.quarantine')->get('/stock/quarantine', QuarantineIndex::class)->name('stock.quarantine');
     Route::middleware('permission:stock.movement')->get('/stock/trace', TraceabilityIndex::class)->name('stock.trace');
+    Route::middleware('permission:stock.movement')->get('/stock/recall', BatchRecallIndex::class)->name('stock.recall');
     Route::middleware('permission:picking.view')->get('/picking', PickListIndex::class)->name('picking.index');
     Route::middleware('permission:picking.create')->get('/picking/create', PickListForm::class)->name('picking.create');
     Route::middleware('permission:picking.view')->get('/picking/{pickList}/slip', [PickSlipController::class, 'slip'])->name('picking.slip');

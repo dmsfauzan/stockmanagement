@@ -117,6 +117,9 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 | GET | `/requisitions` · `/requisitions/{id}` | `requisition.view` | `status`, `warehouse_id` |
 | POST | `/requisitions` | `requisition.create` | `request_date`, `warehouse_id`, `items[]`, `submit` |
 | POST | `/requisitions/{id}/submit` · `/approve` · `/reject` · `/convert` | `requisition.submit/approve/convert` | `reason`, `supplier_id` |
+| GET | `/recalls` | `stock.movement` | `status` |
+| POST | `/recalls/impact` | `stock.movement` | `type`, `value` |
+| POST | `/recalls` · `/{id}/lift` | `stock.movement` | `type`, `value`, `reason` |
 | GET | `/accounting/journal` | `reports.view` | `date_from`, `date_to`, `warehouse_id`, `transaction_type` |
 | GET | `/accounting/summary` | `reports.view` | `date_from`, `date_to`, `warehouse_id` |
 

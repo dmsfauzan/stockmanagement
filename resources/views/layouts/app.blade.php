@@ -25,6 +25,7 @@
                 request()->routeIs('stock.low') => 'Low Stock',
                 request()->routeIs('stock.quarantine') => __('Karantina'),
                 request()->routeIs('stock.trace') => __('Lacak Lot / Serial'),
+                request()->routeIs('stock.recall') => __('Tarik Batch'),
         request()->routeIs('scan') => 'Scan',
         request()->routeIs('reports.stock') => __('Laporan Stock'),
         request()->routeIs('reports.incoming') => __('Laporan Barang Masuk'),
@@ -170,6 +171,10 @@
                 <a href="{{ route('stock.trace') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('stock.trace'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('stock.trace')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.2-5.2M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z"/></svg>
                     <span x-show="!collapsed" class="truncate">{{ __('Lacak Lot') }}</span>
+                </a>
+                <a href="{{ route('stock.recall') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('stock.recall'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('stock.recall')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                    <span x-show="!collapsed" class="truncate">{{ __('Tarik Batch') }}</span>
                 </a>
                 @endcan
             </x-sidebar-group>

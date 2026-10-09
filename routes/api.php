@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\QualityController;
+use App\Http\Controllers\Api\RecallController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ReturnController;
@@ -64,6 +65,10 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
 
     Route::middleware('permission:stock.movement')->group(function (): void {
         Route::get('/traceability/{type}/{value}', [StockController::class, 'traceability'])->where(['type' => 'batch|lot|serial'])->name('api.traceability');
+        Route::get('/recalls', [RecallController::class, 'index'])->name('api.recalls.index');
+        Route::post('/recalls/impact', [RecallController::class, 'impact'])->name('api.recalls.impact');
+        Route::post('/recalls', [RecallController::class, 'store'])->name('api.recalls.store');
+        Route::post('/recalls/{id}/lift', [RecallController::class, 'lift'])->name('api.recalls.lift');
     });
 
     Route::middleware('permission:picking.view')->group(function (): void {
