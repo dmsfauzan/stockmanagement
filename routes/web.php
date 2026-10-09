@@ -3,6 +3,7 @@
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\PickSlipController;
 use App\Http\Controllers\ProfileController;
 use App\Livewire\Admin\ApiTokensIndex;
 use App\Livewire\Admin\AuditLogIndex;
@@ -29,6 +30,9 @@ use App\Livewire\MasterData\SupplierShow;
 use App\Livewire\MasterData\UnitIndex;
 use App\Livewire\MasterData\WarehouseIndex;
 use App\Livewire\NotificationsIndex;
+use App\Livewire\Picking\PickListForm;
+use App\Livewire\Picking\PickListIndex;
+use App\Livewire\Picking\PickListShow;
 use App\Livewire\Profile\AvatarForm;
 use App\Livewire\Profile\NotificationPreferences;
 use App\Livewire\Profile\SessionsIndex;
@@ -183,6 +187,10 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:stock.view')->get('/stock/low-stock', LowStockIndex::class)->name('stock.low');
     Route::middleware('permission:stock.quarantine')->get('/stock/quarantine', QuarantineIndex::class)->name('stock.quarantine');
     Route::middleware('permission:stock.movement')->get('/stock/trace', TraceabilityIndex::class)->name('stock.trace');
+    Route::middleware('permission:picking.view')->get('/picking', PickListIndex::class)->name('picking.index');
+    Route::middleware('permission:picking.create')->get('/picking/create', PickListForm::class)->name('picking.create');
+    Route::middleware('permission:picking.view')->get('/picking/{pickList}/slip', [PickSlipController::class, 'slip'])->name('picking.slip');
+    Route::middleware('permission:picking.view')->get('/picking/{pickList}', PickListShow::class)->name('picking.show');
 
     Route::middleware('permission:reports.view')->get('/reports/stock', StockReport::class)->name('reports.stock');
     Route::middleware('permission:reports.view')->get('/reports/incoming', IncomingReport::class)->name('reports.incoming');

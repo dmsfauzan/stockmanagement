@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PickStatus;
 use App\Enums\StockStatus;
 use App\Http\Resources\Api\StockBalanceResource;
 use App\Http\Resources\Api\StockMovementResource;
+use App\Models\GoodsIssue;
+use App\Models\PickList;
+use App\Services\Inventory\PickService;
 use App\Services\Inventory\TraceabilityService;
 use App\Services\Support\WarehouseAccess;
 use Illuminate\Http\JsonResponse;
@@ -87,6 +91,115 @@ class StockController extends ApiController
         $paginator = $query->paginate($perPage)->withQueryString();
 
         return $this->paginated(StockMovementResource::collection($paginator));
+    }
+
+    public function pickLists(Request $request): JsonResponse
+    {
+        $perPage = min(100, max(1, (int) $request->integer('per_page', 15)));
+
+        $query = PickList::query()
+            ->with(['warehouse:id,name', 'goodsIssue:id,number'])
+            ->whereIn('warehouse_id', WarehouseAccess::ids())
+            ->when($request->filled('status'), fn ($q) => $q->where('status', (string) $request->string('status')))
+            ->when($request->filled('warehouse_id'), fn ($q) => $q->where('warehouse_id', $request->integer('warehouse_id')))
+            ->orderByDesc('id');
+
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        $paginator->getCollection()->transform(fn ($r) => [
+            'id' => $r->id,
+            'number' => $r->number,
+            'warehouse' => $r->warehouse?->name,
+            'goods_issue' => $r->goodsIssue?->number,
+            'status' => $r->status instanceof PickStatus ? $r->status->value : $r->status,
+        ]);
+
+        return $this->paginated($paginator);
+    }
+
+    public function pickList(int $id): JsonResponse
+    {
+        $pickList = PickList::with(['warehouse:id,name', 'goodsIssue', 'items.item:id,sku,name', 'items.unit:id,code,name', 'items.location:id,code'])
+            ->whereIn('warehouse_id', WarehouseAccess::ids())
+            ->findOrFail($id);
+
+        return $this->ok([
+            'id' => $pickList->id,
+            'number' => $pickList->number,
+            'warehouse' => $pickList->warehouse?->name,
+            'status' => $pickList->status instanceof PickStatus ? $pickList->status->value : $pickList->status,
+            'items' => $pickList->items->map(fn ($i) => [
+                'id' => $i->id,
+                'item_id' => $i->item_id,
+                'sku' => $i->item?->sku,
+                'location' => $i->location?->code,
+                'quantity' => (int) $i->quantity,
+                'picked_quantity' => (int) $i->picked_quantity,
+                'status' => $i->status instanceof PickStatus ? $i->status->value : $i->status,
+            ])->values()->all(),
+        ], 'OK');
+    }
+
+    public function generatePickList(Request $request, int $issueId): JsonResponse
+    {
+        $issue = GoodsIssue::with('issueItems')->findOrFail($issueId);
+
+        abort_unless(auth()->user()?->canAccessWarehouse((int) $issue->warehouse_id), 403);
+
+        $request->validate(['assigned_to' => ['nullable', 'exists:users,id']]);
+
+        try {
+            $pickList = PickService::generateFromIssue($issue, $request->integer('assigned_to') ?: null);
+        } catch (\RuntimeException $e) {
+            return $this->error($e->getMessage(), 422);
+        }
+
+        return $this->created(['id' => $pickList->id, 'number' => $pickList->number], 'Pick list dibuat.');
+    }
+
+    public function confirmPickItem(Request $request, int $id, int $itemId): JsonResponse
+    {
+        $pickList = PickList::with('items')->whereIn('warehouse_id', WarehouseAccess::ids())->findOrFail($id);
+
+        $data = $request->validate([
+            'picked_quantity' => ['required', 'integer', 'min:0'],
+            'batch_number' => ['nullable', 'string', 'max:60'],
+            'serial_number' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        try {
+            PickService::confirmItem($pickList, $itemId, (int) $data['picked_quantity'], $data['batch_number'] ?? null, $data['serial_number'] ?? null);
+        } catch (\RuntimeException $e) {
+            return $this->error($e->getMessage(), 422);
+        }
+
+        return $this->ok(null, 'OK');
+    }
+
+    public function completePickList(int $id): JsonResponse
+    {
+        $pickList = PickList::with('items')->whereIn('warehouse_id', WarehouseAccess::ids())->findOrFail($id);
+
+        try {
+            PickService::complete($pickList);
+        } catch (\RuntimeException $e) {
+            return $this->error($e->getMessage(), 422);
+        }
+
+        return $this->ok(null, 'OK');
+    }
+
+    public function packPickList(int $id): JsonResponse
+    {
+        $pickList = PickList::with('items')->whereIn('warehouse_id', WarehouseAccess::ids())->findOrFail($id);
+
+        try {
+            PickService::pack($pickList);
+        } catch (\RuntimeException $e) {
+            return $this->error($e->getMessage(), 422);
+        }
+
+        return $this->ok(null, 'OK');
     }
 
     public function traceability(string $type, string $value): JsonResponse

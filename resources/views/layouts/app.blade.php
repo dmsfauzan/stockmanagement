@@ -11,7 +11,8 @@
         request()->routeIs('purchase-orders.*') => 'Purchase Order',
         request()->routeIs('sales-orders.*') => 'Sales Order',
         request()->routeIs('goods-receipts.*') => __('Barang Masuk'),
-        request()->routeIs('goods-issues.*') => __('Barang Keluar'),
+                request()->routeIs('goods-issues.*') => __('Barang Keluar'),
+                request()->routeIs('picking.*') => 'Picking',
         request()->routeIs('stock-adjustments.*') => 'Stock Adjustment',
         request()->routeIs('stock-opnames.*') => 'Stock Opname',
         request()->routeIs('stock-transfers.*') => __('Transfer Barang'),
@@ -169,7 +170,7 @@
             </x-sidebar-group>
             @endcanany
 
-            @canany(['purchase_order.view', 'sales_order.view', 'goods_receipt.view', 'goods_issue.view', 'stock.adjustment', 'stock_opname.view', 'transfer.view'])
+            @canany(['purchase_order.view', 'sales_order.view', 'goods_receipt.view', 'goods_issue.view', 'picking.view', 'stock.adjustment', 'stock_opname.view', 'transfer.view'])
             <x-sidebar-group group-key="transactions" label="Transactions">
                 @can('purchase_order.view')
                 <a href="{{ route('purchase-orders.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('purchase-orders.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('purchase-orders.*')])>
@@ -193,6 +194,12 @@
                 <a href="{{ route('goods-issues.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('goods-issues.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('goods-issues.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9M12 9v6m7 2a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2"/></svg>
                     <span x-show="!collapsed" class="truncate">{{ __('Barang Keluar') }}</span>
+                </a>
+                @endcan
+                @can('picking.view')
+                <a href="{{ route('picking.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('picking.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('picking.*')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span x-show="!collapsed" class="truncate">Picking</span>
                 </a>
                 @endcan
                 @can('customer_return.view')

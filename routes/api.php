@@ -58,6 +58,24 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
         Route::get('/traceability/{type}/{value}', [StockController::class, 'traceability'])->where(['type' => 'batch|lot|serial'])->name('api.traceability');
     });
 
+    Route::middleware('permission:picking.view')->group(function (): void {
+        Route::get('/pick-lists', [StockController::class, 'pickLists'])->name('api.pick-lists.index');
+        Route::get('/pick-lists/{id}', [StockController::class, 'pickList'])->name('api.pick-lists.show');
+    });
+
+    Route::middleware('permission:picking.create')->group(function (): void {
+        Route::post('/goods-issues/{id}/pick-list', [StockController::class, 'generatePickList'])->name('api.pick-lists.generate');
+    });
+
+    Route::middleware('permission:picking.pick')->group(function (): void {
+        Route::post('/pick-lists/{id}/items/{itemId}/confirm', [StockController::class, 'confirmPickItem'])->name('api.pick-lists.confirm');
+        Route::post('/pick-lists/{id}/complete', [StockController::class, 'completePickList'])->name('api.pick-lists.complete');
+    });
+
+    Route::middleware('permission:picking.pack')->group(function (): void {
+        Route::post('/pick-lists/{id}/pack', [StockController::class, 'packPickList'])->name('api.pick-lists.pack');
+    });
+
     Route::middleware('permission:goods_receipt.view')->group(function (): void {
         Route::get('/goods-receipts', [TransactionController::class, 'receipts'])->name('api.goods-receipts.index');
         Route::get('/goods-receipts/{receipt}', [TransactionController::class, 'receipt'])->name('api.goods-receipts.show');

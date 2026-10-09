@@ -58,6 +58,11 @@ class GoodsIssue extends Model
         return $this->hasMany(GoodsIssueItem::class);
     }
 
+    public function pickLists(): HasMany
+    {
+        return $this->hasMany(PickList::class);
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
