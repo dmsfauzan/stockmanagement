@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-308_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-317_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -102,6 +102,9 @@ flowchart LR
 | Dependensi | CI menjalankan `composer audit` + `npm audit` (high+); **Dependabot** mingguan (composer/npm/actions) |
 | Anti Human-Error | Jadwal `withoutOverlapping`/`onOneServer`; seeder aman (tanpa reset password, guard produksi); **import preview dry-run**; stale-edit guard di 7 form transaksi; konfirmasi ketik-ulang (`PURGE`); zona waktu tampilan **Asia/Jakarta** (simpan UTC) |
 | Reversal | Koreksi transaksi posted tanpa menghapus histori |
+| Retur Penjualan | **Retur customer** (`CRT-...`): Draft→Submitted→Approved→Posted (multi-level approval + reversal), tautan partial ke Barang Keluar, posting `return_in` + laporan |
+| Retur Pembelian | **Retur supplier** (`SRT-...`): workflow sama, tautan partial ke Barang Masuk, posting `return_out` + laporan |
+| Laporan Retur | `/reports/returns` (web + export + API `/api/reports/returns`) |
 | Purchase Order | PO (`PO-...`) → Barang Masuk (penerimaan sebagian), progres penerimaan |
 | Sales Order | SO (`SO-...`): Draft→Submitted→Approved→Partial→Fulfilled→Closed, fulfilment via Barang Keluar |
 | Multi-Warehouse | Switcher gudang global (session), dashboard per gudang, report perbandingan gudang |

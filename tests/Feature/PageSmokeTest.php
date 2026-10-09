@@ -89,6 +89,9 @@ class PageSmokeTest extends TestCase
             'admin.integrations',
             'admin.security',
             'customers.show',
+            'customer-returns.index',
+            'supplier-returns.index',
+            'reports.returns',
         ];
 
         $params = [

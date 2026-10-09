@@ -28,6 +28,8 @@ return [
     'adjustment_in' => 'Penyesuaian Masuk',
     'adjustment_out' => 'Penyesuaian Keluar',
     'reversed' => 'Dibatalkan',
+    'return_in' => 'Retur Masuk',
+    'return_out' => 'Retur Keluar',
     'manual' => 'Manual',
     'auto' => 'Otomatis',
     'info' => 'Info',

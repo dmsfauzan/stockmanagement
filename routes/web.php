@@ -40,12 +40,16 @@ use App\Livewire\Reports\MovementReport;
 use App\Livewire\Reports\OpnameReport;
 use App\Livewire\Reports\OutgoingReport;
 use App\Livewire\Reports\ReplenishmentReport;
+use App\Livewire\Reports\ReturnReport;
 use App\Livewire\Reports\SalesOrderReport;
 use App\Livewire\Reports\StockReport;
 use App\Livewire\Reports\TransferReport;
 use App\Livewire\Reports\ValuationReport;
 use App\Livewire\Reports\WarehouseComparisonReport;
 use App\Livewire\Scanning\ScanIndex;
+use App\Livewire\Transactions\CustomerReturnForm;
+use App\Livewire\Transactions\CustomerReturnIndex;
+use App\Livewire\Transactions\CustomerReturnShow;
 use App\Livewire\Transactions\GoodsIssueForm;
 use App\Livewire\Transactions\GoodsIssueIndex;
 use App\Livewire\Transactions\GoodsIssueShow;
@@ -68,6 +72,9 @@ use App\Livewire\Transactions\StockOpnameShow;
 use App\Livewire\Transactions\StockTransferForm;
 use App\Livewire\Transactions\StockTransferIndex;
 use App\Livewire\Transactions\StockTransferShow;
+use App\Livewire\Transactions\SupplierReturnForm;
+use App\Livewire\Transactions\SupplierReturnIndex;
+use App\Livewire\Transactions\SupplierReturnShow;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'public'])->name('health.public');
@@ -127,6 +134,16 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:purchase_order.view')->get('/purchase-orders/{purchaseOrder}', PurchaseOrderShow::class)->name('purchase-orders.show');
     Route::middleware('permission:purchase_order.update')->get('/purchase-orders/{purchaseOrder}/edit', PurchaseOrderForm::class)->name('purchase-orders.edit');
 
+    Route::middleware('permission:customer_return.view')->get('/customer-returns', CustomerReturnIndex::class)->name('customer-returns.index');
+    Route::middleware('permission:customer_return.create')->get('/customer-returns/create', CustomerReturnForm::class)->name('customer-returns.create');
+    Route::middleware('permission:customer_return.view')->get('/customer-returns/{customerReturn}', CustomerReturnShow::class)->name('customer-returns.show');
+    Route::middleware('permission:customer_return.update')->get('/customer-returns/{customerReturn}/edit', CustomerReturnForm::class)->name('customer-returns.edit');
+
+    Route::middleware('permission:supplier_return.view')->get('/supplier-returns', SupplierReturnIndex::class)->name('supplier-returns.index');
+    Route::middleware('permission:supplier_return.create')->get('/supplier-returns/create', SupplierReturnForm::class)->name('supplier-returns.create');
+    Route::middleware('permission:supplier_return.view')->get('/supplier-returns/{supplierReturn}', SupplierReturnShow::class)->name('supplier-returns.show');
+    Route::middleware('permission:supplier_return.update')->get('/supplier-returns/{supplierReturn}/edit', SupplierReturnForm::class)->name('supplier-returns.edit');
+
     Route::middleware('permission:sales_order.view')->get('/sales-orders', SalesOrderIndex::class)->name('sales-orders.index');
     Route::middleware('permission:sales_order.create')->get('/sales-orders/create', SalesOrderForm::class)->name('sales-orders.create');
     Route::middleware('permission:sales_order.view')->get('/sales-orders/{salesOrder}', SalesOrderShow::class)->name('sales-orders.show');
@@ -176,6 +193,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:reports.view')->get('/reports/journal', JournalReport::class)->name('reports.journal');
     Route::middleware('permission:reports.view')->get('/reports/replenishment', ReplenishmentReport::class)->name('reports.replenishment');
     Route::middleware('permission:reports.view')->get('/reports/sales-order', SalesOrderReport::class)->name('reports.sales-order');
+    Route::middleware('permission:reports.view')->get('/reports/returns', ReturnReport::class)->name('reports.returns');
 
     Route::middleware('permission:users.manage')->get('/admin/users', UserIndex::class)->name('admin.users');
     Route::middleware('permission:roles.manage')->get('/admin/roles', RoleIndex::class)->name('admin.roles');

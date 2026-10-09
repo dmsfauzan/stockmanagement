@@ -11,6 +11,8 @@ enum TransactionType: string
     case TransferOut = 'transfer_out';
     case AdjustmentIn = 'adjustment_in';
     case AdjustmentOut = 'adjustment_out';
+    case ReturnIn = 'return_in';
+    case ReturnOut = 'return_out';
 
     public function label(): string
     {
@@ -22,6 +24,8 @@ enum TransactionType: string
             self::TransferOut => 'Transfer Out',
             self::AdjustmentIn => 'Adjustment In',
             self::AdjustmentOut => 'Adjustment Out',
+            self::ReturnIn => 'Return In',
+            self::ReturnOut => 'Return Out',
         };
     }
 }

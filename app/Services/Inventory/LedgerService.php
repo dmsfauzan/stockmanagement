@@ -41,7 +41,7 @@ class LedgerService
             ]);
         }
 
-        if (in_array($type, [TransactionType::Outgoing, TransactionType::AdjustmentOut, TransactionType::TransferOut], true)) {
+        if (in_array($type, [TransactionType::Outgoing, TransactionType::AdjustmentOut, TransactionType::TransferOut, TransactionType::ReturnOut], true)) {
             $available = (int) $balance->quantity_on_hand - (int) $balance->quantity_reserved;
 
             if ($qtyOut > $available) {

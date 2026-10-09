@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\CustomerReturn;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
@@ -13,8 +14,10 @@ use App\Models\Setting;
 use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
+use App\Models\SupplierReturn;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Policies\CustomerReturnPolicy;
 use App\Policies\GoodsIssuePolicy;
 use App\Policies\GoodsReceiptPolicy;
 use App\Policies\ItemPolicy;
@@ -26,6 +29,7 @@ use App\Policies\SettingPolicy;
 use App\Policies\StockAdjustmentPolicy;
 use App\Policies\StockOpnamePolicy;
 use App\Policies\StockTransferPolicy;
+use App\Policies\SupplierReturnPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WarehousePolicy;
 use App\Services\Security\SecurityMonitor;
@@ -146,6 +150,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(StockAdjustment::class, StockAdjustmentPolicy::class);
         Gate::policy(StockOpname::class, StockOpnamePolicy::class);
         Gate::policy(StockTransfer::class, StockTransferPolicy::class);
+        Gate::policy(CustomerReturn::class, CustomerReturnPolicy::class);
+        Gate::policy(SupplierReturn::class, SupplierReturnPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Setting::class, SettingPolicy::class);

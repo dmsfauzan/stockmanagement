@@ -24,6 +24,8 @@ class JournalService
             'adjustment_loss' => (string) Setting::get('account.adjustment_loss', '5210'),
             'transfer_clearing' => (string) Setting::get('account.transfer_clearing', '1310'),
             'goods_receipt_clearing' => (string) Setting::get('account.goods_receipt_clearing', '2000'),
+            'sales_return' => (string) Setting::get('account.sales_return', '4200'),
+            'purchase_return' => (string) Setting::get('account.purchase_return', '5300'),
         ];
     }
 
@@ -43,6 +45,8 @@ class JournalService
             TransactionType::AdjustmentOut->value => [$a['adjustment_loss'], $a['inventory']],
             TransactionType::TransferOut->value => [$a['transfer_clearing'], $a['inventory']],
             TransactionType::TransferIn->value => [$a['inventory'], $a['transfer_clearing']],
+            TransactionType::ReturnIn->value => [$a['inventory'], $a['sales_return']],
+            TransactionType::ReturnOut->value => [$a['purchase_return'], $a['inventory']],
             default => [$a['inventory'], $a['inventory']],
         };
     }

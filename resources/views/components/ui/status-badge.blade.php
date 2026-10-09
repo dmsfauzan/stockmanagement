@@ -29,6 +29,8 @@
         'adjustment_in' => 'bg-teal-50 text-teal-700 ring-teal-600/20 dark:bg-teal-900/40 dark:text-teal-300 dark:ring-teal-800',
         'adjustment_out' => 'bg-orange-50 text-orange-700 ring-orange-600/20 dark:bg-orange-900/40 dark:text-orange-300 dark:ring-orange-800',
         'reversed' => 'bg-slate-100 text-slate-700 ring-slate-600/20 dark:bg-slate-700 dark:text-slate-300 dark:ring-slate-600',
+        'return_in' => 'bg-cyan-50 text-cyan-700 ring-cyan-600/20 dark:bg-cyan-900/40 dark:text-cyan-300 dark:ring-cyan-800',
+        'return_out' => 'bg-fuchsia-50 text-fuchsia-700 ring-fuchsia-600/20 dark:bg-fuchsia-900/40 dark:text-fuchsia-300 dark:ring-fuchsia-800',
     ];
     $classes = $map[$value] ?? 'bg-slate-100 text-slate-600 ring-slate-500/20 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-600';
     $translationKey = 'status.'.$value;

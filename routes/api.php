@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ReturnController;
 use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\WriteTransactionController;
@@ -95,6 +96,7 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
         Route::get('/reports/cogs', [ReportController::class, 'cogs'])->name('api.reports.cogs');
         Route::get('/reports/journal', [ReportController::class, 'journal'])->name('api.reports.journal');
         Route::get('/reports/replenishment', [ReportController::class, 'replenishment'])->name('api.reports.replenishment');
+        Route::get('/reports/returns', [ReturnController::class, 'report'])->name('api.reports.returns');
         Route::get('/accounting/journal', [ReportController::class, 'journal'])->name('api.accounting.journal');
         Route::get('/accounting/summary', [ReportController::class, 'accountingSummary'])->name('api.accounting.summary');
     });
@@ -158,5 +160,31 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
         Route::post('/{id}/approve', [WriteTransactionController::class, 'approveSalesOrder'])->middleware('permission:sales_order.approve')->name('api.sales-orders.approve');
         Route::post('/{id}/reject', [WriteTransactionController::class, 'rejectSalesOrder'])->middleware('permission:sales_order.approve')->name('api.sales-orders.reject');
         Route::post('/{id}/close', [WriteTransactionController::class, 'closeSalesOrder'])->middleware('permission:sales_order.approve')->name('api.sales-orders.close');
+    });
+
+    Route::middleware('permission:customer_return.view')->group(function (): void {
+        Route::get('/customer-returns', [ReturnController::class, 'customerReturns'])->name('api.customer-returns.index');
+        Route::get('/customer-returns/{id}', [ReturnController::class, 'customerReturn'])->name('api.customer-returns.show');
+    });
+
+    Route::prefix('customer-returns')->group(function (): void {
+        Route::post('/', [ReturnController::class, 'storeCustomerReturn'])->middleware('permission:customer_return.create')->name('api.customer-returns.store');
+        Route::post('/{id}/submit', [ReturnController::class, 'customerReturnSubmit'])->middleware('permission:customer_return.submit')->name('api.customer-returns.submit');
+        Route::post('/{id}/approve', [ReturnController::class, 'customerReturnApprove'])->middleware('permission:customer_return.approve')->name('api.customer-returns.approve');
+        Route::post('/{id}/reject', [ReturnController::class, 'customerReturnReject'])->middleware('permission:customer_return.approve')->name('api.customer-returns.reject');
+        Route::post('/{id}/post', [ReturnController::class, 'customerReturnPost'])->middleware('permission:customer_return.post')->name('api.customer-returns.post');
+    });
+
+    Route::middleware('permission:supplier_return.view')->group(function (): void {
+        Route::get('/supplier-returns', [ReturnController::class, 'supplierReturns'])->name('api.supplier-returns.index');
+        Route::get('/supplier-returns/{id}', [ReturnController::class, 'supplierReturn'])->name('api.supplier-returns.show');
+    });
+
+    Route::prefix('supplier-returns')->group(function (): void {
+        Route::post('/', [ReturnController::class, 'storeSupplierReturn'])->middleware('permission:supplier_return.create')->name('api.supplier-returns.store');
+        Route::post('/{id}/submit', [ReturnController::class, 'supplierReturnSubmit'])->middleware('permission:supplier_return.submit')->name('api.supplier-returns.submit');
+        Route::post('/{id}/approve', [ReturnController::class, 'supplierReturnApprove'])->middleware('permission:supplier_return.approve')->name('api.supplier-returns.approve');
+        Route::post('/{id}/reject', [ReturnController::class, 'supplierReturnReject'])->middleware('permission:supplier_return.approve')->name('api.supplier-returns.reject');
+        Route::post('/{id}/post', [ReturnController::class, 'supplierReturnPost'])->middleware('permission:supplier_return.post')->name('api.supplier-returns.post');
     });
 });

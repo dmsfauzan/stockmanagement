@@ -41,5 +41,15 @@ return [
             ['level' => 2, 'role' => 'manager', 'min_total' => 10_000_000],
             ['level' => 3, 'role' => 'admin', 'min_total' => 50_000_000],
         ],
+        'customer_return' => [
+            ['level' => 1, 'role' => 'supervisor', 'min_total' => 0],
+            ['level' => 2, 'role' => 'manager', 'min_total' => 10_000_000],
+            ['level' => 3, 'role' => 'admin', 'min_total' => 50_000_000],
+        ],
+        'supplier_return' => [
+            ['level' => 1, 'role' => 'supervisor', 'min_total' => 0],
+            ['level' => 2, 'role' => 'manager', 'min_total' => 10_000_000],
+            ['level' => 3, 'role' => 'admin', 'min_total' => 50_000_000],
+        ],
     ],
 ];

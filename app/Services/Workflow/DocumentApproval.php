@@ -3,6 +3,7 @@
 namespace App\Services\Workflow;
 
 use App\Models\ApprovalHistory;
+use App\Models\CustomerReturn;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
@@ -11,6 +12,7 @@ use App\Models\Setting;
 use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
+use App\Models\SupplierReturn;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use RuntimeException;
@@ -26,6 +28,8 @@ class DocumentApproval
         StockTransfer::class => 'stock_transfer',
         PurchaseOrder::class => 'purchase_order',
         SalesOrder::class => 'sales_order',
+        CustomerReturn::class => 'customer_return',
+        SupplierReturn::class => 'supplier_return',
     ];
 
     public static function typeFor(Model $doc): string
@@ -92,6 +96,7 @@ class DocumentApproval
             $doc instanceof GoodsIssue => (float) $doc->issueItems->sum(fn ($r) => (float) $r->quantity * (float) ($r->item?->cost ?? 0)),
             $doc instanceof StockAdjustment, $doc instanceof StockOpname => (float) $doc->items->sum(fn ($r) => abs((int) $r->difference) * (float) ($r->item?->cost ?? 0)),
             $doc instanceof StockTransfer => (float) $doc->items->sum(fn ($r) => (float) $r->quantity * (float) ($r->item?->cost ?? 0)),
+            $doc instanceof CustomerReturn, $doc instanceof SupplierReturn => (float) $doc->items->sum(fn ($r) => (float) $r->quantity * (float) ($r->unit_cost ?? $r->item?->cost ?? 0)),
             default => 0.0,
         };
     }

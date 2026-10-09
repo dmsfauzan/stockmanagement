@@ -7,6 +7,7 @@ use App\Enums\PurchaseOrderStatus;
 use App\Enums\SalesOrderStatus;
 use App\Enums\TransactionStatus;
 use App\Enums\TransferStatus;
+use App\Models\CustomerReturn;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
@@ -14,6 +15,7 @@ use App\Models\SalesOrder;
 use App\Models\StockAdjustment;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
+use App\Models\SupplierReturn;
 use App\Services\Inventory\InventoryService;
 use App\Services\Inventory\ReservationService;
 use App\Services\Support\AuditLogger;
@@ -553,6 +555,156 @@ class DocumentWorkflow
         AuditLogger::log('REJECT', 'sales_order', $order);
 
         static::notifyUser($order->created_by, 'approval.result', 'Sales Order ditolak', $order->number.' ditolak: '.$reason, SalesOrder::class, $order->id);
+    }
+
+    // ---- Return (customer + supplier) ----
+
+    public static function submitCustomerReturn(int $id): void
+    {
+        $ret = CustomerReturn::findOrFail($id);
+
+        static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Submitted));
+        static::ensure($ret->items()->exists());
+
+        DocumentApproval::snapshot($ret);
+
+        $ret->update([
+            'status' => TransactionStatus::Submitted->value,
+            'submitted_by' => auth()->id(),
+            'submitted_at' => now(),
+        ]);
+
+        AuditLogger::log('SUBMIT', 'customer_return', $ret);
+
+        static::notifyApprovalLevel($ret, 'Approval Customer Return');
+    }
+
+    public static function approveCustomerReturn(int $id): void
+    {
+        $ret = CustomerReturn::findOrFail($id);
+
+        static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Approved));
+
+        if (DocumentApproval::approve($ret)) {
+            AuditLogger::log('APPROVE', 'customer_return', $ret);
+            static::notifyUser($ret->created_by, 'approval.result', 'Customer Return disetujui', $ret->number.' telah disetujui', CustomerReturn::class, $ret->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'customer_return', $ret);
+            static::notifyApprovalLevel($ret, 'Approval Customer Return');
+        }
+    }
+
+    public static function rejectCustomerReturn(int $id, string $reason): void
+    {
+        $ret = CustomerReturn::findOrFail($id);
+
+        static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
+        static::ensureReason($reason);
+
+        DocumentApproval::reject($ret, $reason);
+
+        $ret->update([
+            'status' => TransactionStatus::Rejected->value,
+            'rejected_by' => auth()->id(),
+            'rejected_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
+
+        AuditLogger::log('REJECT', 'customer_return', $ret);
+
+        static::notifyUser($ret->created_by, 'approval.result', 'Customer Return ditolak', $ret->number.' ditolak: '.$reason, CustomerReturn::class, $ret->id);
+    }
+
+    public static function postCustomerReturn(int $id): void
+    {
+        $ret = CustomerReturn::findOrFail($id);
+
+        static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Posted));
+
+        InventoryService::postCustomerReturn($ret);
+    }
+
+    public static function reverseCustomerReturn(int $id, string $reason): void
+    {
+        $ret = CustomerReturn::findOrFail($id);
+
+        static::ensureReason($reason);
+
+        InventoryService::reverseCustomerReturn($ret, $reason);
+    }
+
+    public static function submitSupplierReturn(int $id): void
+    {
+        $ret = SupplierReturn::findOrFail($id);
+
+        static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Submitted));
+        static::ensure($ret->items()->exists());
+
+        DocumentApproval::snapshot($ret);
+
+        $ret->update([
+            'status' => TransactionStatus::Submitted->value,
+            'submitted_by' => auth()->id(),
+            'submitted_at' => now(),
+        ]);
+
+        AuditLogger::log('SUBMIT', 'supplier_return', $ret);
+
+        static::notifyApprovalLevel($ret, 'Approval Supplier Return');
+    }
+
+    public static function approveSupplierReturn(int $id): void
+    {
+        $ret = SupplierReturn::findOrFail($id);
+
+        static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Approved));
+
+        if (DocumentApproval::approve($ret)) {
+            AuditLogger::log('APPROVE', 'supplier_return', $ret);
+            static::notifyUser($ret->created_by, 'approval.result', 'Supplier Return disetujui', $ret->number.' telah disetujui', SupplierReturn::class, $ret->id);
+        } else {
+            AuditLogger::log('APPROVE_PARTIAL', 'supplier_return', $ret);
+            static::notifyApprovalLevel($ret, 'Approval Supplier Return');
+        }
+    }
+
+    public static function rejectSupplierReturn(int $id, string $reason): void
+    {
+        $ret = SupplierReturn::findOrFail($id);
+
+        static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
+        static::ensureReason($reason);
+
+        DocumentApproval::reject($ret, $reason);
+
+        $ret->update([
+            'status' => TransactionStatus::Rejected->value,
+            'rejected_by' => auth()->id(),
+            'rejected_at' => now(),
+            'rejection_reason' => $reason,
+        ]);
+
+        AuditLogger::log('REJECT', 'supplier_return', $ret);
+
+        static::notifyUser($ret->created_by, 'approval.result', 'Supplier Return ditolak', $ret->number.' ditolak: '.$reason, SupplierReturn::class, $ret->id);
+    }
+
+    public static function postSupplierReturn(int $id): void
+    {
+        $ret = SupplierReturn::findOrFail($id);
+
+        static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Posted));
+
+        InventoryService::postSupplierReturn($ret);
+    }
+
+    public static function reverseSupplierReturn(int $id, string $reason): void
+    {
+        $ret = SupplierReturn::findOrFail($id);
+
+        static::ensureReason($reason);
+
+        InventoryService::reverseSupplierReturn($ret, $reason);
     }
 
     public static function closeSo(int $id): void

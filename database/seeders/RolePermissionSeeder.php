@@ -64,13 +64,25 @@ class RolePermissionSeeder extends Seeder
             'sales_order.approve' => 'sales_order',
             'sales_order.fulfill' => 'sales_order',
             'sales_order.close' => 'sales_order',
+            'customer_return.view' => 'customer_return',
+            'customer_return.create' => 'customer_return',
+            'customer_return.update' => 'customer_return',
+            'customer_return.submit' => 'customer_return',
+            'customer_return.approve' => 'customer_return',
+            'customer_return.post' => 'customer_return',
+            'supplier_return.view' => 'supplier_return',
+            'supplier_return.create' => 'supplier_return',
+            'supplier_return.update' => 'supplier_return',
+            'supplier_return.submit' => 'supplier_return',
+            'supplier_return.approve' => 'supplier_return',
+            'supplier_return.post' => 'supplier_return',
             'reports.view' => 'reports',
             'reports.export' => 'reports',
             'users.manage' => 'users',
             'roles.manage' => 'roles',
             'settings.manage' => 'settings',
-            'security.manage' => 'security',
             'audit_logs.view' => 'audit_logs',
+            'security.manage' => 'security',
         ];
 
         $permissionIds = [];
@@ -109,6 +121,8 @@ class RolePermissionSeeder extends Seeder
             'transfer.view', 'transfer.create',
             'purchase_order.view', 'purchase_order.create', 'purchase_order.update', 'purchase_order.submit',
             'sales_order.view', 'sales_order.create', 'sales_order.update', 'sales_order.submit',
+            'customer_return.view', 'customer_return.create', 'customer_return.update', 'customer_return.submit',
+            'supplier_return.view', 'supplier_return.create', 'supplier_return.update', 'supplier_return.submit',
         ];
         $this->syncPermissions(
             $roleModels['warehouse_staff']->id,
@@ -125,6 +139,8 @@ class RolePermissionSeeder extends Seeder
             'transfer.view', 'transfer.approve', 'transfer.receive',
             'purchase_order.view', 'purchase_order.approve', 'purchase_order.receive', 'purchase_order.close',
             'sales_order.view', 'sales_order.approve', 'sales_order.fulfill', 'sales_order.close',
+            'customer_return.view', 'customer_return.approve', 'customer_return.post',
+            'supplier_return.view', 'supplier_return.approve', 'supplier_return.post',
             'items.view', 'warehouse.view', 'location.view',
         ];
         $this->syncPermissions(

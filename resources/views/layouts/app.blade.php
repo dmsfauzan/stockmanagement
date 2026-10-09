@@ -15,6 +15,8 @@
         request()->routeIs('stock-adjustments.*') => 'Stock Adjustment',
         request()->routeIs('stock-opnames.*') => 'Stock Opname',
         request()->routeIs('stock-transfers.*') => __('Transfer Barang'),
+        request()->routeIs('customer-returns.*') => 'Retur Penjualan',
+        request()->routeIs('supplier-returns.*') => 'Retur Pembelian',
         request()->routeIs('stock.index') => 'Stock On Hand',
         request()->routeIs('stock.movements') => 'Stock Movement',
         request()->routeIs('stock.low') => 'Low Stock',
@@ -30,6 +32,7 @@
         request()->routeIs('reports.warehouse-comparison') => __('Perbandingan Gudang'),
         request()->routeIs('reports.replenishment') => 'Replenishment',
         request()->routeIs('reports.sales-order') => 'Laporan Sales Order',
+        request()->routeIs('reports.returns') => 'Laporan Retur',
         request()->routeIs('reports.valuation') => __('Valuasi Persediaan'),
         request()->routeIs('reports.cogs') => __('Laporan COGS'),
         request()->routeIs('reports.journal') => __('Jurnal Akuntansi'),
@@ -177,6 +180,18 @@
                     <span x-show="!collapsed" class="truncate">{{ __('Barang Keluar') }}</span>
                 </a>
                 @endcan
+                @can('customer_return.view')
+                <a href="{{ route('customer-returns.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('customer-returns.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('customer-returns.*')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+                    <span x-show="!collapsed" class="truncate">Retur Penjualan</span>
+                </a>
+                @endcan
+                @can('supplier_return.view')
+                <a href="{{ route('supplier-returns.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('supplier-returns.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('supplier-returns.*')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9l6 6m0 0l-6 6m6-6H9a6 6 0 010-12h3"/></svg>
+                    <span x-show="!collapsed" class="truncate">Retur Pembelian</span>
+                </a>
+                @endcan
                 @can('stock.adjustment')
                 <a href="{{ route('stock-adjustments.index') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('stock-adjustments.*'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('stock-adjustments.*')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v4H4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 8v10a2 2 0 002 2h4a2 2 0 002-2V8"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6"/></svg>
@@ -302,6 +317,10 @@
                 <a href="{{ route('reports.sales-order') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.sales-order'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.sales-order')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6M9 17h4"/></svg>
                     <span x-show="!collapsed" class="truncate">Sales Order</span>
+                </a>
+                <a href="{{ route('reports.returns') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('reports.returns'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('reports.returns')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+                    <span x-show="!collapsed" class="truncate">Retur</span>
                 </a>
             </x-sidebar-group>
             @endcan

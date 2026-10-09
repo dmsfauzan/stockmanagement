@@ -28,6 +28,8 @@ return [
     'adjustment_in' => 'Adjustment In',
     'adjustment_out' => 'Adjustment Out',
     'reversed' => 'Reversed',
+    'return_in' => 'Return In',
+    'return_out' => 'Return Out',
     'manual' => 'Manual',
     'auto' => 'Auto',
     'info' => 'Info',

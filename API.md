@@ -104,6 +104,12 @@ Pola: buat dokumen (status `draft`) lalu jalankan workflow. Semua posting memaka
 
 | Aksi | Method & Path | Permission |
 |---|---|---|
+| Baca Retur Penjualan | `GET /customer-returns` · `/{id}` | `customer_return.view` |
+| Buat/Workflow Retur Penjualan | `POST /customer-returns` · `/{id}/{submit\|approve\|reject\|post}` | `customer_return.create` / `.submit` / `.approve` / `.post` |
+| Baca Retur Pembelian | `GET /supplier-returns` · `/{id}` | `supplier_return.view` |
+| Buat/Workflow Retur Pembelian | `POST /supplier-returns` · `/{id}/{submit\|approve\|reject\|post}` | `supplier_return.create` / `.submit` / `.approve` / `.post` |
+| Laporan Retur | `GET /reports/returns` | `reports.view` |
+| Baca Price List Pelanggan | `GET /customers/{id}/prices` | `items.view` |
 | Buat GR | `POST /goods-receipts` | `goods_receipt.create` |
 | Submit/Approve/Reject/Post GR | `POST /goods-receipts/{id}/{submit\|approve\|reject\|post}` | `.submit` / `.approve` / `.approve` / `.post` |
 | Buat GI | `POST /goods-issues` | `goods_issue.create` |

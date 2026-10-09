@@ -6,6 +6,7 @@ use App\Enums\OpnameStatus;
 use App\Enums\TransactionStatus;
 use App\Enums\TransactionType;
 use App\Enums\TransferStatus;
+use App\Models\CustomerReturn;
 use App\Models\GoodsIssue;
 use App\Models\GoodsReceipt;
 use App\Models\Item;
@@ -16,6 +17,7 @@ use App\Models\StockBalance;
 use App\Models\StockMovement;
 use App\Models\StockOpname;
 use App\Models\StockTransfer;
+use App\Models\SupplierReturn;
 use App\Services\Integration\WebhookService;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\DocumentNumberService;
@@ -554,6 +556,174 @@ class InventoryService
     private static function lockedTransfer(int $id): StockTransfer
     {
         return StockTransfer::with('items')->whereKey($id)->lockForUpdate()->firstOrFail();
+    }
+
+    private static function lockedCustomerReturn(int $id): CustomerReturn
+    {
+        return CustomerReturn::with('items')->whereKey($id)->lockForUpdate()->firstOrFail();
+    }
+
+    private static function lockedSupplierReturn(int $id): SupplierReturn
+    {
+        return SupplierReturn::with('items')->whereKey($id)->lockForUpdate()->firstOrFail();
+    }
+
+    public static function postCustomerReturn(CustomerReturn $ret): void
+    {
+        DB::transaction(function () use ($ret): void {
+            $locked = static::lockedCustomerReturn($ret->getKey());
+
+            if ($locked->status !== TransactionStatus::Approved->value) {
+                throw new \RuntimeException('Only approved customer returns can be posted.');
+            }
+
+            foreach ($locked->items as $item) {
+                LedgerService::record(
+                    (int) $item->item_id,
+                    (int) $locked->warehouse_id,
+                    (int) $item->location_id,
+                    TransactionType::ReturnIn,
+                    CustomerReturn::class,
+                    (int) $locked->id,
+                    (int) $item->quantity,
+                    0,
+                    $item->batch_number,
+                    null,
+                    $item->notes,
+                    (float) ($item->unit_cost ?? 0),
+                    $item->serial_number ?? null
+                );
+            }
+
+            $locked->update([
+                'status' => TransactionStatus::Posted->value,
+                'posted_by' => auth()->id(),
+                'posted_at' => now(),
+            ]);
+
+            static::emitWebhook('customer_return.posted', CustomerReturn::class, $locked);
+
+            AuditLogger::log('POST', 'customer_return', $locked);
+        });
+    }
+
+    public static function postSupplierReturn(SupplierReturn $ret): void
+    {
+        DB::transaction(function () use ($ret): void {
+            $locked = static::lockedSupplierReturn($ret->getKey());
+
+            if ($locked->status !== TransactionStatus::Approved->value) {
+                throw new \RuntimeException('Only approved supplier returns can be posted.');
+            }
+
+            foreach ($locked->items as $item) {
+                LedgerService::record(
+                    (int) $item->item_id,
+                    (int) $locked->warehouse_id,
+                    (int) $item->location_id,
+                    TransactionType::ReturnOut,
+                    SupplierReturn::class,
+                    (int) $locked->id,
+                    0,
+                    (int) $item->quantity,
+                    null,
+                    null,
+                    $item->notes,
+                    null,
+                    $item->serial_number ?? null
+                );
+            }
+
+            $locked->update([
+                'status' => TransactionStatus::Posted->value,
+                'posted_by' => auth()->id(),
+                'posted_at' => now(),
+            ]);
+
+            static::emitWebhook('supplier_return.posted', SupplierReturn::class, $locked);
+
+            AuditLogger::log('POST', 'supplier_return', $locked);
+        });
+    }
+
+    public static function reverseCustomerReturn(CustomerReturn $ret, string $reason): void
+    {
+        DB::transaction(function () use ($ret, $reason): void {
+            $locked = static::lockedCustomerReturn($ret->getKey());
+            $locked->loadMissing('items');
+
+            if ($locked->status !== TransactionStatus::Posted->value) {
+                throw new \RuntimeException('Only posted customer returns can be reversed.');
+            }
+
+            if (! is_null($locked->reversed_at)) {
+                throw new \RuntimeException('Transaction already reversed');
+            }
+
+            foreach ($locked->items as $item) {
+                LedgerService::record(
+                    (int) $item->item_id,
+                    (int) $locked->warehouse_id,
+                    (int) $item->location_id,
+                    TransactionType::ReturnOut,
+                    CustomerReturn::class,
+                    (int) $locked->id,
+                    0,
+                    (int) $item->quantity,
+                    $item->batch_number,
+                    null,
+                    "Reversal of {$locked->number} — {$reason}"
+                );
+            }
+
+            $locked->update([
+                'reversed_at' => now(),
+                'reversed_by' => auth()->id(),
+                'reversal_reason' => $reason,
+            ]);
+
+            AuditLogger::log('REVERSE', 'customer_return', $locked);
+        });
+    }
+
+    public static function reverseSupplierReturn(SupplierReturn $ret, string $reason): void
+    {
+        DB::transaction(function () use ($ret, $reason): void {
+            $locked = static::lockedSupplierReturn($ret->getKey());
+            $locked->loadMissing('items');
+
+            if ($locked->status !== TransactionStatus::Posted->value) {
+                throw new \RuntimeException('Only posted supplier returns can be reversed.');
+            }
+
+            if (! is_null($locked->reversed_at)) {
+                throw new \RuntimeException('Transaction already reversed');
+            }
+
+            foreach ($locked->items as $item) {
+                LedgerService::record(
+                    (int) $item->item_id,
+                    (int) $locked->warehouse_id,
+                    (int) $item->location_id,
+                    TransactionType::ReturnIn,
+                    SupplierReturn::class,
+                    (int) $locked->id,
+                    (int) $item->quantity,
+                    0,
+                    $item->batch_number,
+                    null,
+                    "Reversal of {$locked->number} — {$reason}"
+                );
+            }
+
+            $locked->update([
+                'reversed_at' => now(),
+                'reversed_by' => auth()->id(),
+                'reversal_reason' => $reason,
+            ]);
+
+            AuditLogger::log('REVERSE', 'supplier_return', $locked);
+        });
     }
 
     public static function lockedOpname(int $id): StockOpname
