@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-382_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-384_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -95,6 +95,7 @@ flowchart LR
 | Tarik Batch (Recall) | Tandai batch/serial bermasalah + lihat dampak (stok tersisa & dokumen terdampak), tandai lot `recalled` lalu cabut; web + API `/recalls/*` |
 | Auto-release Reservasi | Command `inventory:release-stale-reservations` (jadwal harian 04:15) melepas reservasi usang > TTL; ambang di **Settings → Inventory** |
 | Konfigurasi Label | Ukuran default, brand, harga & teks perusahaan label diatur di **Settings → Label** |
+| Dashboard KPI+ | Widget **KPI Lanjutan**: perputaran stok + hari persediaan, dead stock, fill rate SO, PO terlambat |
 | Cycle Counting | Opname parsial per zona/rak (`type=cycle`), command `inventory:cycle-count` terjadwal mingguan |
 | Landed Cost | Biaya kirim/lainnya pada Barang Masuk dialokasikan (by value/qty) ke average cost |
 | FEFO Picking | Barang Keluar pilih lot/serial otomatis dari expiry terdekat (`applyFefo`) |

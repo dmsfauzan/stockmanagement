@@ -6,6 +6,7 @@ use App\Models\DashboardPreference;
 use App\Models\Item;
 use App\Models\Warehouse;
 use App\Services\Inventory\ExpiryService;
+use App\Services\Inventory\InventoryAnalyticsService;
 use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -19,11 +20,12 @@ use Livewire\Component;
 class DashboardIndex extends Component
 {
     /** @var array<int, string> */
-    public const WIDGETS = ['stats', 'movement_chart', 'category_chart', 'expiring_soon', 'low_stock', 'recent_activities'];
+    public const WIDGETS = ['stats', 'kpi_advanced', 'movement_chart', 'category_chart', 'expiring_soon', 'low_stock', 'recent_activities'];
 
     /** @var array<string, string> */
     public const WIDGET_LABELS = [
         'stats' => 'Ringkasan Statistik',
+        'kpi_advanced' => 'KPI Lanjutan (Turnover / Dead Stock / Fill Rate)',
         'movement_chart' => 'Grafik Pergerakan Stok',
         'category_chart' => 'Stok per Kategori',
         'expiring_soon' => 'Batch Mendekati Kedaluwarsa',
@@ -233,6 +235,8 @@ class DashboardIndex extends Component
             ->when($wid !== null, fn ($q) => $q->where('warehouse_id', $wid))
             ->sum('total_value');
 
+        $advancedKpi = $this->buildAdvancedKpi($wid);
+
         $activeWarehouseName = $wid !== null ? Warehouse::whereKey($wid)->value('name') : null;
 
         return view('livewire.dashboard.dashboard-index', [
@@ -252,8 +256,42 @@ class DashboardIndex extends Component
             'expiredCount' => $expiredCount,
             'activeWarehouseName' => $activeWarehouseName,
             'inventoryValue' => $inventoryValue,
+            'advancedKpi' => $advancedKpi,
             'widgetLabels' => self::WIDGET_LABELS,
         ]);
+    }
+
+    protected function buildAdvancedKpi(?int $warehouseId = null): array
+    {
+        $turnover = InventoryAnalyticsService::turnover($warehouseId);
+        $deadItems = InventoryAnalyticsService::deadStock($warehouseId)->count();
+        $allowed = WarehouseAccess::ids();
+
+        $so = DB::table('sales_order_items')
+            ->join('sales_orders', 'sales_orders.id', '=', 'sales_order_items.sales_order_id')
+            ->whereIn('sales_orders.warehouse_id', $allowed)
+            ->when($warehouseId !== null, fn ($q) => $q->where('sales_orders.warehouse_id', $warehouseId))
+            ->selectRaw('COALESCE(SUM(sales_order_items.quantity),0) as demand, COALESCE(SUM(sales_order_items.fulfilled_quantity),0) as fulfilled')
+            ->first();
+
+        $demand = (int) ($so->demand ?? 0);
+        $fulfilled = (int) ($so->fulfilled ?? 0);
+
+        $latePo = (int) DB::table('purchase_orders')
+            ->whereIn('warehouse_id', $allowed)
+            ->when($warehouseId !== null, fn ($q) => $q->where('warehouse_id', $warehouseId))
+            ->whereIn('status', ['approved', 'partial'])
+            ->whereNotNull('expected_date')
+            ->whereDate('expected_date', '<', Carbon::today()->toDateString())
+            ->count();
+
+        return [
+            'turnover' => (float) ($turnover['turnover'] ?? 0),
+            'days_of_supply' => $turnover['days_of_supply'],
+            'dead_stock_items' => $deadItems,
+            'fill_rate' => $demand > 0 ? round(min(100, max(0, $fulfilled / $demand * 100)), 1) : null,
+            'late_purchase_orders' => $latePo,
+        ];
     }
 
     protected function resolveRange(): array
