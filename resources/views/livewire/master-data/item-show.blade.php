@@ -46,6 +46,7 @@
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Satuan') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->unit?->name ?? '-' }} {{ $itemModel->unit?->code ? '(' . $itemModel->unit->code . ')' : '' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Supplier</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->primarySupplier?->name ?? '-' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Status</dt><dd class="mt-1"><x-ui.status-badge :status="$itemModel->status" /></dd></div>
+                    <div><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Kepemilikan') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->isConsignment() ? __('Konsinyasi').' — '.($itemModel->consignor?->name ?? '-') : __('Milik Sendiri') }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-app-muted">Min / Max</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->minimum_stock }} / {{ $itemModel->maximum_stock }}</dd></div>
                     <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase text-app-muted">{{ __('Deskripsi') }}</dt><dd class="mt-1 text-sm text-app-text">{{ $itemModel->description ?? '-' }}</dd></div>
                 </dl>

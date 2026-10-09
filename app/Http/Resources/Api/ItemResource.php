@@ -34,6 +34,8 @@ class ItemResource extends JsonResource
             'maximum_stock' => (int) $this->maximum_stock,
             'cost' => $this->cost,
             'status' => $this->status,
+            'ownership' => $this->ownership ?? 'owned',
+            'consignor' => $this->whenLoaded('consignor', fn () => $this->consignor ? ['id' => $this->consignor->id, 'name' => $this->consignor->name] : null),
             'conversions' => $this->whenLoaded('conversions', fn () => $this->conversions->map(fn ($conversion) => [
                 'id' => $conversion->id,
                 'unit_id' => (int) $conversion->unit_id,

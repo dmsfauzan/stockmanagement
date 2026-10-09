@@ -39,7 +39,7 @@ class ItemShow extends Component
 
     public function render()
     {
-        $item = Item::with(['category', 'unit', 'primarySupplier'])->findOrFail($this->item);
+        $item = Item::with(['category', 'unit', 'primarySupplier', 'consignor'])->findOrFail($this->item);
 
         $balances = StockBalance::where('item_id', $item->id)
             ->with(['warehouse', 'location.rack.zone.warehouse'])

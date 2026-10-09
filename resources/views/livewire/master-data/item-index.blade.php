@@ -67,6 +67,11 @@
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
+                    <select wire:model.live="ownershipFilter" class="app-select w-full sm:w-auto">
+                        <option value="">{{ __('Semua Kepemilikan') }}</option>
+                        <option value="owned">{{ __('Milik Sendiri') }}</option>
+                        <option value="consignment">{{ __('Konsinyasi') }}</option>
+                    </select>
                     <select wire:model.live="trashedFilter" class="app-select w-full sm:w-auto">
                         <option value="">Aktif</option>
                         <option value="trashed">{{ __('Terhapus') }}</option>
@@ -121,6 +126,7 @@
                         </th>
                         <th>{{ __('Kategori') }}</th>
                         <th>Unit</th>
+                        <th>{{ __('Kepemilikan') }}</th>
                         <th class="text-right">Min</th>
                         <th class="text-right">Max</th>
                         <th>Status</th>
@@ -145,6 +151,7 @@
                             <td>{{ $item->name }}</td>
                             <td class="whitespace-nowrap text-app-muted">{{ $item->category?->name ?? '-' }}</td>
                             <td class="whitespace-nowrap text-app-muted">{{ $item->unit?->name ?? '-' }}</td>
+                            <td class="whitespace-nowrap">@if (($item->ownership ?? 'owned') === 'consignment')<x-ui.status-badge status="quarantine" :label="__('Konsinyasi')" />@else<span class="text-app-muted">-</span>@endif</td>
                             <td class="whitespace-nowrap text-right text-app-muted">{{ $item->minimum_stock }}</td>
                             <td class="whitespace-nowrap text-right text-app-muted">{{ $item->maximum_stock }}</td>
                             <td class="whitespace-nowrap">

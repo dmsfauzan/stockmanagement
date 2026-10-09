@@ -28,6 +28,8 @@ class ItemIndex extends Component
 
     public string $statusFilter = '';
 
+    public string $ownershipFilter = '';
+
     public string $trashedFilter = '';
 
     public string $sortField = 'created_at';
@@ -67,6 +69,11 @@ class ItemIndex extends Component
     }
 
     public function updatedStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedOwnershipFilter(): void
     {
         $this->resetPage();
     }
@@ -327,6 +334,7 @@ class ItemIndex extends Component
             })
             ->when($this->categoryFilter !== '', fn (Builder $query) => $query->where('category_id', $this->categoryFilter))
             ->when($this->statusFilter !== '', fn (Builder $query) => $query->where('status', $this->statusFilter))
+            ->when($this->ownershipFilter !== '', fn (Builder $query) => $query->where('ownership', $this->ownershipFilter))
             ->when($this->trashedFilter === 'trashed', fn (Builder $query) => $query->onlyTrashed())
             ->when($this->trashedFilter === 'all', fn (Builder $query) => $query->withTrashed());
     }

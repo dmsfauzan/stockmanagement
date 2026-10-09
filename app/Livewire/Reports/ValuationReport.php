@@ -30,11 +30,13 @@ class ValuationReport extends Component
 
     public string $categoryFilter = '';
 
+    public string $ownershipFilter = '';
+
     public int $perPage = 15;
 
     protected function filterKeys(): array
     {
-        return ['search', 'warehouseFilter', 'categoryFilter'];
+        return ['search', 'warehouseFilter', 'categoryFilter', 'ownershipFilter'];
     }
 
     public function reportColumns(): array
@@ -44,6 +46,7 @@ class ValuationReport extends Component
             'item' => ['label' => 'Barang'],
             'category' => ['label' => 'Kategori'],
             'warehouse' => ['label' => 'Warehouse'],
+            'ownership' => ['label' => 'Kepemilikan'],
             'quantity' => ['label' => 'Qty', 'align' => 'right'],
             'average_cost' => ['label' => 'Harga Rata-rata', 'align' => 'right'],
             'total_value' => ['label' => 'Total Nilai', 'align' => 'right'],
@@ -72,6 +75,11 @@ class ValuationReport extends Component
         $this->resetPage();
     }
 
+    public function updatedOwnershipFilter(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatedPerPage(): void
     {
         $this->resetPage();
@@ -79,7 +87,7 @@ class ValuationReport extends Component
 
     public function resetFilters(): void
     {
-        $this->reset(['search', 'warehouseFilter', 'categoryFilter']);
+        $this->reset(['search', 'warehouseFilter', 'categoryFilter', 'ownershipFilter']);
         $this->resetPage();
     }
 
@@ -145,6 +153,7 @@ class ValuationReport extends Component
         return array_filter([
             'Warehouse' => $this->warehouseFilter !== '' ? Warehouse::whereKey($this->warehouseFilter)->value('name') : null,
             'Category' => $this->categoryFilter !== '' ? Category::whereKey($this->categoryFilter)->value('name') : null,
+            'Ownership' => $this->ownershipFilter !== '' ? $this->ownershipFilter : null,
             'Search' => $this->search !== '' ? $this->search : null,
         ]);
     }
@@ -155,6 +164,7 @@ class ValuationReport extends Component
             'search' => $this->search,
             'warehouse' => $this->warehouseFilter,
             'category' => $this->categoryFilter,
+            'ownership' => $this->ownershipFilter,
         ];
     }
 
@@ -174,6 +184,7 @@ class ValuationReport extends Component
                 'categories.name as category_name',
                 'warehouses.id as warehouse_id',
                 'warehouses.name as warehouse_name',
+                'items.ownership',
                 'inventory_valuations.quantity',
                 'inventory_valuations.average_cost',
                 'inventory_valuations.total_value',
@@ -187,7 +198,8 @@ class ValuationReport extends Component
                 });
             })
             ->when($this->warehouseFilter !== '', fn (QueryBuilder $query) => $query->where('warehouses.id', $this->warehouseFilter))
-            ->when($this->categoryFilter !== '', fn (QueryBuilder $query) => $query->where('categories.id', $this->categoryFilter));
+            ->when($this->categoryFilter !== '', fn (QueryBuilder $query) => $query->where('categories.id', $this->categoryFilter))
+            ->when($this->ownershipFilter !== '', fn (QueryBuilder $query) => $query->where('items.ownership', $this->ownershipFilter));
     }
 
     public function render()

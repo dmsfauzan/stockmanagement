@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['sku', 'barcode', 'name', 'category_id', 'unit_id', 'brand', 'description', 'image_path', 'minimum_stock', 'maximum_stock', 'cost', 'price', 'primary_supplier_id', 'status', 'tracking_type', 'created_by', 'updated_by'])]
+#[Fillable(['sku', 'barcode', 'name', 'category_id', 'unit_id', 'brand', 'description', 'image_path', 'minimum_stock', 'maximum_stock', 'cost', 'price', 'primary_supplier_id', 'status', 'ownership', 'consignor_id', 'tracking_type', 'created_by', 'updated_by'])]
 class Item extends Model
 {
     use HasFactory, SoftDeletes;
@@ -23,6 +23,7 @@ class Item extends Model
             'maximum_stock' => 'integer',
             'cost' => 'decimal:2',
             'price' => 'decimal:2',
+            'ownership' => 'string',
             'tracking_type' => TrackingType::class,
         ];
     }
@@ -40,6 +41,16 @@ class Item extends Model
     public function primarySupplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class, 'primary_supplier_id');
+    }
+
+    public function consignor(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'consignor_id');
+    }
+
+    public function isConsignment(): bool
+    {
+        return $this->ownership === 'consignment';
     }
 
     public function conversions(): HasMany

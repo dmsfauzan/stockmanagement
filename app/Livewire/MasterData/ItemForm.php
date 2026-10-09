@@ -57,6 +57,10 @@ class ItemForm extends Component
 
     public string $status = 'active';
 
+    public string $ownership = 'owned';
+
+    public string $consignor_id = '';
+
     public string $tracking_type = 'none';
 
     /** @var array<int, array{id:int, unit_id:string, factor:string}> */
@@ -94,6 +98,8 @@ class ItemForm extends Component
             $this->price = (float) $model->price;
             $this->primary_supplier_id = $model->primary_supplier_id ? (string) $model->primary_supplier_id : '';
             $this->status = (string) $model->status;
+            $this->ownership = (string) ($model->ownership ?? 'owned');
+            $this->consignor_id = $model->consignor_id ? (string) $model->consignor_id : '';
             $this->tracking_type = $model->tracking_type?->value ?? 'none';
             $this->existingImagePath = $model->image_path;
 
@@ -129,6 +135,8 @@ class ItemForm extends Component
             'price' => ['nullable', 'numeric', 'min:0'],
             'primary_supplier_id' => ['nullable', 'exists:suppliers,id'],
             'status' => ['required', 'in:active,inactive'],
+            'ownership' => ['required', 'in:owned,consignment'],
+            'consignor_id' => ['nullable', 'exists:suppliers,id'],
             'tracking_type' => ['required', 'in:none,batch,serial'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:2048'],
         ];
@@ -205,6 +213,7 @@ class ItemForm extends Component
         $this->brand = trim($this->brand);
         $this->description = trim($this->description);
         $this->primary_supplier_id = trim($this->primary_supplier_id);
+        $this->consignor_id = trim($this->consignor_id);
 
         $data = $this->validate();
 
@@ -214,6 +223,7 @@ class ItemForm extends Component
         $data['brand'] = $data['brand'] !== '' ? $data['brand'] : null;
         $data['description'] = $data['description'] !== '' ? $data['description'] : null;
         $data['primary_supplier_id'] = $data['primary_supplier_id'] !== '' ? $data['primary_supplier_id'] : null;
+        $data['consignor_id'] = ($data['consignor_id'] ?? '') !== '' && $data['ownership'] === 'consignment' ? $data['consignor_id'] : null;
         $data['cost'] = $data['cost'] ?? 0;
         $data['price'] = $data['price'] ?? 0;
 

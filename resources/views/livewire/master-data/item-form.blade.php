@@ -58,12 +58,30 @@
                 <div>
                     <label for="primary_supplier_id" class="app-label mb-1">Supplier Utama</label>
                     <select id="primary_supplier_id" wire:model="primary_supplier_id" class="app-select">
-                        <option value="">-- Pilih Supplier --</option>
+                        <option value="">{{ __('Tidak ada') }}</option>
                         @foreach ($suppliers as $supplier)
                             <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                         @endforeach
                     </select>
                     @error('primary_supplier_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="ownership" class="app-label mb-1">{{ __('Kepemilikan') }}</label>
+                    <select id="ownership" wire:model="ownership" class="app-select">
+                        <option value="owned">{{ __('Milik Sendiri') }}</option>
+                        <option value="consignment">{{ __('Konsinyasi') }}</option>
+                    </select>
+                    @error('ownership') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                <div x-show="$wire.ownership === 'consignment'">
+                    <label for="consignor_id" class="app-label mb-1">{{ __('Pemilik Konsinyasi') }}</label>
+                    <select id="consignor_id" wire:model="consignor_id" class="app-select">
+                        <option value="">{{ __('Pilih pemilik') }}</option>
+                        @foreach ($suppliers as $supplier)
+                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('consignor_id') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
             </div>
 

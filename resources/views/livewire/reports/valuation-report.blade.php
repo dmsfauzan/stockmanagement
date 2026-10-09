@@ -39,6 +39,11 @@
                     <option value="">Semua Kategori</option>
                     @foreach ($categories as $category)<option value="{{ $category->id }}">{{ $category->name }}</option>@endforeach
                 </select>
+                <select wire:model.live="ownershipFilter" class="app-select">
+                    <option value="">{{ __('Semua Kepemilikan') }}</option>
+                    <option value="owned">{{ __('Milik Sendiri') }}</option>
+                    <option value="consignment">{{ __('Konsinyasi') }}</option>
+                </select>
                 <select wire:model.live="perPage" class="app-select w-24">
                     @foreach ([15, 25, 50, 100] as $size)<option value="{{ $size }}">{{ $size }}</option>@endforeach
                 </select>
@@ -59,8 +64,9 @@
                         <th class="rc-sku">SKU</th>
                         <th class="rc-item">{{ __('Barang') }}</th>
                         <th class="rc-category">{{ __('Kategori') }}</th>
-                        <th class="rc-warehouse">Warehouse</th>
-                        <th class="rc-quantity text-right">Qty</th>
+                    <th class="rc-warehouse">Warehouse</th>
+                    <th class="rc-ownership">{{ __('Kepemilikan') }}</th>
+                    <th class="rc-quantity text-right">Qty</th>
                         <th class="rc-average_cost text-right">Harga Rata-rata</th>
                         <th class="rc-total_value text-right">{{ __('Total Nilai') }}</th>
                     </tr>
@@ -72,12 +78,13 @@
                             <td class="rc-item">{{ $row->item_name }}</td>
                             <td class="rc-category whitespace-nowrap text-app-muted">{{ $row->category_name }}</td>
                             <td class="rc-warehouse whitespace-nowrap text-app-muted">{{ $row->warehouse_name }}</td>
+                            <td class="rc-ownership whitespace-nowrap">@if (($row->ownership ?? 'owned') === 'consignment')<x-ui.status-badge status="quarantine" :label="__('Konsinyasi')" />@else<span class="text-app-muted">{{ __('Milik Sendiri') }}</span>@endif</td>
                             <td class="rc-quantity whitespace-nowrap text-right font-medium">{{ number_format((int) $row->quantity) }}</td>
                             <td class="rc-average_cost whitespace-nowrap text-right text-app-muted">{{ number_format((float) $row->average_cost, 2) }}</td>
                             <td class="rc-total_value whitespace-nowrap text-right font-medium">{{ number_format((float) $row->total_value, 2) }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="7"><x-ui.empty-state title="Tidak ada data valuasi" message="Belum ada data yang cocok dengan filter." /></td></tr>
+                        <tr><td colspan="8"><x-ui.empty-state title="Tidak ada data valuasi" message="Belum ada data yang cocok dengan filter." /></td></tr>
                     @endforelse
                 </tbody>
             </table>
