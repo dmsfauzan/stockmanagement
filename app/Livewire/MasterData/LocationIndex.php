@@ -51,6 +51,8 @@ class LocationIndex extends Component
 
     public string $name = '';
 
+    public string $capacity = '';
+
     public function mount(): void
     {
         $this->authorize('viewAny', Location::class);
@@ -135,7 +137,7 @@ class LocationIndex extends Component
         $this->authorize('create', Location::class);
 
         $this->resetValidation();
-        $this->reset(['editingId', 'warehouse_id', 'zone_id', 'rack_id', 'code', 'name']);
+        $this->reset(['editingId', 'warehouse_id', 'zone_id', 'rack_id', 'code', 'name', 'capacity']);
         $this->showModal = true;
     }
 
@@ -151,6 +153,7 @@ class LocationIndex extends Component
         $this->warehouse_id = (string) $location->rack?->zone?->warehouse_id;
         $this->code = (string) $location->code;
         $this->name = (string) $location->name;
+        $this->capacity = $location->capacity ? (string) $location->capacity : '';
         $this->showModal = true;
     }
 
@@ -172,12 +175,16 @@ class LocationIndex extends Component
             return;
         }
 
+        $capacity = trim($this->capacity);
+        $this->capacity = $capacity;
+
         $this->validate([
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'zone_id' => ['required', 'exists:zones,id'],
             'rack_id' => ['required', 'exists:racks,id'],
             'code' => ['required', 'string', 'max:50', Rule::unique('locations', 'code')->ignore($this->editingId)],
             'name' => ['required', 'string', 'max:255'],
+            'capacity' => ['nullable', 'integer', 'min:0', 'max:1000000'],
         ]);
 
         $rack = Rack::with('zone')->findOrFail($this->rack_id);
@@ -198,6 +205,7 @@ class LocationIndex extends Component
             'rack_id' => $this->rack_id,
             'code' => $this->code,
             'name' => $this->name,
+            'capacity' => $this->capacity !== '' ? (int) $this->capacity : null,
         ];
 
         if ($this->editingId) {

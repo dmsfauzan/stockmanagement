@@ -135,6 +135,8 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
         Route::get('/reports/cogs', [ReportController::class, 'cogs'])->name('api.reports.cogs');
         Route::get('/reports/journal', [ReportController::class, 'journal'])->name('api.reports.journal');
         Route::get('/reports/replenishment', [ReportController::class, 'replenishment'])->name('api.reports.replenishment');
+        Route::get('/reports/capacity', [ReportController::class, 'capacity'])->name('api.reports.capacity');
+        Route::get('/put-away-suggestion', [ReportController::class, 'putAwaySuggestion'])->name('api.put-away-suggestion');
         Route::get('/reports/forecast', [ReportController::class, 'forecast'])->name('api.reports.forecast');
         Route::get('/reports/forecast/{itemId}', [ReportController::class, 'forecastItem'])->name('api.reports.forecast-item');
         Route::get('/reports/aging', [ReportController::class, 'aging'])->name('api.reports.aging');

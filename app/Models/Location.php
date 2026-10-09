@@ -6,16 +6,29 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['rack_id', 'code', 'name'])]
+#[Fillable(['rack_id', 'code', 'name', 'capacity'])]
 class Location extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected function casts(): array
+    {
+        return [
+            'capacity' => 'integer',
+        ];
+    }
+
     public function rack(): BelongsTo
     {
         return $this->belongsTo(Rack::class);
+    }
+
+    public function stockBalances(): HasMany
+    {
+        return $this->hasMany(StockBalance::class);
     }
 
     public function fullPath(): string

@@ -149,6 +149,11 @@
                         <input type="text" wire:model="name" class="app-input" placeholder="Bin A01-01">
                         @error('name') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                     </div>
+                    <div>
+                        <label class="app-label mb-1">{{ __('Kapasitas') }} (opsional, qty maksimal)</label>
+                        <input type="number" min="0" step="1" wire:model="capacity" class="app-input" placeholder="Kosong = tanpa batas">
+                        @error('capacity') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                    </div>
                     <div class="flex justify-end gap-2">
                         <button type="button" wire:click="closeModal" class="app-btn app-btn-secondary">{{ __('Batal') }}</button>
                         <button type="submit" class="app-btn app-btn-primary">{{ __('Simpan') }}</button>

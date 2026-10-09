@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\StockStatus;
 use App\Services\Accounting\JournalService;
+use App\Services\Inventory\CapacityService;
 use App\Services\Inventory\ExpiryService;
 use App\Services\Inventory\InventoryAnalyticsService;
 use App\Services\Inventory\InventoryForecastService;
@@ -699,6 +700,39 @@ class ReportController extends ApiController
             $itemId,
             30,
             $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
+        ), 'OK');
+    }
+
+    public function capacity(Request $request): JsonResponse
+    {
+        $rows = CapacityService::utilization(
+            $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null,
+        )->values();
+
+        $perPage = $this->perPage($request);
+        $page = max(1, (int) $request->integer('page', 1));
+
+        return $this->paginated(new LengthAwarePaginator(
+            $rows->forPage($page, $perPage)->values(),
+            $rows->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        ));
+    }
+
+    public function putAwaySuggestion(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'warehouse_id' => ['required', 'exists:warehouses,id'],
+            'item_id' => ['required', 'exists:items,id'],
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        return $this->ok(CapacityService::suggestLocation(
+            (int) $data['warehouse_id'],
+            (int) $data['item_id'],
+            (int) $data['quantity'],
         ), 'OK');
     }
 
