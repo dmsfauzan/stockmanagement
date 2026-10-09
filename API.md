@@ -73,6 +73,8 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 | GET | `/warehouses` | `warehouse.view` | `search` |
 | GET | `/locations` | `location.view` | `warehouse_id`, `search` |
 | GET | `/stock` | `stock.view` | `warehouse_id`, `category_id`, `search`, `status` |
+| GET | `/quarantine` | `stock.quarantine` | `warehouse_id`, `item_id`, `search` |
+| POST | `/quarantine/{id}/release` · `/{id}/reject` | `stock.quarantine` | `quantity`, `reason` |
 | GET | `/stock/movements` | `stock.view` | `item_id`, `warehouse_id`, `transaction_type`, `date_from`, `date_to` |
 | GET | `/stock/low` | `stock.view` | `warehouse_id`, `category_id` |
 | GET | `/goods-receipts` · `/{id}` | `goods_receipt.view` | `status`, `warehouse_id`, `date_from`, `date_to`, `search` |

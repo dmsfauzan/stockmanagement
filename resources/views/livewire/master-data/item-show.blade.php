@@ -91,8 +91,9 @@
                                 <tr>
                                     <th>Warehouse</th>
                                     <th>Location</th>
-                                    <th class="text-right">On Hand</th>
+                                     <th class="text-right">On Hand</th>
                                     <th class="text-right">Reserved</th>
+                                    <th class="text-right">Karantina</th>
                                     <th class="text-right">Available</th>
                                 </tr>
                             </thead>
@@ -103,7 +104,8 @@
                                         <td class="text-app-muted">{{ $balance->location?->fullPath() ?? '-' }}</td>
                                         <td class="text-right font-medium">{{ $balance->quantity_on_hand }}</td>
                                         <td class="text-right text-app-muted">{{ $balance->quantity_reserved }}</td>
-                                        <td class="text-right text-app-muted">{{ $balance->quantity_on_hand - $balance->quantity_reserved }}</td>
+                                        <td class="text-right text-amber-600 dark:text-amber-400">{{ (int) ($balance->quantity_quarantine ?? 0) > 0 ? $balance->quantity_quarantine : '-' }}</td>
+                                        <td class="text-right text-app-muted">{{ $balance->quantity_on_hand - $balance->quantity_reserved - (int) ($balance->quantity_quarantine ?? 0) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -63,6 +63,7 @@ class ItemShow extends Component
 
         $totalOnHand = (int) $balances->sum('quantity_on_hand');
         $totalReserved = (int) $balances->sum('quantity_reserved');
+        $totalQuarantine = (int) $balances->sum('quantity_quarantine');
         $stockStatus = StockStatusService::evaluate($item, $totalOnHand);
 
         return view('livewire.master-data.item-show', [
@@ -73,7 +74,8 @@ class ItemShow extends Component
             'conversions' => UnitConversionService::conversions($item->id),
             'totalOnHand' => $totalOnHand,
             'totalReserved' => $totalReserved,
-            'totalAvailable' => $totalOnHand - $totalReserved,
+            'totalQuarantine' => $totalQuarantine,
+            'totalAvailable' => $totalOnHand - $totalReserved - $totalQuarantine,
             'stockStatus' => $stockStatus,
         ]);
     }

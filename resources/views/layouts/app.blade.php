@@ -19,7 +19,8 @@
         request()->routeIs('supplier-returns.*') => 'Retur Pembelian',
         request()->routeIs('stock.index') => 'Stock On Hand',
         request()->routeIs('stock.movements') => 'Stock Movement',
-        request()->routeIs('stock.low') => 'Low Stock',
+                request()->routeIs('stock.low') => 'Low Stock',
+                request()->routeIs('stock.quarantine') => 'Karantina',
         request()->routeIs('scan') => 'Scan',
         request()->routeIs('reports.stock') => __('Laporan Stock'),
         request()->routeIs('reports.incoming') => __('Laporan Barang Masuk'),
@@ -125,7 +126,7 @@
             </a>
             @endcan
 
-            @canany(['stock.view', 'stock.movement', 'items.view'])
+            @canany(['stock.view', 'stock.movement', 'stock.quarantine', 'items.view'])
             <x-sidebar-group group-key="inventory" label="Inventory">
                 @can('items.view')
                 <a href="{{ route('scan') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('scan'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('scan')])>
@@ -149,6 +150,12 @@
                 <a href="{{ route('stock.low') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('stock.low'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('stock.low')])>
                     <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 3h.01M10.9 3.1a1.5 1.5 0 012.2 0l6.4 11.1a1.5 1.5 0 01-1.1 2.3H5.6a1.5 1.5 0 01-1.1-2.3L10.9 3.1z"/></svg>
                     <span x-show="!collapsed" class="flex flex-1 items-center justify-between truncate">Low Stock @if(($lowStockCount ?? 0) > 0) <span class="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">{{ $lowStockCount }}</span> @endif</span>
+                </a>
+                @endcan
+                @can('stock.quarantine')
+                <a href="{{ route('stock.quarantine') }}" @class(['flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', 'bg-slate-800 text-white' => request()->routeIs('stock.quarantine'), 'text-slate-400 hover:bg-slate-800 hover:text-white' => ! request()->routeIs('stock.quarantine')])>
+                    <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0h.01M12 21a9 9 0 100-18 9 9 0 000 18z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6"/></svg>
+                    <span x-show="!collapsed" class="truncate">Karantina</span>
                 </a>
                 @endcan
             </x-sidebar-group>

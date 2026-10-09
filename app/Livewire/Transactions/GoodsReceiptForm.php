@@ -45,6 +45,8 @@ class GoodsReceiptForm extends Component
 
     public string $landed_cost_method = 'value';
 
+    public bool $requires_inspection = false;
+
     public string $notes = '';
 
     public array $items = [];
@@ -77,6 +79,7 @@ class GoodsReceiptForm extends Component
             $this->freight_cost = (string) ($model->freight_cost ?? '0');
             $this->other_cost = (string) ($model->other_cost ?? '0');
             $this->landed_cost_method = (string) ($model->landed_cost_method ?? 'value');
+            $this->requires_inspection = (bool) ($model->requires_inspection ?? false);
             $this->notes = (string) ($model->notes ?? '');
             $this->purchaseOrderLink = $model->purchase_order_id ? (int) $model->purchase_order_id : null;
 
@@ -157,6 +160,7 @@ class GoodsReceiptForm extends Component
             'freight_cost' => ['nullable', 'numeric', 'min:0'],
             'other_cost' => ['nullable', 'numeric', 'min:0'],
             'landed_cost_method' => ['required', 'in:value,quantity'],
+            'requires_inspection' => ['boolean'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.item_id' => ['required', 'exists:items,id'],
@@ -318,6 +322,7 @@ class GoodsReceiptForm extends Component
             'freight_cost' => (float) ($data['freight_cost'] ?? 0),
             'other_cost' => (float) ($data['other_cost'] ?? 0),
             'landed_cost_method' => $data['landed_cost_method'] ?? 'value',
+            'requires_inspection' => (bool) ($data['requires_inspection'] ?? false),
             'purchase_order_id' => $this->purchaseOrderLink,
             'warehouse_id' => $data['warehouse_id'],
             'received_by' => $data['received_by'] !== '' ? $data['received_by'] : null,

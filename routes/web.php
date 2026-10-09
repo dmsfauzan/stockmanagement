@@ -13,6 +13,7 @@ use App\Livewire\Admin\SettingIndex;
 use App\Livewire\Admin\UserIndex;
 use App\Livewire\Dashboard\DashboardIndex;
 use App\Livewire\Inventory\LowStockIndex;
+use App\Livewire\Inventory\QuarantineIndex;
 use App\Livewire\Inventory\StockMovementIndex;
 use App\Livewire\Inventory\StockOnHandIndex;
 use App\Livewire\MasterData\CategoryIndex;
@@ -178,6 +179,7 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:stock.view')->get('/stock', StockOnHandIndex::class)->name('stock.index');
     Route::middleware('permission:stock.movement')->get('/stock/movements', StockMovementIndex::class)->name('stock.movements');
     Route::middleware('permission:stock.view')->get('/stock/low-stock', LowStockIndex::class)->name('stock.low');
+    Route::middleware('permission:stock.quarantine')->get('/stock/quarantine', QuarantineIndex::class)->name('stock.quarantine');
 
     Route::middleware('permission:reports.view')->get('/reports/stock', StockReport::class)->name('reports.stock');
     Route::middleware('permission:reports.view')->get('/reports/incoming', IncomingReport::class)->name('reports.incoming');

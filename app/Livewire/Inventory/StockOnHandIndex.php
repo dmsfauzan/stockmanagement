@@ -90,7 +90,7 @@ class StockOnHandIndex extends Component
 
         return response()->streamDownload(function () use ($rows): void {
             $h = fopen('php://output', 'w');
-            fputcsv($h, ['SKU', 'Item', 'Category', 'Warehouse', 'Location', 'On Hand', 'Reserved', 'Available', 'Min', 'Max', 'Status']);
+            fputcsv($h, ['SKU', 'Item', 'Category', 'Warehouse', 'Location', 'On Hand', 'Reserved', 'Quarantine', 'Available', 'Min', 'Max', 'Status']);
             foreach ($rows as $row) {
                 fputcsv($h, [
                     $row->sku,
@@ -100,6 +100,7 @@ class StockOnHandIndex extends Component
                     $row->location_path,
                     $row->quantity_on_hand,
                     $row->quantity_reserved,
+                    $row->quantity_quarantine,
                     $row->quantity_available,
                     $row->min_stock,
                     $row->max_stock,
@@ -154,6 +155,7 @@ class StockOnHandIndex extends Component
             'stock_balances.id',
             'stock_balances.quantity_on_hand',
             'stock_balances.quantity_reserved',
+            'stock_balances.quantity_quarantine',
             'stock_balances.quantity_available',
             'items.sku',
             'items.name as item_name',

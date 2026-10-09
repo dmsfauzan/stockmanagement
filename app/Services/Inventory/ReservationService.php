@@ -40,10 +40,11 @@ class ReservationService
                         'location_id' => $locationId,
                         'quantity_on_hand' => 0,
                         'quantity_reserved' => 0,
+                        'quantity_quarantine' => 0,
                     ]);
                 }
 
-                $available = (int) $balance->quantity_on_hand - (int) $balance->quantity_reserved;
+                $available = (int) $balance->quantity_on_hand - (int) $balance->quantity_reserved - (int) ($balance->quantity_quarantine ?? 0);
 
                 if ($quantity > $available) {
                     throw new \RuntimeException('Insufficient available stock to reserve');

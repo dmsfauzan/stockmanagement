@@ -78,6 +78,7 @@
                         <th>Location</th>
                         <th class="text-right"><button type="button" wire:click="sortBy('on_hand')" class="inline-flex items-center gap-1 hover:text-app-text">On Hand @if($sortField==='on_hand')<span>{{ $sortDirection==='asc'?'↑':'↓' }}</span>@endif</button></th>
                         <th class="text-right">Reserved</th>
+                        <th class="text-right">Karantina</th>
                         <th class="text-right">Available</th>
                         <th class="text-right">Min</th>
                         <th class="text-right">Max</th>
@@ -94,13 +95,14 @@
                             <td class="text-app-muted">{{ $row->location_path }}</td>
                             <td class="whitespace-nowrap text-right font-medium text-app-text">{{ number_format($row->quantity_on_hand) }}</td>
                             <td class="whitespace-nowrap text-right text-app-muted">{{ number_format($row->quantity_reserved) }}</td>
+                            <td class="whitespace-nowrap text-right {{ (int) ($row->quantity_quarantine ?? 0) > 0 ? 'font-medium text-amber-600 dark:text-amber-400' : 'text-app-muted' }}">{{ number_format($row->quantity_quarantine ?? 0) }}</td>
                             <td class="whitespace-nowrap text-right text-app-muted">{{ number_format($row->quantity_available) }}</td>
                             <td class="whitespace-nowrap text-right text-app-muted">{{ number_format($row->min_stock) }}</td>
                             <td class="whitespace-nowrap text-right text-app-muted">{{ number_format($row->max_stock) }}</td>
                             <td class="whitespace-nowrap"><x-ui.status-badge :status="$row->stock_status" /></td>
                         </tr>
                     @empty
-                        <tr><td colspan="11"><x-ui.empty-state title="Tidak ada stok" message="Tidak ada data yang cocok dengan filter." /></td></tr>
+                        <tr><td colspan="12"><x-ui.empty-state title="Tidak ada stok" message="Tidak ada data yang cocok dengan filter." /></td></tr>
                     @endforelse
                 </tbody>
                 @if ($rows->count() > 0)
@@ -108,6 +110,7 @@
                         <tr class="bg-app-surface-2 font-semibold">
                             <td colspan="5" class="px-4 py-3 text-right text-app-muted">Totals (filtered):</td>
                             <td class="px-4 py-3 text-right text-app-text">{{ number_format($totals['on_hand']) }}</td>
+                            <td></td>
                             <td></td>
                             <td class="px-4 py-3 text-right text-app-text">{{ number_format($totals['available']) }}</td>
                             <td colspan="3"></td>

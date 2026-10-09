@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\QualityStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['item_id', 'warehouse_id', 'location_id', 'transaction_type', 'reference_type', 'reference_id', 'quantity_in', 'quantity_out', 'balance_after', 'unit_cost', 'total_cost', 'batch_number', 'serial_number', 'expiry_date', 'notes', 'created_by'])]
+#[Fillable(['item_id', 'warehouse_id', 'location_id', 'transaction_type', 'reference_type', 'reference_id', 'quantity_in', 'quantity_out', 'balance_after', 'unit_cost', 'total_cost', 'batch_number', 'serial_number', 'quality_status', 'expiry_date', 'notes', 'created_by'])]
 class StockMovement extends Model
 {
     use HasFactory;
@@ -25,6 +26,7 @@ class StockMovement extends Model
             'balance_after' => 'integer',
             'unit_cost' => 'decimal:4',
             'total_cost' => 'decimal:2',
+            'quality_status' => QualityStatus::class,
             'expiry_date' => 'date',
             'created_at' => 'datetime',
         ];

@@ -3,6 +3,7 @@
 namespace App\Services\Inventory;
 
 use App\Enums\OpnameStatus;
+use App\Enums\QualityStatus;
 use App\Enums\TransactionStatus;
 use App\Enums\TransactionType;
 use App\Enums\TransferStatus;
@@ -66,6 +67,9 @@ class InventoryService
                     $effectiveCost += $rowLanded / max(1, $baseQty);
                 }
 
+                $quarantine = (bool) ($locked->requires_inspection ?? false);
+                $baseQtyIn = $item->baseQuantity();
+
                 LedgerService::record(
                     (int) $item->item_id,
                     (int) $locked->warehouse_id,
@@ -73,14 +77,27 @@ class InventoryService
                     TransactionType::Incoming,
                     GoodsReceipt::class,
                     (int) $locked->id,
-                    $item->baseQuantity(),
+                    $baseQtyIn,
                     0,
                     $item->batch_number,
                     $expiryDate,
                     $item->notes,
                     $effectiveCost,
-                    $item->serial_number ?? null
+                    $item->serial_number ?? null,
+                    $quarantine ? QualityStatus::Quarantine->value : QualityStatus::Good->value
                 );
+
+                if ($quarantine) {
+                    QualityService::hold(
+                        (int) $item->item_id,
+                        (int) $locked->warehouse_id,
+                        (int) $item->location_id,
+                        $baseQtyIn,
+                        'Inspection required ('.$locked->number.')',
+                        $item->batch_number,
+                        $item->serial_number ?? null
+                    );
+                }
             }
 
             $locked->update([

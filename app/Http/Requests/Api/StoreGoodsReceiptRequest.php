@@ -22,6 +22,7 @@ class StoreGoodsReceiptRequest extends FormRequest
             'purchase_order_id' => ['nullable', 'exists:purchase_orders,id'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'received_by' => ['nullable', 'string', 'max:100'],
+            'requires_inspection' => ['sometimes', 'boolean'],
             'notes' => ['nullable', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.item_id' => ['required', 'exists:items,id'],

@@ -68,6 +68,13 @@
                     @error('received_by') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
                 </div>
                 <div class="sm:col-span-2 lg:col-span-3">
+                    <label class="flex items-center gap-2 text-sm text-app-text">
+                        <input type="checkbox" wire:model="requires_inspection" class="rounded border-app-border">
+                        {{ __('Perlu inspeksi (masuk karantina saat diposting)') }}
+                    </label>
+                    @error('requires_inspection') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror
+                </div>
+                <div class="sm:col-span-2 lg:col-span-3">
                     <label for="notes" class="app-label mb-1.5">{{ __('Catatan') }}</label>
                     <textarea id="notes" wire:model="notes" rows="2" class="app-textarea" placeholder="Catatan transaksi..."></textarea>
                     @error('notes') <p class="mt-1 text-xs text-rose-600 dark:text-rose-400">{{ $message }}</p> @enderror

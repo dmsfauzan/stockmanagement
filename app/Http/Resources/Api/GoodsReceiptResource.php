@@ -21,6 +21,7 @@ class GoodsReceiptResource extends JsonResource
             'warehouse' => $this->whenLoaded('warehouse', fn () => $this->warehouse ? ['id' => $this->warehouse->id, 'name' => $this->warehouse->name] : null),
             'po_number' => $this->po_number,
             'delivery_note' => $this->delivery_note,
+            'requires_inspection' => (bool) ($this->requires_inspection ?? false),
             'status' => $this->status,
             'notes' => $this->notes,
             'created_at' => $this->created_at?->toISOString(),

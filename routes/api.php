@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\MasterDataController;
+use App\Http\Controllers\Api\QualityController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ReturnController;
 use App\Http\Controllers\Api\StockController;
@@ -45,6 +46,12 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
         Route::get('/stock', [StockController::class, 'index'])->name('api.stock.index');
         Route::get('/stock/movements', [StockController::class, 'movements'])->name('api.stock.movements');
         Route::get('/stock/low', [StockController::class, 'low'])->name('api.stock.low');
+    });
+
+    Route::middleware('permission:stock.quarantine')->group(function (): void {
+        Route::get('/quarantine', [QualityController::class, 'index'])->name('api.quarantine.index');
+        Route::post('/quarantine/{id}/release', [QualityController::class, 'release'])->name('api.quarantine.release');
+        Route::post('/quarantine/{id}/reject', [QualityController::class, 'reject'])->name('api.quarantine.reject');
     });
 
     Route::middleware('permission:goods_receipt.view')->group(function (): void {

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->foreignId('location_id')->constrained()->restrictOnDelete();
             $table->integer('quantity_on_hand')->default(0);
             $table->unsignedInteger('quantity_reserved')->default(0);
-            $table->integer('quantity_available')->storedAs('quantity_on_hand - quantity_reserved');
+            $table->unsignedInteger('quantity_quarantine')->default(0);
+            $table->integer('quantity_available')->storedAs('quantity_on_hand - quantity_reserved - quantity_quarantine');
             $table->timestamp('last_movement_at')->nullable();
             $table->timestamps();
             $table->unique(['item_id', 'warehouse_id', 'location_id']);

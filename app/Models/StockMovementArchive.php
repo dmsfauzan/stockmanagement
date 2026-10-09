@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\QualityStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ class StockMovementArchive extends Model
 
     protected $casts = [
         'expiry_date' => 'date',
+        'quality_status' => QualityStatus::class,
         'created_at' => 'datetime',
         'archived_at' => 'datetime',
     ];

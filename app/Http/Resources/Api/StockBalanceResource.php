@@ -31,6 +31,7 @@ class StockBalanceResource extends JsonResource
             'location' => $this->location_path ?? $this->location_code,
             'on_hand' => (int) $this->quantity_on_hand,
             'reserved' => (int) $this->quantity_reserved,
+            'quarantine' => (int) ($this->quantity_quarantine ?? 0),
             'available' => (int) $this->quantity_available,
             'min' => (int) ($this->min_stock ?? 0),
             'max' => (int) ($this->max_stock ?? 0),

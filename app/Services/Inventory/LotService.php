@@ -80,6 +80,7 @@ class LotService
                 ->when($batchNumber !== null, fn ($q) => $q->where('batch_number', $batchNumber))
                 ->when($serialNumber !== null, fn ($q) => $q->where('serial_number', $serialNumber))
                 ->available()
+                ->good()
                 ->fefo()
                 ->lockForUpdate()
                 ->get();
@@ -93,11 +94,12 @@ class LotService
             return;
         }
 
-        // FEFO across all available lots at the location.
+        // FEFO across all available good lots at the location.
         $lots = StockLot::where('item_id', $itemId)
             ->where('warehouse_id', $warehouseId)
             ->where('location_id', $locationId)
             ->available()
+            ->good()
             ->fefo()
             ->lockForUpdate()
             ->get();
@@ -141,6 +143,7 @@ class LotService
             ->where('warehouse_id', $warehouseId)
             ->when($locationId !== null, fn ($q) => $q->where('location_id', $locationId))
             ->available()
+            ->good()
             ->fefo()
             ->get();
     }

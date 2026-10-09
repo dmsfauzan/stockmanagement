@@ -100,6 +100,7 @@ class StockController extends ApiController
                 'stock_balances.id',
                 'stock_balances.quantity_on_hand',
                 'stock_balances.quantity_reserved',
+                'stock_balances.quantity_quarantine',
                 'stock_balances.quantity_available',
                 'stock_balances.last_movement_at',
                 'items.sku',

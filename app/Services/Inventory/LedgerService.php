@@ -23,7 +23,8 @@ class LedgerService
         ?string $expiryDate = null,
         ?string $notes = null,
         ?float $unitCost = null,
-        ?string $serialNumber = null
+        ?string $serialNumber = null,
+        ?string $qualityStatus = null
     ): StockMovement {
         $balance = StockBalance::where('item_id', $itemId)
             ->where('warehouse_id', $warehouseId)
@@ -38,11 +39,12 @@ class LedgerService
                 'location_id' => $locationId,
                 'quantity_on_hand' => 0,
                 'quantity_reserved' => 0,
+                'quantity_quarantine' => 0,
             ]);
         }
 
         if (in_array($type, [TransactionType::Outgoing, TransactionType::AdjustmentOut, TransactionType::TransferOut, TransactionType::ReturnOut], true)) {
-            $available = (int) $balance->quantity_on_hand - (int) $balance->quantity_reserved;
+            $available = (int) $balance->quantity_on_hand - (int) $balance->quantity_reserved - (int) ($balance->quantity_quarantine ?? 0);
 
             if ($qtyOut > $available) {
                 throw new \RuntimeException('Insufficient stock');
@@ -81,6 +83,7 @@ class LedgerService
             'total_cost' => $movementTotalCost,
             'batch_number' => $batchNumber,
             'serial_number' => $serialNumber,
+            'quality_status' => $qualityStatus ?? 'good',
             'expiry_date' => $expiryDate,
             'notes' => $notes,
             'created_by' => auth()->id(),

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['item_id', 'warehouse_id', 'location_id', 'quantity_on_hand', 'quantity_reserved', 'last_movement_at'])]
+#[Fillable(['item_id', 'warehouse_id', 'location_id', 'quantity_on_hand', 'quantity_reserved', 'quantity_quarantine', 'last_movement_at'])]
 class StockBalance extends Model
 {
     use HasFactory;
@@ -19,9 +19,15 @@ class StockBalance extends Model
         return [
             'quantity_on_hand' => 'integer',
             'quantity_reserved' => 'integer',
+            'quantity_quarantine' => 'integer',
             'quantity_available' => 'integer',
             'last_movement_at' => 'datetime',
         ];
+    }
+
+    public function scopeQuarantined(Builder $query): Builder
+    {
+        return $query->where('quantity_quarantine', '>', 0);
     }
 
     public function item(): BelongsTo

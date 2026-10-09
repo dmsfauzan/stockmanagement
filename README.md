@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-323_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-329_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -81,6 +81,7 @@ flowchart LR
 | Batch & Expiry | Tracking batch/expiry, report kedaluwarsa, alert dashboard, notifikasi batch ≤ 7 hari |
 | Lot / Serial | `tracking_type` per item (none/batch/serial), tabel `stock_lots`, stok per lot/serial, FEFO |
 | Konversi Satuan | Satuan majemuk per barang (mis. 1 BOX = 12 PCS) di form Barang; posting transaksi otomatis dikonversi ke satuan dasar (`base_quantity`); tabel konversi di Detail Barang + API `?include=conversions`; dropdown satuan dapat dibatasi ke konversi terdaftar (**Settings → Inventory**) |
+| QC / Karantina | Barang Masuk bertanda **Perlu Inspeksi** masuk ke bucket karantina; `Available = On Hand − Reserved − Karantina`; halaman **Inventory → Karantina** (Loloskan / Tolak) + export, API `/quarantine`; lot/serial berstatus karantina tidak ikut FEFO |
 | Cycle Counting | Opname parsial per zona/rak (`type=cycle`), command `inventory:cycle-count` terjadwal mingguan |
 | Landed Cost | Biaya kirim/lainnya pada Barang Masuk dialokasikan (by value/qty) ke average cost |
 | FEFO Picking | Barang Keluar pilih lot/serial otomatis dari expiry terdekat (`applyFefo`) |

@@ -69,6 +69,7 @@ class WriteTransactionController extends ApiController
             'po_number' => $this->nullableString($data['po_number'] ?? null),
             'delivery_note' => $this->nullableString($data['delivery_note'] ?? null),
             'purchase_order_id' => $data['purchase_order_id'] ?? null,
+            'requires_inspection' => (bool) ($data['requires_inspection'] ?? false),
             'warehouse_id' => $data['warehouse_id'],
             'received_by' => $this->nullableString($data['received_by'] ?? null),
             'notes' => $this->nullableString($data['notes'] ?? null),
