@@ -126,7 +126,7 @@ flowchart LR
 | Sales Order | SO (`SO-...`): Draft→Submitted→Approved→Partial→Fulfilled→Closed, fulfilment via Barang Keluar |
 | Multi-Warehouse | Switcher gudang global (session), dashboard per gudang, report perbandingan gudang |
 | Valuation / COGS | Harga pokok rata-rata bergerak (moving average), COGS, report valuasi & COGS |
-| **REST API** | Sanctum token, ~72 endpoint (read + tulis workflow), permission- & rate-limited, format konsisten — lihat [`API.md`](API.md) |
+| **REST API** | Sanctum token, ~116 endpoint (read + tulis workflow), permission- & rate-limited, format konsisten — lihat [`API.md`](API.md) & `/docs/api` |
 | Advanced Supplier | Lead time, termin, price list, skor on-time & variasi harga |
 | Replenishment | Saran beli dari min/max + buat PO sekali klik |
 | PWA | Installable, app-shell offline, scan kamera di HP |
@@ -320,7 +320,7 @@ Penerima notifikasi diatur via `BACKUP_MAIL_TO` (default `MAIL_FROM_ADDRESS`). J
 - [x] Phase 3 — barcode/QR, reserved stock, batch & expiry, import, reversal
 - [x] Purchase Order & Multi-Warehouse (switcher + comparison report)
 - [x] Valuation (moving average) & COGS, accounting journal, replenishment
-- [x] PWA & REST API (Sanctum, 68 endpoint, workflow dari API)
+- [x] PWA & REST API (Sanctum, 116 endpoint, workflow dari API)
 - [x] UX & Data — gambar barang/avatar, template label, saved filter & pilih kolom report
 - [x] Security & Ops — soft-delete/restore, 2FA, security headers, health, backup terjadwal
 - [x] Sales Order — SO → Barang Keluar (fulfilment), report & REST API

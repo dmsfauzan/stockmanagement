@@ -132,9 +132,16 @@ return [
         | Grup | Prefiks | Permission |
         | --- | --- | --- |
         | Identitas | `/me` | — |
-        | Master data | `/items`, `/categories`, `/units`, `/suppliers`, `/customers`, `/warehouses`, `/locations` | `items.view`, `warehouse.view`, `location.view` |
+        | Master data | `/items` (`?include=conversions\|bom`), `/categories`, `/units`, `/suppliers`, `/customers`, `/warehouses`, `/locations`, `/currencies` | `items.view`, `warehouse.view`, `location.view` |
         | Stok | `/stock`, `/stock/movements`, `/stock/low` | `stock.view` |
         | Transaksi | `/goods-receipts`, `/goods-issues`, `/stock-adjustments`, `/stock-opnames`, `/stock-transfers`, `/purchase-orders`, `/sales-orders` | `*.view` / `*.create` |
+        | Picking | `/pick-lists`, `/pick-lists/{id}`, `POST /goods-issues/{id}/pick-list`, `/pick-lists/{id}/items/{itemId}/confirm`, `/{id}/complete`, `/{id}/pack` | `picking.view` / `.create` / `.pick` / `.pack` |
+        | Perakitan (Kitting/BOM) | `/assembly-orders`, `/assembly-orders/{id}` | `assembly.view` / `.create` |
+        | Requisition | `/requisitions`, `/requisitions/{id}`, `/{id}/{submit\|approve\|reject\|convert}` | `requisition.view` / `.create` / `.submit` / `.approve` / `.convert` |
+        | Karantina (QC) | `/quarantine`, `/quarantine/{id}/release`, `/{id}/reject` | `stock.quarantine` |
+        | Lacak & Recall | `/traceability/{type}/{value}`, `/recalls`, `/recalls/impact`, `/recalls/{id}/lift` | `stock.movement` |
+        | Mata uang | `/currencies`, `/currency/convert` | `items.view` |
+        | Analitik & Kapasitas | `/reports/aging`, `/abc`, `/turnover`, `/slow-moving`, `/forecast`, `/forecast/{itemId}`, `/capacity`, `/put-away-suggestion` | `reports.view` |
         | Laporan | `/reports/*`, `/accounting/*` | `reports.view` |
 
         ## Quick start
