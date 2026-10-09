@@ -31,7 +31,7 @@
 
         <div class="overflow-x-auto">
             <table class="app-table">
-                <thead><tr><th>{{ __('Nomor') }}</th><th>{{ __('Tipe') }}</th><th>{{ __('Barang') }}</th><th class="text-right">{{ __('Qty') }}</th><th>{{ __('Warehouse') }}</th><th>{{ __('Status') }}</th><th></th></tr></thead>
+                    <thead><tr><th>{{ __('Nomor') }}</th><th>{{ __('Tipe') }}</th><th>{{ __('Barang') }}</th><th class="text-right">{{ __('Qty') }}</th><th>{{ __('Warehouse') }}</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                     @forelse ($rows as $row)
                         <tr>

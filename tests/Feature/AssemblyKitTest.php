@@ -85,6 +85,11 @@ class AssemblyKitTest extends TestCase
         return (int) StockBalance::where('item_id', $item->id)->sum('quantity_on_hand');
     }
 
+    public function test_assembly_index_renders(): void
+    {
+        $this->get(route('assembly-orders.index'))->assertOk()->assertSee('Perakitan / Kit');
+    }
+
     public function test_bom_cost_computation(): void
     {
         [$kit, $compA, $compB] = $this->kitContext();
