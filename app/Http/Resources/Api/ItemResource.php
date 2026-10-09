@@ -41,6 +41,11 @@ class ItemResource extends JsonResource
                 'unit_name' => $conversion->unit?->name,
                 'factor' => (float) $conversion->factor,
             ])->values()->all(), null),
+            'bom' => $this->whenLoaded('bomComponents', fn () => $this->bomComponents->map(fn ($bom) => [
+                'component_item_id' => (int) $bom->component_item_id,
+                'sku' => $bom->component?->sku,
+                'quantity' => (int) $bom->quantity,
+            ])->values()->all(), null),
             'created_at' => $this->created_at?->toISOString(),
         ];
     }

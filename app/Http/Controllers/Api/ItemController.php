@@ -35,8 +35,12 @@ class ItemController extends ApiController
     {
         $with = ['category', 'unit'];
 
-        if ((string) $request->string('include') === 'conversions') {
+        $include = (string) $request->string('include');
+
+        if ($include === 'conversions') {
             $with[] = 'conversions.unit';
+        } elseif ($include === 'bom') {
+            $with[] = 'bomComponents.component';
         }
 
         $item->loadMissing($with);

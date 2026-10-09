@@ -18,6 +18,8 @@ use App\Livewire\Inventory\QuarantineIndex;
 use App\Livewire\Inventory\StockMovementIndex;
 use App\Livewire\Inventory\StockOnHandIndex;
 use App\Livewire\Inventory\TraceabilityIndex;
+use App\Livewire\Manufacturing\AssemblyOrderForm;
+use App\Livewire\Manufacturing\AssemblyOrderIndex;
 use App\Livewire\MasterData\CategoryIndex;
 use App\Livewire\MasterData\CustomerIndex;
 use App\Livewire\MasterData\CustomerShow;
@@ -191,6 +193,8 @@ Route::middleware(['auth', 'active', 'twofactor.admin'])->group(function () {
     Route::middleware('permission:picking.create')->get('/picking/create', PickListForm::class)->name('picking.create');
     Route::middleware('permission:picking.view')->get('/picking/{pickList}/slip', [PickSlipController::class, 'slip'])->name('picking.slip');
     Route::middleware('permission:picking.view')->get('/picking/{pickList}', PickListShow::class)->name('picking.show');
+    Route::middleware('permission:assembly.view')->get('/assembly-orders', AssemblyOrderIndex::class)->name('assembly-orders.index');
+    Route::middleware('permission:assembly.create')->get('/assembly-orders/create', AssemblyOrderForm::class)->name('assembly-orders.create');
 
     Route::middleware('permission:reports.view')->get('/reports/stock', StockReport::class)->name('reports.stock');
     Route::middleware('permission:reports.view')->get('/reports/incoming', IncomingReport::class)->name('reports.incoming');

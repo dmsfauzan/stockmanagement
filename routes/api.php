@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AssemblyController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\QualityController;
@@ -74,6 +75,15 @@ Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->gro
 
     Route::middleware('permission:picking.pack')->group(function (): void {
         Route::post('/pick-lists/{id}/pack', [StockController::class, 'packPickList'])->name('api.pick-lists.pack');
+    });
+
+    Route::middleware('permission:assembly.view')->group(function (): void {
+        Route::get('/assembly-orders', [AssemblyController::class, 'index'])->name('api.assembly-orders.index');
+        Route::get('/assembly-orders/{id}', [AssemblyController::class, 'show'])->name('api.assembly-orders.show');
+    });
+
+    Route::middleware('permission:assembly.create')->group(function (): void {
+        Route::post('/assembly-orders', [AssemblyController::class, 'store'])->name('api.assembly-orders.store');
     });
 
     Route::middleware('permission:goods_receipt.view')->group(function (): void {

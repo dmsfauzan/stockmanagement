@@ -180,6 +180,45 @@
                 @endif
             </div>
 
+            <div class="rounded-lg border border-app-border p-4">
+                <h3 class="app-card-title mb-2">{{ __('Bill of Materials (Kit)') }}</h3>
+                <p class="mb-3 text-xs text-app-muted">{{ __('Tetapkan komponen perakitan barang ini. Biaya perakitan otomatis dihitung dari komponen.') }}</p>
+
+                <div class="flex flex-wrap items-end gap-2">
+                    <label><span class="app-label">{{ __('Komponen') }}</span>
+                        <select wire:model="bomComponentId" class="app-select">
+                            <option value="">—</option>
+                            @foreach ($componentItems as $c)
+                                <option value="{{ $c->id }}">{{ $c->sku }} — {{ $c->name }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label><span class="app-label">{{ __('Qty per 1 kit') }}</span>
+                        <input type="number" min="1" step="1" wire:model="bomQuantity" class="app-input">
+                    </label>
+                    <button type="button" wire:click="addBomComponent" class="app-btn app-btn-secondary">{{ __('Tambah') }}</button>
+                </div>
+                @error('bomComponentId') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+                @error('bomQuantity') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
+
+                @if (count($bomRows) > 0)
+                    <div class="mt-3 overflow-x-auto">
+                        <table class="app-table">
+                            <thead><tr><th>{{ __('Komponen') }}</th><th class="text-right">{{ __('Qty') }}</th><th></th></tr></thead>
+                            <tbody>
+                                @foreach ($bomRows as $i => $row)
+                                    <tr>
+                                        <td class="text-app-text">{{ $componentItems->firstWhere('id', (int) $row['component_item_id'])?->name ?? $row['component_item_id'] }}</td>
+                                        <td class="text-right text-app-text">{{ $row['quantity'] }}</td>
+                                        <td class="text-right"><button type="button" wire:click="removeBomComponent({{ $i }})" class="app-btn app-btn-ghost !p-1.5 hover:!text-rose-600" title="Hapus">✕</button></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+
             <div class="flex justify-end gap-2 pt-2">
                 <a href="{{ route('items.index') }}" class="app-btn app-btn-secondary">{{ __('Batal') }}</a>
                 <button type="submit" wire:loading.attr="disabled" class="app-btn app-btn-primary gap-2">

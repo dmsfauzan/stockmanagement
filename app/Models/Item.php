@@ -47,6 +47,11 @@ class Item extends Model
         return $this->hasMany(ItemUnitConversion::class);
     }
 
+    public function bomComponents(): HasMany
+    {
+        return $this->hasMany(ItemBom::class, 'kit_item_id');
+    }
+
     public function customerPrices(): HasMany
     {
         return $this->hasMany(CustomerItemPrice::class);

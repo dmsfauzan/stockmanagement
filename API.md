@@ -64,7 +64,7 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 | Method | Path | Permission | Filter |
 |---|---|---|---|
 | GET | `/me` | — | |
-| GET | `/items` · `/items/{id}` | `items.view` | `search`, `category_id`, `status`, `include=conversions` |
+| GET | `/items` · `/items/{id}` | `items.view` | `search`, `category_id`, `status`, `include=conversions\|bom` |
 | GET | `/categories` | `items.view` | `search` |
 | GET | `/units` | `items.view` | `search` |
 | GET | `/suppliers` | `items.view` | `search`, `status` |
@@ -106,6 +106,9 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 | POST | `/goods-issues/{id}/pick-list` | `picking.create` | `assigned_to` |
 | POST | `/pick-lists/{id}/items/{itemId}/confirm` · `/{id}/complete` | `picking.pick` | `picked_quantity`, `batch_number`, `serial_number` |
 | POST | `/pick-lists/{id}/pack` | `picking.pack` | |
+| GET | `/items/{id}?include=bom` | `items.view` | |
+| GET | `/assembly-orders` · `/assembly-orders/{id}` | `assembly.view` | `status`, `warehouse_id` |
+| POST | `/assembly-orders` | `assembly.create` | `type`, `item_id`, `quantity`, `warehouse_id`, `location_id` |
 | GET | `/accounting/journal` | `reports.view` | `date_from`, `date_to`, `warehouse_id`, `transaction_type` |
 | GET | `/accounting/summary` | `reports.view` | `date_from`, `date_to`, `warehouse_id` |
 

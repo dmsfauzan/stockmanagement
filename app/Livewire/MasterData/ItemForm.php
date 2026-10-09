@@ -4,6 +4,7 @@ namespace App\Livewire\MasterData;
 
 use App\Models\Category;
 use App\Models\Item;
+use App\Models\ItemBom;
 use App\Models\ItemUnitConversion;
 use App\Models\Supplier;
 use App\Models\SupplierItemPrice;
@@ -65,6 +66,13 @@ class ItemForm extends Component
 
     public string $conversionFactor = '';
 
+    /** @var array<int, array{id:int, component_item_id:string, quantity:string}> */
+    public array $bomRows = [];
+
+    public string $bomComponentId = '';
+
+    public string $bomQuantity = '1';
+
     public function mount($item = null): void
     {
         $model = $item instanceof Item ? $item : ($item ? Item::findOrFail($item) : null);
@@ -93,6 +101,12 @@ class ItemForm extends Component
                 ->orderByDesc('factor')
                 ->get()
                 ->map(fn ($c) => ['id' => $c->id, 'unit_id' => (string) $c->unit_id, 'factor' => (string) $c->factor])
+                ->values()->all();
+
+            $this->bomRows = ItemBom::where('kit_item_id', $model->id)
+                ->orderBy('id')
+                ->get()
+                ->map(fn ($b) => ['id' => $b->id, 'component_item_id' => (string) $b->component_item_id, 'quantity' => (string) $b->quantity])
                 ->values()->all();
         } else {
             $this->authorize('create', Item::class);
@@ -147,6 +161,42 @@ class ItemForm extends Component
 
         unset($this->conversionRows[$index]);
         $this->conversionRows = array_values($this->conversionRows);
+    }
+
+    public function addBomComponent(): void
+    {
+        $this->validate([
+            'bomComponentId' => ['required', 'exists:items,id'],
+            'bomQuantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        if ($this->itemId && (int) $this->bomComponentId === $this->itemId) {
+            $this->addError('bomComponentId', __('Komponen tidak boleh sama dengan barang kit.'));
+
+            return;
+        }
+
+        $this->bomRows[] = [
+            'id' => 0,
+            'component_item_id' => (string) $this->bomComponentId,
+            'quantity' => (string) $this->bomQuantity,
+        ];
+
+        $this->reset('bomComponentId', 'bomQuantity');
+        $this->bomQuantity = '1';
+        $this->resetErrorBag(['bomComponentId', 'bomQuantity']);
+    }
+
+    public function removeBomComponent(int $index): void
+    {
+        $row = $this->bomRows[$index] ?? null;
+
+        if ($row && (int) $row['id'] > 0) {
+            ItemBom::whereKey($row['id'])->delete();
+        }
+
+        unset($this->bomRows[$index]);
+        $this->bomRows = array_values($this->bomRows);
     }
 
     public function save()
@@ -222,6 +272,20 @@ class ItemForm extends Component
             );
         }
 
+        foreach ($this->bomRows as $row) {
+            $componentId = (int) $row['component_item_id'];
+            $quantity = (int) $row['quantity'];
+
+            if ($componentId <= 0 || $quantity <= 0 || $componentId === $item->id) {
+                continue;
+            }
+
+            ItemBom::updateOrCreate(
+                ['kit_item_id' => $item->id, 'component_item_id' => $componentId],
+                ['quantity' => $quantity, 'created_by' => auth()->id()],
+            );
+        }
+
         $this->dispatch('toast', type: 'success', message: __('Tersimpan'));
 
         return $this->redirect(route('items.index'), navigate: true);
@@ -234,6 +298,10 @@ class ItemForm extends Component
             'categories' => Category::where('status', 'active')->orderBy('name')->get(['id', 'name']),
             'units' => Unit::orderBy('name')->get(['id', 'name', 'code']),
             'suppliers' => Supplier::where('status', 'active')->orderBy('name')->get(['id', 'name']),
+            'componentItems' => Item::where('status', 'active')
+                ->when($this->itemId, fn ($q) => $q->whereKeyNot($this->itemId))
+                ->orderBy('name')
+                ->get(['id', 'sku', 'name']),
         ]);
     }
 }
