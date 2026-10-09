@@ -1,6 +1,6 @@
 <?php
 
-$defaultCsp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com unpkg.com; font-src 'self' data: fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' unpkg.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'";
+$defaultCsp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net unpkg.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com unpkg.com; font-src 'self' data: fonts.gstatic.com; img-src 'self' data: blob: img.shields.io; connect-src 'self' unpkg.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'";
 $customCsp = env('SECURITY_CSP');
 
 return [
