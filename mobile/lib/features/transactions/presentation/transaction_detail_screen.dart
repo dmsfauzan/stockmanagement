@@ -154,6 +154,25 @@ class _TransactionDetailScreenState
     }
   }
 
+  Future<void> _generatePickList() async {
+    setState(() => _busy = true);
+
+    try {
+      await ref.read(pickingRepositoryProvider).generate(widget.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Pick list dibuat.')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e'), backgroundColor: AppColors.rose),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<String?> _askReason() async {
     final controller = TextEditingController();
 
@@ -252,6 +271,21 @@ class _TransactionDetailScreenState
             ),
           ),
         ),
+        if (widget.type == TxnType.issue &&
+            (detail.status == 'approved' || detail.status == 'partial') &&
+            (ref
+                    .watch(authStateProvider)
+                    .valueOrNull
+                    ?.user
+                    ?.can('picking.create') ??
+                false)) ...[
+          const SizedBox(height: AppSpacing.lg),
+          FilledButton.icon(
+            onPressed: _busy ? null : _generatePickList,
+            icon: const Icon(Icons.checklist_outlined),
+            label: const Text('Buat Pick List'),
+          ),
+        ],
         const SizedBox(height: AppSpacing.lg),
         SectionHeader(title: 'Item (${detail.lines.length})'),
         Card(

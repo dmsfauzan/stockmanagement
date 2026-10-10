@@ -3,82 +3,118 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/widgets/common.dart';
-import '../../../../data/transactions/transaction_models.dart';
+
+class _HubEntry {
+  const _HubEntry({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.path,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String path;
+}
+
+const _entries = [
+  _HubEntry(
+    icon: Icons.move_to_inbox_outlined,
+    title: 'Barang Masuk',
+    subtitle: 'Penerimaan supplier',
+    path: '/tx/receipts',
+  ),
+  _HubEntry(
+    icon: Icons.outbox_outlined,
+    title: 'Barang Keluar',
+    subtitle: 'Pengeluaran ke customer',
+    path: '/tx/issues',
+  ),
+  _HubEntry(
+    icon: Icons.tune_outlined,
+    title: 'Adjustment',
+    subtitle: 'Koreksi stok',
+    path: '/tx/adjustments',
+  ),
+  _HubEntry(
+    icon: Icons.fact_check_outlined,
+    title: 'Opname',
+    subtitle: 'Stock opname & counting',
+    path: '/tx/opnames',
+  ),
+  _HubEntry(
+    icon: Icons.swap_horiz_outlined,
+    title: 'Transfer',
+    subtitle: 'Antar gudang/lokasi',
+    path: '/tx/transfers',
+  ),
+  _HubEntry(
+    icon: Icons.shopping_cart_checkout_outlined,
+    title: 'Purchase Order',
+    subtitle: 'Pesanan pembelian ke supplier',
+    path: '/tx/purchase-orders',
+  ),
+  _HubEntry(
+    icon: Icons.point_of_sale_outlined,
+    title: 'Sales Order',
+    subtitle: 'Pesanan penjualan ke customer',
+    path: '/tx/sales-orders',
+  ),
+  _HubEntry(
+    icon: Icons.assignment_return_outlined,
+    title: 'Retur Penjualan',
+    subtitle: 'Barang kembali dari customer',
+    path: '/tx/customer-returns',
+  ),
+  _HubEntry(
+    icon: Icons.keyboard_return_outlined,
+    title: 'Retur Pembelian',
+    subtitle: 'Barang dikembalikan ke supplier',
+    path: '/tx/supplier-returns',
+  ),
+  _HubEntry(
+    icon: Icons.request_quote_outlined,
+    title: 'Purchase Requisition',
+    subtitle: 'Pengajuan pembelian (PR)',
+    path: '/requisitions',
+  ),
+  _HubEntry(
+    icon: Icons.build_outlined,
+    title: 'Perakitan',
+    subtitle: 'Assembly / disassembly',
+    path: '/assembly-orders',
+  ),
+  _HubEntry(
+    icon: Icons.checklist_outlined,
+    title: 'Picking',
+    subtitle: 'Daftar pengambilan barang',
+    path: '/pick-lists',
+  ),
+];
 
 class TransactionsHubScreen extends StatelessWidget {
   const TransactionsHubScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const modules = [
-      (
-        TxnType.receipt,
-        Icons.move_to_inbox_outlined,
-        'Barang Masuk',
-        'Penerimaan supplier',
-      ),
-      (
-        TxnType.issue,
-        Icons.outbox_outlined,
-        'Barang Keluar',
-        'Pengeluaran ke customer',
-      ),
-      (TxnType.adjustment, Icons.tune_outlined, 'Adjustment', 'Koreksi stok'),
-      (
-        TxnType.opname,
-        Icons.fact_check_outlined,
-        'Opname',
-        'Stock opname & counting',
-      ),
-      (
-        TxnType.transfer,
-        Icons.swap_horiz_outlined,
-        'Transfer',
-        'Antar gudang/lokasi',
-      ),
-      (
-        TxnType.purchaseOrder,
-        Icons.shopping_cart_checkout_outlined,
-        'Purchase Order',
-        'Pesanan pembelian ke supplier',
-      ),
-      (
-        TxnType.salesOrder,
-        Icons.point_of_sale_outlined,
-        'Sales Order',
-        'Pesanan penjualan ke customer',
-      ),
-      (
-        TxnType.customerReturn,
-        Icons.assignment_return_outlined,
-        'Retur Penjualan',
-        'Barang kembali dari customer',
-      ),
-      (
-        TxnType.supplierReturn,
-        Icons.keyboard_return_outlined,
-        'Retur Pembelian',
-        'Barang dikembalikan ke supplier',
-      ),
-    ];
-
     return Scaffold(
       appBar: AppBar(title: const Text('Transaksi')),
       body: ListView.separated(
         padding: const EdgeInsets.all(AppSpacing.lg),
-        itemCount: modules.length,
+        itemCount: _entries.length,
         separatorBuilder: (context, index) =>
             const SizedBox(height: AppSpacing.sm),
         itemBuilder: (context, index) {
-          final m = modules[index];
+          final entry = _entries[index];
 
           return Card(
             child: DataListRow(
-              title: m.$3,
-              subtitle: m.$4,
-              leading: Icon(m.$2),
+              title: entry.title,
+              subtitle: entry.subtitle,
+              leading: Icon(entry.icon),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/tx/${m.$1.key}'),
+              onTap: () => context.push(entry.path),
             ),
           );
         },

@@ -8,10 +8,15 @@ import 'core/theme/app_theme.dart';
 import 'data/master/master_models.dart';
 import 'data/providers.dart';
 import 'data/transactions/transaction_models.dart';
+import 'features/assembly/presentation/assembly_detail_screen.dart';
+import 'features/assembly/presentation/assembly_form_screen.dart';
+import 'features/assembly/presentation/assembly_list_screen.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/two_factor_challenge_screen.dart';
 import 'features/common/soon_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/picking/presentation/picking_detail_screen.dart';
+import 'features/picking/presentation/picking_list_screen.dart';
 import 'features/transactions/presentation/transaction_detail_screen.dart';
 import 'features/transactions/presentation/transaction_form_screen.dart';
 import 'features/transactions/presentation/transaction_list_screen.dart';
@@ -20,6 +25,9 @@ import 'features/items/presentation/item_detail_screen.dart';
 import 'features/master/presentation/master_screens.dart';
 import 'features/more/presentation/more_screen.dart';
 import 'features/reports/presentation/reports_screen.dart';
+import 'features/requisitions/presentation/requisition_detail_screen.dart';
+import 'features/requisitions/presentation/requisition_form_screen.dart';
+import 'features/requisitions/presentation/requisition_list_screen.dart';
 import 'features/settings/presentation/settings_screen.dart';
 import 'features/stock/presentation/stock_list_screen.dart';
 
@@ -217,6 +225,44 @@ final _router = GoRouter(
             GoRoute(
               path: '/settings',
               builder: (context, state) => const SettingsScreen(),
+            ),
+            GoRoute(
+              path: '/requisitions',
+              builder: (context, state) => const RequisitionListScreen(),
+            ),
+            GoRoute(
+              path: '/requisitions/create',
+              builder: (context, state) => const RequisitionFormScreen(),
+            ),
+            GoRoute(
+              path: '/requisitions/:id',
+              builder: (context, state) => RequisitionDetailScreen(
+                id: int.parse(state.pathParameters['id'] ?? '0'),
+              ),
+            ),
+            GoRoute(
+              path: '/assembly-orders',
+              builder: (context, state) => const AssemblyListScreen(),
+            ),
+            GoRoute(
+              path: '/assembly-orders/create',
+              builder: (context, state) => const AssemblyFormScreen(),
+            ),
+            GoRoute(
+              path: '/assembly-orders/:id',
+              builder: (context, state) => AssemblyDetailScreen(
+                id: int.parse(state.pathParameters['id'] ?? '0'),
+              ),
+            ),
+            GoRoute(
+              path: '/pick-lists',
+              builder: (context, state) => const PickingListScreen(),
+            ),
+            GoRoute(
+              path: '/pick-lists/:id',
+              builder: (context, state) => PickingDetailScreen(
+                id: int.parse(state.pathParameters['id'] ?? '0'),
+              ),
             ),
           ],
         ),

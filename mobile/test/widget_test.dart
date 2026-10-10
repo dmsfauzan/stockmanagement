@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wsm_mobile/core/config/app_config.dart';
+import 'package:wsm_mobile/data/assembly/assembly_models.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
+import 'package:wsm_mobile/data/picking/picking_models.dart';
+import 'package:wsm_mobile/data/requisitions/requisition_models.dart';
 import 'package:wsm_mobile/data/stock/stock_repository.dart';
 import 'package:wsm_mobile/data/transactions/transaction_models.dart';
 import 'package:wsm_mobile/features/reports/presentation/reports_screen.dart';
@@ -176,6 +179,67 @@ void main() {
     expect(find.text('Sales Order'), findsOneWidget);
     expect(find.text('Retur Penjualan'), findsOneWidget);
     expect(find.text('Retur Pembelian'), findsOneWidget);
+  });
+
+  test('Requisition detail parses lines', () {
+    final detail = RequisitionDetail.fromJson({
+      'id': 1,
+      'number': 'PR-1',
+      'status': 'submitted',
+      'request_date': '2026-10-10',
+      'warehouse': {'id': 1, 'name': 'Jakarta'},
+      'items': [
+        {'item_id': 9, 'sku': 'BRG-1', 'quantity': 3, 'estimated_price': 1200},
+      ],
+    });
+
+    expect(detail.number, 'PR-1');
+    expect(detail.warehouse, 'Jakarta');
+    expect(detail.lines.first.quantity, 3);
+    expect(detail.lines.first.estimatedPrice, 1200);
+  });
+
+  test('Assembly detail parses components', () {
+    final detail = AssemblyDetail.fromJson({
+      'id': 1,
+      'number': 'ASM-1',
+      'status': 'posted',
+      'type': 'assembly',
+      'item_id': 5,
+      'quantity': 2,
+      'items': [
+        {'id': 1, 'item_id': 9, 'role': 'component', 'quantity': 4},
+      ],
+    });
+
+    expect(detail.type, 'assembly');
+    expect(detail.quantity, 2);
+    expect(detail.lines.first.quantity, 4);
+  });
+
+  test('Pick list detail parses lines with locations', () {
+    final detail = PickListDetail.fromJson({
+      'id': 1,
+      'number': 'PL-1',
+      'status': 'picking',
+      'warehouse': {'id': 1, 'name': 'Jakarta'},
+      'items': [
+        {
+          'id': 10,
+          'item_id': 9,
+          'sku': 'BRG-1',
+          'location': 'A01-01',
+          'quantity': 5,
+          'picked_quantity': 2,
+          'status': 'picking',
+        },
+      ],
+    });
+
+    expect(detail.warehouse, 'Jakarta');
+    expect(detail.lines.first.id, 10);
+    expect(detail.lines.first.location, 'A01-01');
+    expect(detail.lines.first.pickedQuantity, 2);
   });
 
   testWidgets('Reports index lists report modules', (tester) async {

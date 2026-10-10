@@ -1,0 +1,301 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/theme/tokens.dart';
+import '../../../core/widgets/common.dart';
+import '../../../core/widgets/feedback.dart';
+import '../../../core/widgets/status_badge.dart';
+import '../../../core/widgets/workflow_stepper.dart';
+import '../../../data/auth/auth_repository.dart';
+import '../../../data/providers.dart';
+import '../../../data/requisitions/requisition_models.dart';
+import '../../transactions/presentation/picker_loaders.dart';
+import '../../../core/widgets/picker.dart';
+
+const _verbLabels = {
+  'submit': 'Ajukan',
+  'approve': 'Setujui',
+  'reject': 'Tolak',
+  'convert': 'Jadikan PO',
+};
+
+String? _permissionFor(String verb) => switch (verb) {
+  'submit' => 'requisition.submit',
+  'approve' || 'reject' => 'requisition.approve',
+  'convert' => 'requisition.convert',
+  _ => null,
+};
+
+class RequisitionDetailScreen extends ConsumerStatefulWidget {
+  const RequisitionDetailScreen({super.key, required this.id});
+
+  final int id;
+
+  @override
+  ConsumerState<RequisitionDetailScreen> createState() =>
+      _RequisitionDetailScreenState();
+}
+
+class _RequisitionDetailScreenState
+    extends ConsumerState<RequisitionDetailScreen> {
+  RequisitionDetail? _detail;
+  bool _loading = true;
+  bool _busy = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      final detail = await ref
+          .read(requisitionRepositoryProvider)
+          .show(widget.id);
+      setState(() => _detail = detail);
+    } catch (e) {
+      setState(() => _error = '$e');
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _run(String verb) async {
+    if (verb == 'convert') {
+      await _convert();
+      return;
+    }
+
+    String? reason;
+
+    if (verb == 'reject') {
+      reason = await _askReason();
+      if (reason == null) return;
+    }
+
+    setState(() => _busy = true);
+
+    try {
+      await ref
+          .read(requisitionRepositoryProvider)
+          .action(widget.id, verb, reason: reason);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${_verbLabels[verb] ?? verb} berhasil.')),
+      );
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e'), backgroundColor: AppColors.rose),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _convert() async {
+    final option = await pickOption(
+      context,
+      title: 'Pilih Supplier (opsional)',
+      loader: (q) => supplierOptions(ref, q),
+    );
+
+    if (!mounted) return;
+    setState(() => _busy = true);
+
+    try {
+      final po = await ref
+          .read(requisitionRepositoryProvider)
+          .convert(widget.id, supplierId: option?.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(po != null ? 'PO $po dibuat.' : 'PO berhasil dibuat.'),
+        ),
+      );
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$e'), backgroundColor: AppColors.rose),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<String?> _askReason() async {
+    final controller = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Alasan penolakan'),
+        content: TextField(
+          controller: controller,
+          maxLines: 3,
+          decoration: const InputDecoration(hintText: 'Tulis alasan…'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text('Tolak'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final detail = _detail;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(detail?.number ?? 'Requisition')),
+      body: _loading
+          ? const ListSkeleton(rows: 6)
+          : _error != null
+          ? ListView(
+              children: [ErrorCard(message: _error!, onRetry: _load)],
+            )
+          : _buildDetail(context, detail!),
+      bottomNavigationBar: (_busy || detail == null)
+          ? null
+          : _actionsBar(context, detail),
+    );
+  }
+
+  Widget _buildDetail(BuildContext context, RequisitionDetail detail) {
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        detail.number,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                    StatusBadge(
+                      status: detail.status,
+                      label: detail.status.toUpperCase(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                if (detail.requestDate != null)
+                  _row('Tgl permintaan', detail.requestDate!),
+                if (detail.requiredDate != null)
+                  _row('Dibutuhkan', detail.requiredDate!),
+                if (detail.warehouse != null) _row('Gudang', detail.warehouse!),
+                if (detail.notes != null && detail.notes!.isNotEmpty)
+                  _row('Catatan', detail.notes!),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        const SectionHeader(title: 'Alur'),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: WorkflowStepper(
+              steps: RequisitionWorkflow.steps,
+              currentStatus: detail.status,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        SectionHeader(title: 'Item (${detail.lines.length})'),
+        Card(
+          child: Column(
+            children: [
+              for (final line in detail.lines)
+                DataListRow(
+                  title: '${line.sku ?? ''} — ${line.itemName ?? ''}',
+                  trailing: Text(
+                    '${line.quantity}'
+                    '${line.estimatedPrice != null ? ' · ${line.estimatedPrice}' : ''}',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              if (detail.lines.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(AppSpacing.lg),
+                  child: Text('Belum ada item.'),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _actionsBar(BuildContext context, RequisitionDetail detail) {
+    final user = ref.watch(authStateProvider).valueOrNull?.user;
+    final verbs = RequisitionWorkflow.actions[detail.status] ?? const [];
+
+    final allowed = verbs.where((v) {
+      final permission = _permissionFor(v);
+      return permission == null || (user?.can(permission) ?? false);
+    }).toList();
+
+    if (allowed.isEmpty) return const SizedBox.shrink();
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
+          children: [
+            for (final verb in allowed) ...[
+              Expanded(
+                child: verb == 'reject'
+                    ? OutlinedButton(
+                        onPressed: () => _run(verb),
+                        child: Text(_verbLabels[verb] ?? verb),
+                      )
+                    : FilledButton(
+                        onPressed: () => _run(verb),
+                        child: Text(_verbLabels[verb] ?? verb),
+                      ),
+              ),
+              if (verb != allowed.last) const SizedBox(width: AppSpacing.sm),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _row(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 120, child: Text(label, style: AppText.caption)),
+          Expanded(child: Text(value)),
+        ],
+      ),
+    );
+  }
+}
