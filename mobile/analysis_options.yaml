@@ -1,0 +1,6 @@
+# Konfigurasi analyzer & lints untuk aplikasi Flutter mobile.
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - avoid_print
