@@ -9,6 +9,9 @@ import '../storage/secure_store.dart';
 import 'outbox.dart';
 import 'outbox_entry.dart';
 
+/// Jeda backoff (detik) berdasarkan jumlah percobaan: 30s, 60s, … maks 30m.
+int backoffSeconds(int attempts) => min(30 * (1 << min(attempts, 6)), 1800);
+
 class OutboxFlushResult {
   const OutboxFlushResult({
     required this.sent,
@@ -125,11 +128,12 @@ class OutboxService {
           } else {
             // Masih offline / server error → backoff lalu coba lagi nanti.
             final attempts = entry.attempts + 1;
-            final seconds = min(30 * (1 << min(attempts - 1, 6)), 1800);
             await _outbox.markAttempt(
               entry.id!,
               attempts,
-              DateTime.now().add(Duration(seconds: seconds)).toIso8601String(),
+              DateTime.now()
+                  .add(Duration(seconds: backoffSeconds(entry.attempts)))
+                  .toIso8601String(),
             );
             failed++;
             break;

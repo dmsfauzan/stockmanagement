@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wsm_mobile/core/config/app_config.dart';
 import 'package:wsm_mobile/core/network/api_exception.dart';
 import 'package:wsm_mobile/core/offline/outbox_entry.dart';
+import 'package:wsm_mobile/core/offline/outbox_service.dart';
 import 'package:wsm_mobile/core/utils/format.dart';
 import 'package:wsm_mobile/core/utils/form_errors.dart';
 import 'package:wsm_mobile/data/assembly/assembly_models.dart';
@@ -324,6 +325,12 @@ void main() {
     expect(message, contains('quantity'));
     expect(message, contains('Jumlah harus lebih dari 0.'));
     expect(message, contains('supplier id'));
+  });
+
+  test('backoffSeconds grows exponentially and caps at 30m', () {
+    expect(backoffSeconds(0), 30);
+    expect(backoffSeconds(1), 60);
+    expect(backoffSeconds(20), 1800);
   });
 
   test('OutboxEntry round-trips through map', () {
