@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wsm_mobile/core/config/app_config.dart';
+import 'package:wsm_mobile/core/offline/outbox_entry.dart';
 import 'package:wsm_mobile/data/assembly/assembly_models.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
 import 'package:wsm_mobile/data/picking/picking_models.dart';
@@ -296,6 +297,24 @@ void main() {
 
     expect(row.value, 'B-1');
     expect(row.status, 'active');
+  });
+
+  test('OutboxEntry round-trips through map', () {
+    const entry = OutboxEntry(
+      id: 3,
+      method: 'POST',
+      url: 'http://host/api/goods-receipts',
+      data: '{"foo":1}',
+      idempotencyKey: 'key-1',
+      createdAt: '2026-10-10T00:00:00',
+    );
+
+    final restored = OutboxEntry.fromMap(entry.toMap());
+
+    expect(restored.id, 3);
+    expect(restored.method, 'POST');
+    expect(restored.url, contains('goods-receipts'));
+    expect(restored.idempotencyKey, 'key-1');
   });
 
   testWidgets('Reports index lists report modules', (tester) async {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/offline/outbox_service.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
@@ -55,6 +56,54 @@ class SettingsScreen extends ConsumerWidget {
                   title: 'Bahasa',
                   subtitle: 'Indonesia',
                   leading: Icon(Icons.language_outlined),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          const SectionHeader(title: 'Sinkronisasi Offline'),
+          Card(
+            child: Column(
+              children: [
+                DataListRow(
+                  title: 'Menunggu dikirim',
+                  subtitle:
+                      (ref.watch(outboxCountProvider).valueOrNull ?? 0) == 0
+                      ? 'Tidak ada antrean'
+                      : '${ref.watch(outboxCountProvider).valueOrNull} dokumen',
+                  leading: const Icon(Icons.cloud_upload_outlined),
+                ),
+                const Divider(height: 1),
+                DataListRow(
+                  title: 'Kirim sekarang',
+                  leading: const Icon(Icons.sync),
+                  onTap: () async {
+                    final result = await ref
+                        .read(outboxServiceProvider)
+                        .flush();
+                    ref.invalidate(outboxCountProvider);
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Terkirim ${result.sent}, gagal ${result.failed}, '
+                          'sisa ${result.remaining}.',
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const Divider(height: 1),
+                DataListRow(
+                  title: 'Kosongkan antrean',
+                  leading: const Icon(
+                    Icons.delete_outline,
+                    color: AppColors.rose,
+                  ),
+                  onTap: () async {
+                    await ref.read(outboxServiceProvider).clear();
+                    ref.invalidate(outboxCountProvider);
+                  },
                 ),
               ],
             ),

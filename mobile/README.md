@@ -50,8 +50,14 @@ lib/
 - Fase 0 — laporan/settings, tautan dashboard, label picker, debounce/filter list ✅
 - E4 — PO/SO/retur, requisition, perakitan, picking ✅
 - E5 — karantina, lacak, recall, laporan (viewer generik), alat ✅
-- E6 — scan kamera (`mobile_scanner`) ✅, banner offline, finalisasi grafik, build APK
-- Menyusul: offline penuh (outbox antrean tulis), push (FCM), cetak label Bluetooth, biometrik
+- E6 — scan kamera (`mobile_scanner`) ✅, banner + outbox offline ✅, finalisasi grafik, build APK
+- Menyusul: push (FCM), cetak label Bluetooth, biometrik
+
+## Offline (outbox)
+
+Request tulis (POST/PUT/PATCH/DELETE) yang gagal karena jaringan otomatis
+di-antrekan ke SQLite (`wsm_offline.db`) dengan `Idempotency-Key`, lalu dikirim
+ulang saat koneksi kembali atau lewat **Pengaturan → Sinkronisasi Offline**.
 
 ## CI
 

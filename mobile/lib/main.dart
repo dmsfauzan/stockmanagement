@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/config/app_config.dart';
+import 'core/offline/offline_sync.dart';
 import 'core/router/app_shell.dart';
 import 'core/theme/app_theme.dart';
 import 'data/master/master_models.dart';
@@ -299,12 +300,14 @@ class WsmApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp.router(
-      title: AppConfig.appName,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      routerConfig: _router,
-      debugShowCheckedModeBanner: false,
+    return OfflineSync(
+      child: MaterialApp.router(
+        title: AppConfig.appName,
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        routerConfig: _router,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
