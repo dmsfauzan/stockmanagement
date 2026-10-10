@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/tokens.dart';
+import 'barcode_scanner.dart';
 
 class PickerOption {
   const PickerOption({required this.id, required this.label, this.subtitle});
@@ -10,11 +11,23 @@ class PickerOption {
   final String? subtitle;
 }
 
-/// Bottom sheet pemilih dengan pencarian. Mengembalikan opsi terpilih.
+/// Satu halaman opsi picker.
+class PickerPage {
+  const PickerPage({required this.options, this.hasMore = false});
+
+  const PickerPage.single(this.options) : hasMore = false;
+
+  final List<PickerOption> options;
+  final bool hasMore;
+}
+
+typedef PickerLoader = Future<PickerPage> Function(String query, int page);
+
+/// Bottom sheet pemilih dengan pencarian + paging. Mengembalikan opsi terpilih.
 Future<PickerOption?> pickOption(
   BuildContext context, {
   required String title,
-  required Future<List<PickerOption>> Function(String query) loader,
+  required PickerLoader loader,
 }) {
   return showModalBottomSheet<PickerOption>(
     context: context,
@@ -28,7 +41,7 @@ class _PickerSheet extends StatefulWidget {
   const _PickerSheet({required this.title, required this.loader});
 
   final String title;
-  final Future<List<PickerOption>> Function(String query) loader;
+  final PickerLoader loader;
 
   @override
   State<_PickerSheet> createState() => _PickerSheetState();
@@ -36,35 +49,77 @@ class _PickerSheet extends StatefulWidget {
 
 class _PickerSheetState extends State<_PickerSheet> {
   final _search = TextEditingController();
+  final _scroll = ScrollController();
+
   List<PickerOption> _options = [];
+  int _page = 1;
+  bool _hasMore = false;
   bool _loading = true;
+  bool _loadingMore = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
+    _scroll.addListener(_onScroll);
     _load('');
   }
 
   @override
   void dispose() {
     _search.dispose();
+    _scroll.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 120 &&
+        !_loadingMore &&
+        _hasMore) {
+      _loadMore();
+    }
   }
 
   Future<void> _load(String query) async {
     setState(() {
       _loading = true;
       _error = null;
+      _page = 1;
+      _hasMore = false;
     });
 
     try {
-      final options = await widget.loader(query);
-      if (mounted) setState(() => _options = options);
+      final page = await widget.loader(query, 1);
+      if (mounted) {
+        setState(() {
+          _options = page.options;
+          _hasMore = page.hasMore;
+          if (page.hasMore) _page = 2;
+        });
+      }
     } catch (e) {
       if (mounted) setState(() => _error = '$e');
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _loadMore() async {
+    setState(() => _loadingMore = true);
+
+    try {
+      final page = await widget.loader(_search.text, _page);
+      if (mounted) {
+        setState(() {
+          _options = [..._options, ...page.options];
+          _hasMore = page.hasMore;
+          if (page.hasMore) _page++;
+        });
+      }
+    } catch (_) {
+      // Abaikan; pengguna dapat menggulir ulang.
+    } finally {
+      if (mounted) setState(() => _loadingMore = false);
     }
   }
 
@@ -91,9 +146,21 @@ class _PickerSheetState extends State<_PickerSheet> {
                 controller: _search,
                 autofocus: true,
                 textInputAction: TextInputAction.search,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Cari…',
-                  prefixIcon: Icon(Icons.search),
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.qr_code_scanner),
+                    tooltip: 'Pindai barcode',
+                    onPressed: () async {
+                      final code = await showBarcodeScanner(context);
+                      if (!context.mounted) return;
+                      if (code != null && code.isNotEmpty) {
+                        _search.text = code;
+                        _load(code);
+                      }
+                    },
+                  ),
                 ),
                 onSubmitted: _load,
               ),
@@ -104,10 +171,18 @@ class _PickerSheetState extends State<_PickerSheet> {
                   : _error != null
                   ? Center(child: Text(_error!))
                   : ListView.separated(
-                      itemCount: _options.length,
+                      controller: _scroll,
+                      itemCount: _options.length + (_loadingMore ? 1 : 0),
                       separatorBuilder: (context, index) =>
                           const Divider(height: 1),
                       itemBuilder: (context, index) {
+                        if (index >= _options.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(AppSpacing.lg),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+
                         final option = _options[index];
 
                         return ListTile(

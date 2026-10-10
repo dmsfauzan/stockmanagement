@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/tokens.dart';
 import '../../../core/utils/form_errors.dart';
+import '../../../core/widgets/date_field.dart';
 import '../../../core/widgets/picker.dart';
 import '../../../data/providers.dart';
 import '../../transactions/presentation/picker_loaders.dart';
@@ -40,6 +41,8 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
   String _notes = '';
   bool _submit = false;
   bool _saving = false;
+  DateTime _requestDate = DateTime.now();
+  DateTime? _requiredDate;
 
   @override
   void dispose() {
@@ -53,7 +56,7 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
     final option = await pickOption(
       context,
       title: 'Pilih Gudang',
-      loader: (q) => warehouseOptions(ref, q),
+      loader: (q, p) => warehouseOptions(ref, q),
     );
 
     if (option != null) {
@@ -68,7 +71,7 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
     final option = await pickOption(
       context,
       title: 'Pilih Barang',
-      loader: (q) => itemOptions(ref, q),
+      loader: (q, p) => itemOptions(ref, q, p),
     );
 
     if (option != null) {
@@ -83,7 +86,7 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
     final option = await pickOption(
       context,
       title: 'Pilih Satuan',
-      loader: (q) => unitOptions(ref, q),
+      loader: (q, p) => unitOptions(ref, q),
     );
 
     if (option != null) {
@@ -125,7 +128,9 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
 
     try {
       await ref.read(requisitionRepositoryProvider).create({
-        'request_date': DateTime.now().toIso8601String().substring(0, 10),
+        'request_date': _requestDate.toIso8601String().substring(0, 10),
+        if (_requiredDate != null)
+          'required_date': _requiredDate!.toIso8601String().substring(0, 10),
         'warehouse_id': int.tryParse(_warehouseId),
         'notes': _notes.isNotEmpty ? _notes : null,
         'submit': _submit,
@@ -158,6 +163,20 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
+          DateField(
+            label: 'Tanggal permintaan',
+            value: _requestDate,
+            required: true,
+            onChanged: (d) => setState(() => _requestDate = d),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          DateField(
+            label: 'Dibutuhkan pada',
+            value: _requiredDate,
+            firstDate: _requestDate,
+            onChanged: (d) => setState(() => _requiredDate = d),
+          ),
+          const SizedBox(height: AppSpacing.md),
           PickerTile(
             label: 'Gudang',
             value: _warehouseLabel.isEmpty ? null : _warehouseLabel,

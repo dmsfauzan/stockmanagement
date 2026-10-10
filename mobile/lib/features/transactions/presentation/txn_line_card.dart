@@ -288,7 +288,7 @@ Future<void> showUnitPicker(
   final option = await pickOption(
     context,
     title: 'Pilih Satuan',
-    loader: (q) => unitOptions(ref, q),
+    loader: (q, p) => unitOptions(ref, q),
   );
   if (option != null) {
     form.unitIdController.text = '${option.id}';
@@ -305,7 +305,7 @@ Future<void> showLocationPicker(
   final option = await pickOption(
     context,
     title: 'Pilih Lokasi',
-    loader: (q) => locationOptions(ref, q, warehouseId: warehouseId),
+    loader: (q, p) => locationOptions(ref, q, warehouseId: warehouseId),
   );
   if (option != null) {
     form.locationIdController.text = '${option.id}';
@@ -321,7 +321,7 @@ Future<void> showItemPicker(
   final option = await pickOption(
     context,
     title: 'Pilih Barang',
-    loader: (q) => itemOptions(ref, q),
+    loader: (q, p) => itemOptions(ref, q, p),
   );
   if (option != null) {
     form.itemIdController.text = '${option.id}';

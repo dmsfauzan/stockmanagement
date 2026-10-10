@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/tokens.dart';
 import '../../../core/utils/form_errors.dart';
+import '../../../core/widgets/date_field.dart';
 import '../../../core/widgets/picker.dart';
 import '../../../data/providers.dart';
 import '../../transactions/presentation/picker_loaders.dart';
@@ -26,6 +27,7 @@ class _AssemblyFormScreenState extends ConsumerState<AssemblyFormScreen> {
   final _quantity = TextEditingController(text: '1');
   String _notes = '';
   bool _saving = false;
+  DateTime _assemblyDate = DateTime.now();
 
   @override
   void dispose() {
@@ -37,7 +39,7 @@ class _AssemblyFormScreenState extends ConsumerState<AssemblyFormScreen> {
     final option = await pickOption(
       context,
       title: 'Pilih Barang',
-      loader: (q) => itemOptions(ref, q),
+      loader: (q, p) => itemOptions(ref, q, p),
     );
 
     if (option != null) {
@@ -52,7 +54,7 @@ class _AssemblyFormScreenState extends ConsumerState<AssemblyFormScreen> {
     final option = await pickOption(
       context,
       title: 'Pilih Gudang',
-      loader: (q) => warehouseOptions(ref, q),
+      loader: (q, p) => warehouseOptions(ref, q),
     );
 
     if (option != null) {
@@ -67,7 +69,7 @@ class _AssemblyFormScreenState extends ConsumerState<AssemblyFormScreen> {
     final option = await pickOption(
       context,
       title: 'Pilih Lokasi',
-      loader: (q) => locationOptions(ref, q, warehouseId: _warehouseId),
+      loader: (q, p) => locationOptions(ref, q, warehouseId: _warehouseId),
     );
 
     if (option != null) {
@@ -89,7 +91,7 @@ class _AssemblyFormScreenState extends ConsumerState<AssemblyFormScreen> {
     try {
       await ref.read(assemblyRepositoryProvider).create({
         'type': _type,
-        'assembly_date': DateTime.now().toIso8601String().substring(0, 10),
+        'assembly_date': _assemblyDate.toIso8601String().substring(0, 10),
         'item_id': int.tryParse(_itemId),
         'quantity': int.tryParse(_quantity.text.trim()) ?? 1,
         'warehouse_id': int.tryParse(_warehouseId),
@@ -134,6 +136,13 @@ class _AssemblyFormScreenState extends ConsumerState<AssemblyFormScreen> {
               ),
             ],
             onChanged: (v) => setState(() => _type = v ?? 'assembly'),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          DateField(
+            label: 'Tanggal perakitan',
+            value: _assemblyDate,
+            required: true,
+            onChanged: (d) => setState(() => _assemblyDate = d),
           ),
           const SizedBox(height: AppSpacing.md),
           PickerTile(

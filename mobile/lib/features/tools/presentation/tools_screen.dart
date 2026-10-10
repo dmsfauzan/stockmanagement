@@ -225,7 +225,7 @@ class _PutAwayTabState extends ConsumerState<_PutAwayTab> {
     final option = await pickOption(
       context,
       title: 'Pilih Gudang',
-      loader: (q) => warehouseOptions(ref, q),
+      loader: (q, p) => warehouseOptions(ref, q),
     );
     if (option != null) {
       setState(() {
@@ -239,7 +239,7 @@ class _PutAwayTabState extends ConsumerState<_PutAwayTab> {
     final option = await pickOption(
       context,
       title: 'Pilih Barang',
-      loader: (q) => itemOptions(ref, q),
+      loader: (q, p) => itemOptions(ref, q, p),
     );
     if (option != null) {
       setState(() {

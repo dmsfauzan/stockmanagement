@@ -105,7 +105,7 @@ class _RequisitionDetailScreenState
     final option = await pickOption(
       context,
       title: 'Pilih Supplier (opsional)',
-      loader: (q) => supplierOptions(ref, q),
+      loader: (q, p) => supplierOptions(ref, q),
     );
 
     if (!mounted) return;

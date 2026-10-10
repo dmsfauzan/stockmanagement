@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/form_errors.dart';
+import '../../../../core/widgets/date_field.dart';
 import '../../../../core/widgets/picker.dart';
 import '../../../../data/providers.dart';
 import '../../../../data/transactions/transaction_models.dart';
@@ -42,6 +43,10 @@ class _TransactionFormCreateScreenState
   String _notes = '';
   bool _saving = false;
   bool _requiresInspection = false;
+  DateTime _date = DateTime.now();
+  DateTime? _expectedDate;
+
+  String get _dateStr => _date.toIso8601String().substring(0, 10);
 
   @override
   void initState() {
@@ -64,7 +69,7 @@ class _TransactionFormCreateScreenState
     return pickOption(
       context,
       title: 'Pilih Gudang',
-      loader: (q) => warehouseOptions(ref, q),
+      loader: (q, p) => warehouseOptions(ref, q),
     );
   }
 
@@ -72,7 +77,7 @@ class _TransactionFormCreateScreenState
     return pickOption(
       context,
       title: 'Pilih Lokasi',
-      loader: (q) => locationOptions(ref, q, warehouseId: warehouseId),
+      loader: (q, p) => locationOptions(ref, q, warehouseId: warehouseId),
     );
   }
 
@@ -80,7 +85,7 @@ class _TransactionFormCreateScreenState
     return pickOption(
       context,
       title: 'Pilih Supplier',
-      loader: (q) => supplierOptions(ref, q),
+      loader: (q, p) => supplierOptions(ref, q),
     );
   }
 
@@ -88,7 +93,7 @@ class _TransactionFormCreateScreenState
     return pickOption(
       context,
       title: 'Pilih Customer',
-      loader: (q) => customerOptions(ref, q),
+      loader: (q, p) => customerOptions(ref, q),
     );
   }
 
@@ -153,7 +158,7 @@ class _TransactionFormCreateScreenState
       };
     }).toList();
 
-    final now = DateTime.now().toIso8601String().substring(0, 10);
+    final now = _dateStr;
 
     return switch (widget.type) {
       TxnType.receipt => {
@@ -206,6 +211,7 @@ class _TransactionFormCreateScreenState
       },
       TxnType.purchaseOrder => {
         'order_date': now,
+        'expected_date': _expectedDate?.toIso8601String().substring(0, 10),
         'supplier_id': int.tryParse(_supplierId),
         'warehouse_id': int.tryParse(_warehouseId),
         'notes': _notes.isNotEmpty ? _notes : null,
@@ -213,6 +219,7 @@ class _TransactionFormCreateScreenState
       },
       TxnType.salesOrder => {
         'order_date': now,
+        'expected_date': _expectedDate?.toIso8601String().substring(0, 10),
         'customer_id': int.tryParse(_customerId),
         'warehouse_id': int.tryParse(_warehouseId),
         'notes': _notes.isNotEmpty ? _notes : null,
@@ -243,7 +250,48 @@ class _TransactionFormCreateScreenState
     };
   }
 
+  String? _headerError() {
+    if (widget.type == TxnType.receipt ||
+        widget.type == TxnType.purchaseOrder) {
+      if (_supplierId.isEmpty) return 'Supplier wajib dipilih.';
+    }
+
+    if (widget.type == TxnType.salesOrder && _customerId.isEmpty) {
+      return 'Customer wajib dipilih.';
+    }
+
+    if (widget.type == TxnType.transfer) {
+      if (_warehouseId.isEmpty) return 'Gudang asal wajib dipilih.';
+      if (_fromLocationId.isEmpty) return 'Lokasi asal wajib dipilih.';
+      if (_warehouseToId.isEmpty) return 'Gudang tujuan wajib dipilih.';
+      if (_toLocationId.isEmpty) return 'Lokasi tujuan wajib dipilih.';
+    } else if (_warehouseId.isEmpty) {
+      return 'Gudang wajib dipilih.';
+    }
+
+    if ((widget.type == TxnType.adjustment || _isReturn) &&
+        _locationId.isEmpty) {
+      return 'Lokasi wajib dipilih.';
+    }
+
+    if (widget.type == TxnType.adjustment &&
+        _reasonOrDestination.trim().isEmpty) {
+      return 'Alasan wajib diisi.';
+    }
+
+    return null;
+  }
+
   Future<void> _submit() async {
+    final headerError = _headerError();
+
+    if (headerError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(headerError), backgroundColor: AppColors.rose),
+      );
+      return;
+    }
+
     for (var i = 0; i < _lines.length; i++) {
       if (!_lines[i].validateForType(widget.type, context, ref, i)) return;
     }
@@ -348,9 +396,32 @@ class _TransactionFormCreateScreenState
       widget.type == TxnType.customerReturn ||
       widget.type == TxnType.supplierReturn;
 
+  String get _dateLabel => switch (widget.type) {
+    TxnType.opname => 'Tanggal opname',
+    TxnType.transfer => 'Tanggal transfer',
+    TxnType.purchaseOrder || TxnType.salesOrder => 'Tanggal pesan',
+    _ => 'Tanggal',
+  };
+
   Widget _headerFields() {
     return Column(
       children: [
+        DateField(
+          label: _dateLabel,
+          value: _date,
+          required: true,
+          onChanged: (d) => setState(() => _date = d),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        if (widget.type == TxnType.purchaseOrder ||
+            widget.type == TxnType.salesOrder) ...[
+          DateField(
+            label: 'Perkiraan tiba',
+            value: _expectedDate,
+            onChanged: (d) => setState(() => _expectedDate = d),
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
         if (widget.type == TxnType.receipt ||
             widget.type == TxnType.purchaseOrder ||
             widget.type == TxnType.supplierReturn) ...[
