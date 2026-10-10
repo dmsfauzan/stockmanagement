@@ -8,6 +8,8 @@ class OutboxEntry {
     this.data,
     this.idempotencyKey,
     required this.createdAt,
+    this.attempts = 0,
+    this.nextAttemptAt,
   });
 
   final int? id;
@@ -16,6 +18,8 @@ class OutboxEntry {
   final String? data;
   final String? idempotencyKey;
   final String createdAt;
+  final int attempts;
+  final String? nextAttemptAt;
 
   factory OutboxEntry.fromMap(Map<String, dynamic> map) => OutboxEntry(
     id: map['id'] as int?,
@@ -24,6 +28,8 @@ class OutboxEntry {
     data: map['data'] as String?,
     idempotencyKey: map['idempotency_key'] as String?,
     createdAt: '${map['created_at']}',
+    attempts: (map['attempts'] as int?) ?? 0,
+    nextAttemptAt: map['next_attempt_at'] as String?,
   );
 
   Map<String, dynamic> toMap() => {
@@ -33,5 +39,7 @@ class OutboxEntry {
     'data': data,
     'idempotency_key': idempotencyKey,
     'created_at': createdAt,
+    'attempts': attempts,
+    'next_attempt_at': nextAttemptAt,
   };
 }

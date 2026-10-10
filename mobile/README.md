@@ -53,11 +53,14 @@ lib/
 - E6 — scan kamera (`mobile_scanner`) ✅, banner + outbox offline ✅, finalisasi grafik, build APK
 - Menyusul: push (FCM), cetak label Bluetooth, biometrik
 
-## Offline (outbox)
+## Offline (outbox + cache baca)
 
-Request tulis (POST/PUT/PATCH/DELETE) yang gagal karena jaringan otomatis
-di-antrekan ke SQLite (`wsm_offline.db`) dengan `Idempotency-Key`, lalu dikirim
-ulang saat koneksi kembali atau lewat **Pengaturan → Sinkronisasi Offline**.
+- **Tulis**: request (POST/PUT/PATCH/DELETE) yang gagal/ketika offline otomatis
+  di-antrekan ke SQLite (`wsm_offline.db`) dengan `Idempotency-Key`, lalu dikirim
+  ulang (dengan backoff) saat koneksi kembali atau via **Pengaturan →
+  Sinkronisasi Offline**. Jumlah antre tampil sebagai badge pada tab "Lainnya".
+- **Baca**: respons GET di-cache (`wsm_cache.db`); saat offline atau gagal
+  jaringan, cache disajikan agar daftar/detail tetap dapat dibuka.
 
 ## CI
 

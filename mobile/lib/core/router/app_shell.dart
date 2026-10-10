@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../network/connectivity.dart';
+import '../offline/outbox_service.dart';
 
 /// Shell dengan bottom navigation (go_router StatefulShellRoute).
 class AppShell extends ConsumerWidget {
@@ -13,6 +14,7 @@ class AppShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final online = ref.watch(connectivityProvider).valueOrNull ?? true;
+    final pending = ref.watch(outboxCountProvider).valueOrNull ?? 0;
 
     return Scaffold(
       body: Column(
@@ -47,34 +49,56 @@ class AppShell extends ConsumerWidget {
           index,
           initialLocation: index == navigationShell.currentIndex,
         ),
-        destinations: const [
-          NavigationDestination(
+        destinations: [
+          const NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
             selectedIcon: Icon(Icons.dashboard),
             label: 'Dashboard',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.qr_code_scanner_outlined),
             selectedIcon: Icon(Icons.qr_code_scanner),
             label: 'Scan',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.swap_horiz_outlined),
             selectedIcon: Icon(Icons.swap_horiz),
             label: 'Transaksi',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.inventory_2_outlined),
             selectedIcon: Icon(Icons.inventory_2),
             label: 'Stok',
           ),
           NavigationDestination(
-            icon: Icon(Icons.more_horiz),
-            selectedIcon: Icon(Icons.more_horiz),
+            icon: _OutboxBadge(
+              count: pending,
+              child: const Icon(Icons.more_horiz),
+            ),
+            selectedIcon: _OutboxBadge(
+              count: pending,
+              child: const Icon(Icons.more_horiz),
+            ),
             label: 'Lainnya',
           ),
         ],
       ),
+    );
+  }
+}
+
+class _OutboxBadge extends StatelessWidget {
+  const _OutboxBadge({required this.count, required this.child});
+
+  final int count;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Badge(
+      isLabelVisible: count > 0,
+      label: Text('$count'),
+      child: child,
     );
   }
 }

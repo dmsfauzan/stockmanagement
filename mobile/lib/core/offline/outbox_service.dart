@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,8 +40,9 @@ class OutboxService {
 
   bool _flushing = false;
 
-  Future<void> enqueue(DioException e) async {
-    final req = e.requestOptions;
+  Future<void> enqueue(DioException e) => enqueueOptions(e.requestOptions);
+
+  Future<void> enqueueOptions(RequestOptions req) async {
     final idempotencyKey = req.headers['Idempotency-Key']?.toString();
 
     String? data;
@@ -84,7 +86,7 @@ class OutboxService {
 
     try {
       final token = await _store.readToken();
-      final entries = await _outbox.all();
+      final entries = await _outbox.due();
 
       for (final entry in entries) {
         try {
@@ -121,7 +123,14 @@ class OutboxService {
             await _outbox.remove(entry.id!);
             failed++;
           } else {
-            // Masih offline / server error → hentikan, coba lagi nanti.
+            // Masih offline / server error → backoff lalu coba lagi nanti.
+            final attempts = entry.attempts + 1;
+            final seconds = min(30 * (1 << min(attempts - 1, 6)), 1800);
+            await _outbox.markAttempt(
+              entry.id!,
+              attempts,
+              DateTime.now().add(Duration(seconds: seconds)).toIso8601String(),
+            );
             failed++;
             break;
           }
