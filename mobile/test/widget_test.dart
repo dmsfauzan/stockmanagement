@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wsm_mobile/core/config/app_config.dart';
+import 'package:wsm_mobile/core/config/api_discovery.dart';
 import 'package:wsm_mobile/core/network/api_exception.dart';
 import 'package:wsm_mobile/core/offline/outbox_entry.dart';
 import 'package:wsm_mobile/core/offline/outbox_service.dart';
@@ -301,6 +302,17 @@ void main() {
 
     expect(row.value, 'B-1');
     expect(row.status, 'active');
+  });
+
+  test('candidateUrls targets emulator host', () {
+    expect(candidateUrls(), contains('http://10.0.2.2:8000/api'));
+  });
+
+  test('looksLikeApi accepts JSON envelope and rejects HTML/404', () {
+    expect(looksLikeApi(401, {'success': false}), isTrue);
+    expect(looksLikeApi(200, {'data': {}}), isTrue);
+    expect(looksLikeApi(404, '<html></html>'), isFalse);
+    expect(looksLikeApi(200, '<html></html>'), isFalse);
   });
 
   test('formatDate & formatNumber format values', () {

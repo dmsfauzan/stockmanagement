@@ -11,17 +11,29 @@ Aplikasi Android untuk Warehouse Stock Management, mengonsumsi REST API project 
 
 ## Menjalankan
 
-Base URL API dikonfigurasi saat build via `--dart-define`:
+Cukup:
 
 ```bash
-# Android emulator → host
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2/api
-
-# Perangkat fisik → IP LAN host
-flutter run --dart-define=API_BASE_URL=http://192.168.1.10/api
+flutter run
 ```
 
-Default: `http://10.0.2.2/api`. Akun demo: `admin@stock.test` / `password`.
+Saat startup, app **menemukan base URL API secara otomatis** (khusus emulator
+Android → host `10.0.2.2`), mencoba `http://10.0.2.2:8000/api` lalu
+`http://localhost:8000/api`, dan menyimpan hasilnya.
+
+Prasyarat backend (dari root project):
+
+```bash
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+Override manual bila perlu (mis. perangkat fisik / rilis):
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8000/api
+```
+
+Akun demo: `admin@stock.test` / `password`.
 
 ## Build APK
 
