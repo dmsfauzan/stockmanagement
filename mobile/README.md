@@ -44,7 +44,7 @@ lib/
 ## Status fase
 
 - E1 — design tokens, widget library, auth (login/2FA), dashboard ✅
-- E2 — stok list + detail barang + master data
+- E2 — stok list (filter + paging) + detail barang (tab) + master data ✅
 - E3 — transaksi (GR/GI/Adjustment/Opname/Transfer)
 - E4 — PO/SO/retur, requisition, perakitan, picking
 - E5 — karantina, lacak, recall, laporan, lainnya

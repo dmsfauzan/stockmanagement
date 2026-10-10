@@ -25,8 +25,8 @@ class AuthUser {
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => AuthUser(
     id: (json['id'] as num).toInt(),
-    name: (json['name'] ?? '') as String,
-    email: (json['email'] ?? '') as String,
+    name: ('${json['name'] ?? ''}'),
+    email: ('${json['email'] ?? ''}'),
     roles: (json['roles'] as List? ?? []).map((e) => '$e').toList(),
     permissions: (json['permissions'] as List? ?? []).map((e) => '$e').toList(),
   );

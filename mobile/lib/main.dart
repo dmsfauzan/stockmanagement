@@ -5,10 +5,15 @@ import 'package:go_router/go_router.dart';
 import 'core/config/app_config.dart';
 import 'core/router/app_shell.dart';
 import 'core/theme/app_theme.dart';
+import 'data/master/master_models.dart';
+import 'data/providers.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/two_factor_challenge_screen.dart';
 import 'features/common/soon_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/items/presentation/item_detail_screen.dart';
+import 'features/master/presentation/master_screens.dart';
+import 'features/more/presentation/more_screen.dart';
 import 'features/stock/presentation/stock_list_screen.dart';
 
 void main() {
@@ -75,10 +80,80 @@ final _router = GoRouter(
           routes: [
             GoRoute(
               path: '/more',
-              builder: (context, state) => const SoonScreen(
-                title: 'Lainnya',
-                note: 'Profil, label, laporan, dan lainnya masuk pada Fase 3.',
+              builder: (context, state) => const MoreScreen(),
+            ),
+            GoRoute(
+              path: '/item/:id',
+              builder: (context, state) => ItemDetailScreen(
+                itemId: int.parse(state.pathParameters['id'] ?? '0'),
               ),
+            ),
+            GoRoute(
+              path: '/master',
+              builder: (context, state) => const MasterIndexScreen(),
+            ),
+            GoRoute(
+              path: '/master/items',
+              builder: (context, state) => const ItemsScreen(),
+            ),
+            GoRoute(
+              path: '/master/categories',
+              builder: (context, state) => SimpleListScreen<Category>(
+                title: 'Kategori',
+                future: (ref) =>
+                    ref.read(masterRepositoryProvider).categories(),
+                titleOf: (c) => '${c.name} — ${c.code}',
+                subtitleOf: (c) => c.status,
+              ),
+            ),
+            GoRoute(
+              path: '/master/units',
+              builder: (context, state) => SimpleListScreen<Unit>(
+                title: 'Satuan',
+                future: (ref) => ref.read(masterRepositoryProvider).units(),
+                titleOf: (c) => '${c.name} — ${c.code}',
+              ),
+            ),
+            GoRoute(
+              path: '/master/suppliers',
+              builder: (context, state) => SimpleListScreen<Supplier>(
+                title: 'Supplier',
+                future: (ref) => ref.read(masterRepositoryProvider).suppliers(),
+                titleOf: (c) => c.name,
+                subtitleOf: (c) => '${c.code} · ${c.status ?? '-'}',
+              ),
+            ),
+            GoRoute(
+              path: '/master/customers',
+              builder: (context, state) => SimpleListScreen<Customer>(
+                title: 'Customer',
+                future: (ref) => ref.read(masterRepositoryProvider).customers(),
+                titleOf: (c) => c.name,
+                subtitleOf: (c) => '${c.code} · ${c.type ?? '-'}',
+              ),
+            ),
+            GoRoute(
+              path: '/master/warehouses',
+              builder: (context, state) => SimpleListScreen<Warehouse>(
+                title: 'Gudang',
+                future: (ref) =>
+                    ref.read(masterRepositoryProvider).warehouses(),
+                titleOf: (c) => c.name,
+                subtitleOf: (c) => c.code,
+              ),
+            ),
+            GoRoute(
+              path: '/master/locations',
+              builder: (context, state) => SimpleListScreen<Location>(
+                title: 'Lokasi',
+                future: (ref) => ref.read(masterRepositoryProvider).locations(),
+                titleOf: (c) => c.code,
+                subtitleOf: (c) => c.name ?? c.warehouse?.name,
+              ),
+            ),
+            GoRoute(
+              path: '/master/currencies',
+              builder: (context, state) => const CurrenciesScreen(),
             ),
           ],
         ),
