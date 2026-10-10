@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -106,6 +108,7 @@ class _ItemsScreenState extends ConsumerState<ItemsScreen> {
   final _scroll = ScrollController();
 
   final List<ItemListRow> _rows = [];
+  Timer? _debounce;
   String _query = '';
   String? _status;
   int _page = 1;
@@ -123,9 +126,18 @@ class _ItemsScreenState extends ConsumerState<ItemsScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _search.dispose();
     _scroll.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _query = value.trim();
+      _load();
+    });
   }
 
   void _onScroll() {
@@ -194,7 +206,9 @@ class _ItemsScreenState extends ConsumerState<ItemsScreen> {
                 hintText: 'Cari SKU / nama…',
                 prefixIcon: Icon(Icons.search),
               ),
+              onChanged: _onSearchChanged,
               onSubmitted: (value) {
+                _debounce?.cancel();
                 _query = value.trim();
                 _load();
               },
@@ -221,19 +235,27 @@ class _ItemsScreenState extends ConsumerState<ItemsScreen> {
   Widget _body() {
     if (_loading) return const ListSkeleton(rows: 8);
     if (_error != null) {
-      return ListView(
-        children: [ErrorCard(message: _error!, onRetry: _load)],
+      return RefreshIndicator(
+        onRefresh: _load,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [ErrorCard(message: _error!, onRetry: _load)],
+        ),
       );
     }
     if (_rows.isEmpty) {
-      return ListView(
-        children: const [
-          SizedBox(height: 80),
-          EmptyState(
-            title: 'Tidak ada barang',
-            message: 'Coba ubah pencarian / filter.',
-          ),
-        ],
+      return RefreshIndicator(
+        onRefresh: _load,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const [
+            SizedBox(height: 80),
+            EmptyState(
+              title: 'Tidak ada barang',
+              message: 'Coba ubah pencarian / filter.',
+            ),
+          ],
+        ),
       );
     }
 
@@ -241,6 +263,7 @@ class _ItemsScreenState extends ConsumerState<ItemsScreen> {
       onRefresh: () => _load(),
       child: ListView.separated(
         controller: _scroll,
+        physics: const AlwaysScrollableScrollPhysics(),
         itemCount: _rows.length + (_loadingMore ? 1 : 0),
         separatorBuilder: (context, index) => const Divider(height: 1),
         itemBuilder: (context, index) {

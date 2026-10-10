@@ -24,12 +24,19 @@ class _TransactionFormCreateScreenState
   late final List<TxnLineForm> _lines;
 
   String _supplierId = '';
+  String _supplierLabel = '';
   String _customerId = '';
+  String _customerLabel = '';
   String _warehouseId = '';
+  String _warehouseLabel = '';
   String _warehouseToId = '';
+  String _warehouseToLabel = '';
   String _fromLocationId = '';
+  String _fromLocationLabel = '';
   String _toLocationId = '';
+  String _toLocationLabel = '';
   String _locationId = '';
+  String _locationLabel = '';
   String _reasonOrDestination = '';
   String _notes = '';
   bool _saving = false;
@@ -49,47 +56,39 @@ class _TransactionFormCreateScreenState
     super.dispose();
   }
 
-  Future<String?> _selectWarehouse({
+  Future<PickerOption?> _selectWarehouse({
     String? current,
     bool isSource = true,
-  }) async {
-    final option = await pickOption(
+  }) {
+    return pickOption(
       context,
       title: 'Pilih Gudang',
       loader: (q) => warehouseOptions(ref, q),
     );
-
-    return option != null ? '${option.id}' : null;
   }
 
-  Future<String?> _selectLocation({String? warehouseId}) async {
-    final option = await pickOption(
+  Future<PickerOption?> _selectLocation({String? warehouseId}) {
+    return pickOption(
       context,
       title: 'Pilih Lokasi',
       loader: (q) => locationOptions(ref, q, warehouseId: warehouseId),
     );
-
-    return option != null ? '${option.id}' : null;
   }
 
-  Future<String?> _selectSupplier() async {
-    final option = await pickOption(
+  Future<PickerOption?> _selectSupplier() {
+    return pickOption(
       context,
       title: 'Pilih Supplier',
       loader: (q) => supplierOptions(ref, q),
     );
-
-    return option != null ? '${option.id}' : null;
   }
 
-  Future<String?> _selectCustomer() async {
-    final option = await pickOption(
+  Future<PickerOption?> _selectCustomer() {
+    return pickOption(
       context,
       title: 'Pilih Customer',
       loader: (q) => customerOptions(ref, q),
     );
-
-    return option != null ? '${option.id}' : null;
   }
 
   Map<String, dynamic> _payload() {
@@ -256,14 +255,23 @@ class _TransactionFormCreateScreenState
                 if (_lines.length <= 1) return;
                 setState(() => _lines.removeAt(i).dispose());
               },
-              onPickItem: () => showItemPicker(context, ref, _lines[i]),
-              onPickUnit: () => showUnitPicker(context, ref, _lines[i]),
-              onPickLocation: () => showLocationPicker(
-                context,
-                ref,
-                _lines[i],
-                warehouseId: _warehouseId,
-              ),
+              onPickItem: () async {
+                await showItemPicker(context, ref, _lines[i]);
+                if (mounted) setState(() {});
+              },
+              onPickUnit: () async {
+                await showUnitPicker(context, ref, _lines[i]);
+                if (mounted) setState(() {});
+              },
+              onPickLocation: () async {
+                await showLocationPicker(
+                  context,
+                  ref,
+                  _lines[i],
+                  warehouseId: _warehouseId,
+                );
+                if (mounted) setState(() {});
+              },
             ),
           OutlinedButton.icon(
             onPressed: () => setState(() => _lines.add(TxnLineForm.create())),
@@ -306,11 +314,16 @@ class _TransactionFormCreateScreenState
             widget.type == TxnType.purchaseOrder) ...[
           PickerTile(
             label: 'Supplier',
-            value: _supplierId.isEmpty ? null : '#$_supplierId',
+            value: _supplierLabel.isEmpty ? null : _supplierLabel,
             required: true,
             onTap: () async {
-              final value = await _selectSupplier();
-              if (value != null) setState(() => _supplierId = value);
+              final option = await _selectSupplier();
+              if (option != null) {
+                setState(() {
+                  _supplierId = '${option.id}';
+                  _supplierLabel = option.label;
+                });
+              }
             },
           ),
           const SizedBox(height: AppSpacing.md),
@@ -321,11 +334,16 @@ class _TransactionFormCreateScreenState
             label: widget.type == TxnType.salesOrder
                 ? 'Customer'
                 : 'Customer (opsional)',
-            value: _customerId.isEmpty ? null : '#$_customerId',
+            value: _customerLabel.isEmpty ? null : _customerLabel,
             required: widget.type == TxnType.salesOrder,
             onTap: () async {
-              final value = await _selectCustomer();
-              if (value != null) setState(() => _customerId = value);
+              final option = await _selectCustomer();
+              if (option != null) {
+                setState(() {
+                  _customerId = '${option.id}';
+                  _customerLabel = option.label;
+                });
+              }
             },
           ),
           const SizedBox(height: AppSpacing.md),
@@ -349,69 +367,99 @@ class _TransactionFormCreateScreenState
         if (widget.type == TxnType.transfer) ...[
           PickerTile(
             label: 'Gudang asal',
-            value: _warehouseId.isEmpty ? null : '#$_warehouseId',
+            value: _warehouseLabel.isEmpty ? null : _warehouseLabel,
             required: true,
             onTap: () async {
-              final value = await _selectWarehouse(
+              final option = await _selectWarehouse(
                 current: _warehouseId,
                 isSource: true,
               );
-              if (value != null) setState(() => _warehouseId = value);
+              if (option != null) {
+                setState(() {
+                  _warehouseId = '${option.id}';
+                  _warehouseLabel = option.label;
+                });
+              }
             },
           ),
           const SizedBox(height: AppSpacing.sm),
           PickerTile(
             label: 'Lokasi asal',
-            value: _fromLocationId.isEmpty ? null : '#$_fromLocationId',
+            value: _fromLocationLabel.isEmpty ? null : _fromLocationLabel,
             required: true,
             onTap: () async {
-              final value = await _selectLocation(warehouseId: _warehouseId);
-              if (value != null) setState(() => _fromLocationId = value);
+              final option = await _selectLocation(warehouseId: _warehouseId);
+              if (option != null) {
+                setState(() {
+                  _fromLocationId = '${option.id}';
+                  _fromLocationLabel = option.label;
+                });
+              }
             },
           ),
           const SizedBox(height: AppSpacing.md),
           PickerTile(
             label: 'Gudang tujuan',
-            value: _warehouseToId.isEmpty ? null : '#$_warehouseToId',
+            value: _warehouseToLabel.isEmpty ? null : _warehouseToLabel,
             required: true,
             onTap: () async {
-              final value = await _selectWarehouse(
+              final option = await _selectWarehouse(
                 current: _warehouseToId,
                 isSource: false,
               );
-              if (value != null) setState(() => _warehouseToId = value);
+              if (option != null) {
+                setState(() {
+                  _warehouseToId = '${option.id}';
+                  _warehouseToLabel = option.label;
+                });
+              }
             },
           ),
           const SizedBox(height: AppSpacing.sm),
           PickerTile(
             label: 'Lokasi tujuan',
-            value: _toLocationId.isEmpty ? null : '#$_toLocationId',
+            value: _toLocationLabel.isEmpty ? null : _toLocationLabel,
             required: true,
             onTap: () async {
-              final value = await _selectLocation(warehouseId: _warehouseToId);
-              if (value != null) setState(() => _toLocationId = value);
+              final option = await _selectLocation(warehouseId: _warehouseToId);
+              if (option != null) {
+                setState(() {
+                  _toLocationId = '${option.id}';
+                  _toLocationLabel = option.label;
+                });
+              }
             },
           ),
           const SizedBox(height: AppSpacing.md),
         ] else ...[
           PickerTile(
             label: 'Gudang',
-            value: _warehouseId.isEmpty ? null : '#$_warehouseId',
+            value: _warehouseLabel.isEmpty ? null : _warehouseLabel,
             required: true,
             onTap: () async {
-              final value = await _selectWarehouse();
-              if (value != null) setState(() => _warehouseId = value);
+              final option = await _selectWarehouse();
+              if (option != null) {
+                setState(() {
+                  _warehouseId = '${option.id}';
+                  _warehouseLabel = option.label;
+                });
+              }
             },
           ),
           const SizedBox(height: AppSpacing.sm),
           if (_needsLocation)
             PickerTile(
               label: 'Lokasi',
-              value: _locationId.isEmpty ? null : '#$_locationId',
+              value: _locationLabel.isEmpty ? null : _locationLabel,
               required: widget.type == TxnType.adjustment,
               onTap: () async {
-                final value = await _selectLocation(warehouseId: _warehouseId);
-                if (value != null) setState(() => _locationId = value);
+                final option = await _selectLocation(warehouseId: _warehouseId);
+                if (option != null) {
+                  setState(() {
+                    _locationId = '${option.id}';
+                    _locationLabel = option.label;
+                  });
+                }
               },
             ),
           const SizedBox(height: AppSpacing.md),

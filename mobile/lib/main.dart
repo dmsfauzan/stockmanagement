@@ -19,6 +19,8 @@ import 'features/transactions/presentation/transactions_hub_screen.dart';
 import 'features/items/presentation/item_detail_screen.dart';
 import 'features/master/presentation/master_screens.dart';
 import 'features/more/presentation/more_screen.dart';
+import 'features/reports/presentation/reports_screen.dart';
+import 'features/settings/presentation/settings_screen.dart';
 import 'features/stock/presentation/stock_list_screen.dart';
 
 void main() {
@@ -202,6 +204,19 @@ final _router = GoRouter(
             GoRoute(
               path: '/master/currencies',
               builder: (context, state) => const CurrenciesScreen(),
+            ),
+            GoRoute(
+              path: '/reports',
+              builder: (context, state) => const ReportsIndexScreen(),
+            ),
+            GoRoute(
+              path: '/reports/:key',
+              builder: (context, state) =>
+                  ReportScreen(reportKey: state.pathParameters['key'] ?? ''),
+            ),
+            GoRoute(
+              path: '/settings',
+              builder: (context, state) => const SettingsScreen(),
             ),
           ],
         ),

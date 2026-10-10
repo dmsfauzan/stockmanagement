@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +25,7 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
 
   final List<StockRow> _rows = [];
   List<Warehouse> _warehouses = [];
+  Timer? _debounce;
   String _query = '';
   String? _status;
   String? _warehouseId;
@@ -50,9 +53,18 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _search.dispose();
     _scroll.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      _query = value.trim();
+      _load();
+    });
   }
 
   Future<void> _loadWarehouses() async {
@@ -135,7 +147,9 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
                 hintText: 'Cari SKU / nama barang…',
                 prefixIcon: Icon(Icons.search),
               ),
+              onChanged: _onSearchChanged,
               onSubmitted: (value) {
+                _debounce?.cancel();
                 _query = value.trim();
                 _load();
               },
@@ -200,19 +214,27 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
   Widget _buildBody() {
     if (_loading) return const ListSkeleton(rows: 8);
     if (_error != null) {
-      return ListView(
-        children: [ErrorCard(message: _error!, onRetry: _load)],
+      return RefreshIndicator(
+        onRefresh: _load,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [ErrorCard(message: _error!, onRetry: _load)],
+        ),
       );
     }
     if (_rows.isEmpty) {
-      return ListView(
-        children: const [
-          SizedBox(height: 80),
-          EmptyState(
-            title: 'Tidak ada data stok',
-            message: 'Coba ubah pencarian / filter.',
-          ),
-        ],
+      return RefreshIndicator(
+        onRefresh: _load,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const [
+            SizedBox(height: 80),
+            EmptyState(
+              title: 'Tidak ada data stok',
+              message: 'Coba ubah pencarian / filter.',
+            ),
+          ],
+        ),
       );
     }
 
@@ -220,6 +242,7 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
       onRefresh: () => _load(),
       child: ListView.separated(
         controller: _scroll,
+        physics: const AlwaysScrollableScrollPhysics(),
         itemCount: _rows.length + (_loadingMore ? 1 : 0),
         separatorBuilder: (context, index) => const Divider(height: 1),
         itemBuilder: (context, index) {

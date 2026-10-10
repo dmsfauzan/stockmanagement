@@ -5,6 +5,7 @@ import 'package:wsm_mobile/core/config/app_config.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
 import 'package:wsm_mobile/data/stock/stock_repository.dart';
 import 'package:wsm_mobile/data/transactions/transaction_models.dart';
+import 'package:wsm_mobile/features/reports/presentation/reports_screen.dart';
 import 'package:wsm_mobile/features/transactions/presentation/transactions_hub_screen.dart';
 
 void main() {
@@ -144,6 +145,13 @@ void main() {
     expect(find.text('Transfer'), findsOneWidget);
     expect(find.text('Purchase Order'), findsOneWidget);
     expect(find.text('Sales Order'), findsOneWidget);
+  });
+
+  testWidgets('Reports index lists report modules', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: ReportsIndexScreen()));
+
+    expect(find.text('Laporan Stok'), findsOneWidget);
+    expect(find.text('Valuasi Persediaan'), findsOneWidget);
   });
 
   testWidgets('Login screen shows email and password fields', (

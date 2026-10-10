@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/network/dio_client.dart';
@@ -202,7 +203,7 @@ class DashboardScreen extends ConsumerWidget {
             SectionHeader(
               title: 'Low Stock (Top 5)',
               action: TextButton(
-                onPressed: () => _reload(ref),
+                onPressed: () => context.go('/stock'),
                 child: const Text('Lihat semua'),
               ),
             ),
@@ -234,7 +235,9 @@ class DashboardScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          onTap: () {},
+                          onTap: (row['item_id'] as num?) != null
+                              ? () => context.push('/item/${row['item_id']}')
+                              : null,
                         ),
                     ],
                   ),

@@ -33,6 +33,9 @@ class TxnLineForm {
   final TextEditingController reasonController;
   final TextEditingController notesController;
 
+  String unitLabel = '';
+  String locationLabel = '';
+
   String get itemId => itemIdController.text.trim();
   String get unitId => unitIdController.text.trim();
   String get locationId => locationIdController.text.trim();
@@ -191,9 +194,7 @@ class TxnLineCard extends StatelessWidget {
                 Expanded(
                   child: PickerTile(
                     label: 'Satuan',
-                    value: form.unitIdController.text.isNotEmpty
-                        ? '#${form.unitIdController.text}'
-                        : null,
+                    value: form.unitLabel.isNotEmpty ? form.unitLabel : null,
                     required: true,
                     onTap: () => onPickUnit(),
                   ),
@@ -206,8 +207,8 @@ class TxnLineCard extends StatelessWidget {
                 type == TxnType.transfer) ...[
               PickerTile(
                 label: 'Lokasi',
-                value: form.locationIdController.text.isNotEmpty
-                    ? '#${form.locationIdController.text}'
+                value: form.locationLabel.isNotEmpty
+                    ? form.locationLabel
                     : null,
                 required: true,
                 onTap: () => onPickLocation(),
@@ -276,6 +277,7 @@ Future<void> showUnitPicker(
   );
   if (option != null) {
     form.unitIdController.text = '${option.id}';
+    form.unitLabel = option.label;
   }
 }
 
@@ -290,7 +292,10 @@ Future<void> showLocationPicker(
     title: 'Pilih Lokasi',
     loader: (q) => locationOptions(ref, q, warehouseId: warehouseId),
   );
-  if (option != null) form.locationIdController.text = '${option.id}';
+  if (option != null) {
+    form.locationIdController.text = '${option.id}';
+    form.locationLabel = option.label;
+  }
 }
 
 Future<void> showItemPicker(

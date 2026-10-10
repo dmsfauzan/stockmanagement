@@ -14,6 +14,8 @@ class TransactionRepository {
     String? search,
     String? status,
     String? warehouseId,
+    String? supplierId,
+    String? customerId,
     int page = 1,
     int perPage = 20,
   }) async {
@@ -27,6 +29,10 @@ class TransactionRepository {
           if (status != null && status.isNotEmpty) 'status': status,
           if (warehouseId != null && warehouseId.isNotEmpty)
             'warehouse_id': warehouseId,
+          if (supplierId != null && supplierId.isNotEmpty)
+            'supplier_id': supplierId,
+          if (customerId != null && customerId.isNotEmpty)
+            'customer_id': customerId,
         },
       );
 
