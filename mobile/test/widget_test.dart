@@ -5,6 +5,7 @@ import 'package:wsm_mobile/core/config/app_config.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
 import 'package:wsm_mobile/data/stock/stock_repository.dart';
 import 'package:wsm_mobile/data/transactions/transaction_models.dart';
+import 'package:wsm_mobile/features/transactions/presentation/transactions_hub_screen.dart';
 
 void main() {
   test('AppConfig has a valid API base URL', () {
@@ -98,6 +99,18 @@ void main() {
     expect(detail.lines, hasLength(1));
     expect(detail.lines.first.unitCode, 'PCS');
     expect(detail.lines.first.locationCode, 'A01-01');
+  });
+
+  testWidgets('Transactions hub lists five modules', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: TransactionsHubScreen()),
+    );
+
+    expect(find.text('Barang Masuk'), findsOneWidget);
+    expect(find.text('Barang Keluar'), findsOneWidget);
+    expect(find.text('Adjustment'), findsOneWidget);
+    expect(find.text('Opname'), findsOneWidget);
+    expect(find.text('Transfer'), findsOneWidget);
   });
 
   testWidgets('Login screen shows email and password fields', (

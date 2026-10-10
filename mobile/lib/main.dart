@@ -13,6 +13,7 @@ import 'features/auth/presentation/two_factor_challenge_screen.dart';
 import 'features/common/soon_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/transactions/presentation/transaction_detail_screen.dart';
+import 'features/transactions/presentation/transaction_form_screen.dart';
 import 'features/transactions/presentation/transaction_list_screen.dart';
 import 'features/transactions/presentation/transactions_hub_screen.dart';
 import 'features/items/presentation/item_detail_screen.dart';
@@ -80,6 +81,21 @@ final _router = GoRouter(
                 }
 
                 return TransactionListScreen(type: type);
+              },
+            ),
+            GoRoute(
+              path: '/tx/:type/create',
+              builder: (context, state) {
+                final type = txnTypeFromKey(state.pathParameters['type']);
+
+                if (type == null) {
+                  return const SoonScreen(
+                    title: 'Transaksi',
+                    note: 'Tipe dokumen tidak dikenal.',
+                  );
+                }
+
+                return TransactionFormCreateScreen(type: type);
               },
             ),
             GoRoute(

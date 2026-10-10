@@ -46,6 +46,7 @@ lib/
 - E1 — design tokens, widget library, auth (login/2FA), dashboard ✅
 - E2 — stok list (filter + paging) + detail barang (tab) + master data ✅
 - E3a — transaksi: hub, list, detail + workflow (GR/GI/Adjustment/Opname/Transfer) ✅
+- E3b — form pembuatan + picker (item/satuan/lokasi/gudang/supplier/customer) ✅
 - E4 — PO/SO/retur, requisition, perakitan, picking
 - E5 — karantina, lacak, recall, laporan, lainnya
 - E6 — scan kamera (`mobile_scanner`), finalisasi grafik, build APK
