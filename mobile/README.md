@@ -47,10 +47,16 @@ lib/
 - E2 — stok list (filter + paging) + detail barang (tab) + master data ✅
 - E3a — transaksi: hub, list, detail + workflow (GR/GI/Adjustment/Opname/Transfer) ✅
 - E3b — form pembuatan + picker (item/satuan/lokasi/gudang/supplier/customer) ✅
-- E4 — PO/SO/retur, requisition, perakitan, picking
-- E5 — karantina, lacak, recall, laporan, lainnya
-- E6 — scan kamera (`mobile_scanner`), finalisasi grafik, build APK
-- Menyusul: offline (outbox), push (FCM), cetak label Bluetooth, biometrik
+- Fase 0 — laporan/settings, tautan dashboard, label picker, debounce/filter list ✅
+- E4 — PO/SO/retur, requisition, perakitan, picking ✅
+- E5 — karantina, lacak, recall, laporan (viewer generik), alat ✅
+- E6 — scan kamera (`mobile_scanner`) ✅, banner offline, finalisasi grafik, build APK
+- Menyusul: offline penuh (outbox antrean tulis), push (FCM), cetak label Bluetooth, biometrik
+
+## CI
+
+Job `mobile` di `.github/workflows/tests.yml` menjalankan `flutter pub get`,
+`dart format --set-exit-if-changed`, `flutter analyze`, dan `flutter test`.
 
 ## Perintah pengembangan
 

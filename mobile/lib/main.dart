@@ -20,6 +20,7 @@ import 'features/picking/presentation/picking_list_screen.dart';
 import 'features/quality/presentation/quarantine_screen.dart';
 import 'features/recall/presentation/recall_form_screen.dart';
 import 'features/recall/presentation/recall_list_screen.dart';
+import 'features/scan/presentation/scan_screen.dart';
 import 'features/tools/presentation/tools_screen.dart';
 import 'features/tracing/presentation/traceability_screen.dart';
 import 'features/transactions/presentation/transaction_detail_screen.dart';
@@ -70,10 +71,7 @@ final _router = GoRouter(
           routes: [
             GoRoute(
               path: '/scan',
-              builder: (context, state) => const SoonScreen(
-                title: 'Scan',
-                note: 'Scan kamera masuk pada Fase 4.',
-              ),
+              builder: (context, state) => const ScanScreen(),
             ),
           ],
         ),

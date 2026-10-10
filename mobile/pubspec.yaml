@@ -41,6 +41,7 @@ dependencies:
   connectivity_plus: ^6.1.0
   uuid: ^4.6.0
   fl_chart: ^1.2.0
+  mobile_scanner: ^7.0.0
 
 dev_dependencies:
   flutter_test:
