@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/tokens.dart';
+import '../../../core/utils/form_errors.dart';
 import '../../../core/widgets/picker.dart';
 import '../../../data/providers.dart';
 import '../../transactions/presentation/picker_loaders.dart';
@@ -99,7 +100,7 @@ class _AssemblyFormScreenState extends ConsumerState<AssemblyFormScreen> {
       _snack('Assembly order dibuat & diposting.');
       context.pop(true);
     } catch (e) {
-      _snack('$e', error: true);
+      _snack(describeApiError(e), error: !isQueuedError(e));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

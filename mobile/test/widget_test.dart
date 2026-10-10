@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wsm_mobile/core/config/app_config.dart';
+import 'package:wsm_mobile/core/network/api_exception.dart';
 import 'package:wsm_mobile/core/offline/outbox_entry.dart';
+import 'package:wsm_mobile/core/utils/form_errors.dart';
 import 'package:wsm_mobile/data/assembly/assembly_models.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
 import 'package:wsm_mobile/data/picking/picking_models.dart';
@@ -297,6 +299,24 @@ void main() {
 
     expect(row.value, 'B-1');
     expect(row.status, 'active');
+  });
+
+  test('describeApiError maps validation errors to readable text', () {
+    final error = ApiException(
+      'Validasi gagal',
+      statusCode: 422,
+      errors: {
+        'items.0.quantity': ['Jumlah harus lebih dari 0.'],
+        'supplier_id': ['Supplier wajib diisi.'],
+      },
+    );
+
+    final message = describeApiError(error);
+
+    expect(message, contains('Baris 1'));
+    expect(message, contains('quantity'));
+    expect(message, contains('Jumlah harus lebih dari 0.'));
+    expect(message, contains('supplier id'));
   });
 
   test('OutboxEntry round-trips through map', () {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/form_errors.dart';
 import '../../../../core/widgets/picker.dart';
 import '../../../../data/providers.dart';
 import '../../../../data/transactions/transaction_models.dart';
@@ -261,7 +262,10 @@ class _TransactionFormCreateScreenState
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$e'), backgroundColor: AppColors.rose),
+        SnackBar(
+          content: Text(describeApiError(e)),
+          backgroundColor: isQueuedError(e) ? null : AppColors.rose,
+        ),
       );
     } finally {
       if (mounted) setState(() => _saving = false);

@@ -6,6 +6,7 @@ import '../config/app_config.dart';
 import '../offline/outbox_service.dart';
 import '../storage/secure_store.dart';
 import 'api_exception.dart';
+import 'session_events.dart';
 
 final dioProvider = Provider<Dio>((ref) {
   final dio = Dio(
@@ -49,6 +50,10 @@ final dioProvider = Provider<Dio>((ref) {
           message = 'Tidak dapat terhubung ke server. Periksa API_BASE_URL.';
         }
 
+        if (code == 401 && !_isAuthPath(e.requestOptions.path)) {
+          ref.read(sessionExpiredProvider.notifier).state++;
+        }
+
         var queued = false;
         if (_shouldQueue(e)) {
           try {
@@ -83,6 +88,14 @@ final dioProvider = Provider<Dio>((ref) {
 
   return dio;
 });
+
+bool _isAuthPath(String path) {
+  for (final p in const ['/login', '/logout', '/two-factor', '/me']) {
+    if (path.startsWith(p)) return true;
+  }
+
+  return false;
+}
 
 bool _shouldQueue(DioException e) {
   if (e.requestOptions.method == 'GET') return false;
