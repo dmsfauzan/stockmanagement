@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/tokens.dart';
+import '../../../core/utils/format.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/status_badge.dart';
@@ -333,7 +334,7 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
 
           return DataListRow(
             title: row.number,
-            subtitle: '${row.date ?? '-'} · ${row.warehouse ?? '-'}',
+            subtitle: '${formatDate(row.date)} · ${row.warehouse ?? '-'}',
             badge: StatusBadge(
               status: row.status,
               label: row.status.toUpperCase(),

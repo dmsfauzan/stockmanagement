@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wsm_mobile/core/config/app_config.dart';
 import 'package:wsm_mobile/core/network/api_exception.dart';
 import 'package:wsm_mobile/core/offline/outbox_entry.dart';
+import 'package:wsm_mobile/core/utils/format.dart';
 import 'package:wsm_mobile/core/utils/form_errors.dart';
 import 'package:wsm_mobile/data/assembly/assembly_models.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
@@ -299,6 +300,12 @@ void main() {
 
     expect(row.value, 'B-1');
     expect(row.status, 'active');
+  });
+
+  test('formatDate & formatNumber format values', () {
+    expect(formatDate('2026-10-10'), '10/10/2026');
+    expect(formatDate(null), '-');
+    expect(formatNumber(1234), '1.234');
   });
 
   test('describeApiError maps validation errors to readable text', () {

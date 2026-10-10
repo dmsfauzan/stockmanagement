@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/tokens.dart';
+import '../../../core/utils/format.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/status_badge.dart';
@@ -202,7 +203,7 @@ class _RequisitionListScreenState extends ConsumerState<RequisitionListScreen> {
           return DataListRow(
             title: row.number,
             subtitle:
-                '${row.date ?? '-'} · ${row.warehouse ?? '-'}'
+                '${formatDate(row.date)} · ${row.warehouse ?? '-'}'
                 '${row.poNumber != null ? ' · PO ${row.poNumber}' : ''}',
             badge: StatusBadge(
               status: row.status,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/tokens.dart';
+import '../../../core/utils/format.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/status_badge.dart';
@@ -203,9 +204,9 @@ class _RequisitionDetailScreenState
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 if (detail.requestDate != null)
-                  _row('Tgl permintaan', detail.requestDate!),
+                  _row('Tgl permintaan', formatDate(detail.requestDate)),
                 if (detail.requiredDate != null)
-                  _row('Dibutuhkan', detail.requiredDate!),
+                  _row('Dibutuhkan', formatDate(detail.requiredDate)),
                 if (detail.warehouse != null) _row('Gudang', detail.warehouse!),
                 if (detail.notes != null && detail.notes!.isNotEmpty)
                   _row('Catatan', detail.notes!),

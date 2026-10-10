@@ -145,7 +145,7 @@ class DashboardScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: StatCard(
-                    label: 'Items (PR 15D)',
+                    label: 'Total Baris Stok',
                     value: stock.when(
                       data: (s) => '${s.items15d}',
                       loading: () => '…',

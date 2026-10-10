@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/tokens.dart';
+import '../../../core/utils/format.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/status_badge.dart';
@@ -243,7 +244,8 @@ class _TransactionDetailScreenState
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                if (detail.date != null) _row('Tanggal', detail.date!),
+                if (detail.date != null)
+                  _row('Tanggal', formatDate(detail.date)),
                 if (detail.party != null)
                   _row(detail.partyLabel ?? 'Pihak', detail.party!),
                 if (detail.warehouse != null)
