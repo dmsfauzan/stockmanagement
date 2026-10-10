@@ -130,8 +130,37 @@ void main() {
     expect(detail.lines.first.unitCost, 1200);
   });
 
+  test('TxnDetail customer return parses party and lines', () {
+    final detail = TxnDetail.customerReturn({
+      'id': 1,
+      'number': 'CRT-1',
+      'status': 'submitted',
+      'transaction_date': '2026-10-10',
+      'party': 'Customer A',
+      'warehouse': 'Jakarta',
+      'reason': 'Barang rusak',
+      'items': [
+        {
+          'id': 1,
+          'item_id': 9,
+          'sku': 'BRG-1',
+          'item_name': 'Barang',
+          'quantity': 2,
+          'unit': 'PCS',
+          'location': 'A01-01',
+          'unit_cost': 500,
+        },
+      ],
+    });
+
+    expect(detail.party, 'Customer A');
+    expect(detail.partyLabel, 'Customer');
+    expect(detail.lines.first.unitCode, 'PCS');
+    expect(detail.lines.first.locationCode, 'A01-01');
+  });
+
   testWidgets('Transactions hub lists transaction modules', (tester) async {
-    tester.view.physicalSize = const Size(1200, 3000);
+    tester.view.physicalSize = const Size(1200, 4000);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -145,6 +174,8 @@ void main() {
     expect(find.text('Transfer'), findsOneWidget);
     expect(find.text('Purchase Order'), findsOneWidget);
     expect(find.text('Sales Order'), findsOneWidget);
+    expect(find.text('Retur Penjualan'), findsOneWidget);
+    expect(find.text('Retur Pembelian'), findsOneWidget);
   });
 
   testWidgets('Reports index lists report modules', (tester) async {

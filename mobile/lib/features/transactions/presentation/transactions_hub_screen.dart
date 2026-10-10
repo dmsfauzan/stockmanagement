@@ -48,6 +48,18 @@ class TransactionsHubScreen extends StatelessWidget {
         'Sales Order',
         'Pesanan penjualan ke customer',
       ),
+      (
+        TxnType.customerReturn,
+        Icons.assignment_return_outlined,
+        'Retur Penjualan',
+        'Barang kembali dari customer',
+      ),
+      (
+        TxnType.supplierReturn,
+        Icons.keyboard_return_outlined,
+        'Retur Pembelian',
+        'Barang dikembalikan ke supplier',
+      ),
     ];
 
     return Scaffold(

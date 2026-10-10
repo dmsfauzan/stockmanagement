@@ -52,6 +52,18 @@ String? _permissionFor(TxnType type, String verb) => switch (type) {
     'close' => 'sales_order.close',
     _ => null,
   },
+  TxnType.customerReturn => switch (verb) {
+    'submit' => 'customer_return.submit',
+    'approve' || 'reject' => 'customer_return.approve',
+    'post' => 'customer_return.post',
+    _ => null,
+  },
+  TxnType.supplierReturn => switch (verb) {
+    'submit' => 'supplier_return.submit',
+    'approve' || 'reject' => 'supplier_return.approve',
+    'post' => 'supplier_return.post',
+    _ => null,
+  },
 };
 
 const _verbLabels = {

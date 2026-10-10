@@ -66,6 +66,8 @@ class TransactionRepository {
         TxnType.transfer => TxnDetail.transfer(data),
         TxnType.purchaseOrder => TxnDetail.purchaseOrder(data),
         TxnType.salesOrder => TxnDetail.salesOrder(data),
+        TxnType.customerReturn => TxnDetail.customerReturn(data),
+        TxnType.supplierReturn => TxnDetail.supplierReturn(data),
       };
     } on DioException catch (e) {
       throw e.error is ApiException

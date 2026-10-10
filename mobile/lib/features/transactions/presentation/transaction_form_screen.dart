@@ -140,6 +140,15 @@ class _TransactionFormCreateScreenState
           'unit_price': double.tryParse(l.price) ?? 0,
           'notes': l.notes.isNotEmpty ? l.notes : null,
         },
+        TxnType.customerReturn || TxnType.supplierReturn => {
+          'item_id': itemId,
+          'quantity': qty,
+          'unit_id': unitId > 0 ? unitId : null,
+          'location_id': locationId,
+          'unit_cost': double.tryParse(l.price) ?? 0,
+          'batch_number': l.batch.isNotEmpty ? l.batch : null,
+          'notes': l.notes.isNotEmpty ? l.notes : null,
+        },
       };
     }).toList();
 
@@ -205,6 +214,28 @@ class _TransactionFormCreateScreenState
         'order_date': now,
         'customer_id': int.tryParse(_customerId),
         'warehouse_id': int.tryParse(_warehouseId),
+        'notes': _notes.isNotEmpty ? _notes : null,
+        'items': items,
+      },
+      TxnType.customerReturn => {
+        'transaction_date': now,
+        'customer_id': _customerId.isNotEmpty
+            ? int.tryParse(_customerId)
+            : null,
+        'warehouse_id': int.tryParse(_warehouseId),
+        'location_id': int.tryParse(_locationId),
+        'reason': _reasonOrDestination.isNotEmpty ? _reasonOrDestination : null,
+        'notes': _notes.isNotEmpty ? _notes : null,
+        'items': items,
+      },
+      TxnType.supplierReturn => {
+        'transaction_date': now,
+        'supplier_id': _supplierId.isNotEmpty
+            ? int.tryParse(_supplierId)
+            : null,
+        'warehouse_id': int.tryParse(_warehouseId),
+        'location_id': int.tryParse(_locationId),
+        'reason': _reasonOrDestination.isNotEmpty ? _reasonOrDestination : null,
         'notes': _notes.isNotEmpty ? _notes : null,
         'items': items,
       },
@@ -305,17 +336,26 @@ class _TransactionFormCreateScreenState
   bool get _needsLocation =>
       widget.type == TxnType.issue ||
       widget.type == TxnType.adjustment ||
-      widget.type == TxnType.opname;
+      widget.type == TxnType.opname ||
+      widget.type == TxnType.customerReturn ||
+      widget.type == TxnType.supplierReturn;
+
+  bool get _isReturn =>
+      widget.type == TxnType.customerReturn ||
+      widget.type == TxnType.supplierReturn;
 
   Widget _headerFields() {
     return Column(
       children: [
         if (widget.type == TxnType.receipt ||
-            widget.type == TxnType.purchaseOrder) ...[
+            widget.type == TxnType.purchaseOrder ||
+            widget.type == TxnType.supplierReturn) ...[
           PickerTile(
-            label: 'Supplier',
+            label: widget.type == TxnType.supplierReturn
+                ? 'Supplier (opsional)'
+                : 'Supplier',
             value: _supplierLabel.isEmpty ? null : _supplierLabel,
-            required: true,
+            required: widget.type != TxnType.supplierReturn,
             onTap: () async {
               final option = await _selectSupplier();
               if (option != null) {
@@ -329,7 +369,8 @@ class _TransactionFormCreateScreenState
           const SizedBox(height: AppSpacing.md),
         ],
         if (widget.type == TxnType.issue ||
-            widget.type == TxnType.salesOrder) ...[
+            widget.type == TxnType.salesOrder ||
+            widget.type == TxnType.customerReturn) ...[
           PickerTile(
             label: widget.type == TxnType.salesOrder
                 ? 'Customer'
@@ -351,6 +392,13 @@ class _TransactionFormCreateScreenState
         if (widget.type == TxnType.issue) ...[
           TextField(
             decoration: const InputDecoration(labelText: 'Tujuan *'),
+            onChanged: (v) => _reasonOrDestination = v,
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+        if (_isReturn) ...[
+          TextField(
+            decoration: const InputDecoration(labelText: 'Alasan retur'),
             onChanged: (v) => _reasonOrDestination = v,
           ),
           const SizedBox(height: AppSpacing.md),

@@ -7,6 +7,8 @@ enum TxnType {
   transfer,
   purchaseOrder,
   salesOrder,
+  customerReturn,
+  supplierReturn,
 }
 
 extension TxnTypeX on TxnType {
@@ -18,6 +20,8 @@ extension TxnTypeX on TxnType {
     TxnType.transfer => 'transfers',
     TxnType.purchaseOrder => 'purchase-orders',
     TxnType.salesOrder => 'sales-orders',
+    TxnType.customerReturn => 'customer-returns',
+    TxnType.supplierReturn => 'supplier-returns',
   };
 
   String get label => switch (this) {
@@ -28,6 +32,8 @@ extension TxnTypeX on TxnType {
     TxnType.transfer => 'Transfer',
     TxnType.purchaseOrder => 'Purchase Order',
     TxnType.salesOrder => 'Sales Order',
+    TxnType.customerReturn => 'Retur Penjualan',
+    TxnType.supplierReturn => 'Retur Pembelian',
   };
 
   String get listPath => switch (this) {
@@ -38,6 +44,8 @@ extension TxnTypeX on TxnType {
     TxnType.transfer => '/stock-transfers',
     TxnType.purchaseOrder => '/purchase-orders',
     TxnType.salesOrder => '/sales-orders',
+    TxnType.customerReturn => '/customer-returns',
+    TxnType.supplierReturn => '/supplier-returns',
   };
 
   String detailPath(int id) => '$listPath/$id';
@@ -128,8 +136,8 @@ class TxnLineItem {
     quantity: (j['quantity'] as num?)?.toInt() ?? 0,
     remaining: (j['remaining'] as num?)?.toInt(),
     unitCost: j['unit_cost'] ?? j['unit_price'],
-    unitCode: j['unit_code'] as String?,
-    locationCode: j['location_code'] as String?,
+    unitCode: (j['unit_code'] ?? j['unit']) as String?,
+    locationCode: (j['location_code'] ?? j['location']) as String?,
     batchNumber: j['batch_number'] as String?,
     expiryDate: j['expiry_date'] as String?,
     systemQuantity: (j['system_quantity'] as num?)?.toInt(),
@@ -280,6 +288,45 @@ class TxnDetail {
         .map((e) => TxnLineItem.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
+
+  factory TxnDetail.customerReturn(Map<String, dynamic> j) =>
+      _returnDetail(j, partyLabel: 'Customer', customer: true);
+
+  factory TxnDetail.supplierReturn(Map<String, dynamic> j) =>
+      _returnDetail(j, partyLabel: 'Supplier', customer: false);
+
+  static String? _partyName(Map<String, dynamic> j, String key) {
+    final value = j[key];
+
+    return value is Map ? value['name'] as String? : null;
+  }
+
+  static TxnDetail _returnDetail(
+    Map<String, dynamic> j, {
+    required String partyLabel,
+    required bool customer,
+  }) {
+    final party =
+        (j['party'] as String?) ??
+        (customer ? _partyName(j, 'customer') : _partyName(j, 'supplier'));
+
+    return TxnDetail(
+      id: (j['id'] as num).toInt(),
+      number: '${j['number'] ?? ''}',
+      status: '${j['status'] ?? ''}',
+      date: j['transaction_date'] as String?,
+      party: party,
+      partyLabel: partyLabel,
+      warehouse: j['warehouse'] is Map
+          ? (j['warehouse'] as Map<String, dynamic>)['name'] as String?
+          : j['warehouse'] as String?,
+      reason: j['reason'] as String?,
+      notes: j['notes'] as String?,
+      lines: ((j['items'] as List?) ?? [])
+          .map((e) => TxnLineItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
 }
 
 /// Alur workflow per tipe: urutan status + aksi yang valid per status.
@@ -346,6 +393,14 @@ class TxnWorkflow {
           'approved': ['close'],
           'partial': ['close'],
           'fulfilled': ['close'],
+        },
+      ),
+      TxnType.customerReturn || TxnType.supplierReturn => const TxnWorkflow(
+        steps: ['draft', 'submitted', 'approved', 'posted'],
+        actions: {
+          'draft': ['submit'],
+          'submitted': ['approve', 'reject'],
+          'approved': ['post'],
         },
       ),
     };

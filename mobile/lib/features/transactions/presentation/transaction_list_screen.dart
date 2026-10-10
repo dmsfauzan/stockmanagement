@@ -201,8 +201,11 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
 
   Widget _filterBar() {
     final fields = <Widget>[];
+    final isReturn =
+        widget.type == TxnType.customerReturn ||
+        widget.type == TxnType.supplierReturn;
 
-    if (_warehouses.isNotEmpty) {
+    if (_warehouses.isNotEmpty && !isReturn) {
       fields.add(
         _dropdown(
           label: 'Gudang',

@@ -66,12 +66,17 @@ class TxnLineForm {
             type == TxnType.issue ||
             type == TxnType.transfer ||
             type == TxnType.purchaseOrder ||
-            type == TxnType.salesOrder) &&
+            type == TxnType.salesOrder ||
+            type == TxnType.customerReturn ||
+            type == TxnType.supplierReturn) &&
         unitId.isEmpty) {
       errors['items.$index.unit_id'] = 'Satuan wajib diisi.';
     }
 
-    if ((type == TxnType.receipt || type == TxnType.issue) &&
+    if ((type == TxnType.receipt ||
+            type == TxnType.issue ||
+            type == TxnType.customerReturn ||
+            type == TxnType.supplierReturn) &&
         locationId.isEmpty) {
       errors['items.$index.location_id'] = 'Lokasi wajib diisi.';
     }
@@ -204,7 +209,9 @@ class TxnLineCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.md),
             if (type == TxnType.receipt ||
                 type == TxnType.issue ||
-                type == TxnType.transfer) ...[
+                type == TxnType.transfer ||
+                type == TxnType.customerReturn ||
+                type == TxnType.supplierReturn) ...[
               PickerTile(
                 label: 'Lokasi',
                 value: form.locationLabel.isNotEmpty
@@ -217,22 +224,28 @@ class TxnLineCard extends StatelessWidget {
             ],
             if (type == TxnType.receipt ||
                 type == TxnType.purchaseOrder ||
-                type == TxnType.salesOrder) ...[
+                type == TxnType.salesOrder ||
+                type == TxnType.customerReturn ||
+                type == TxnType.supplierReturn) ...[
               TextField(
                 controller: form.priceController,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
                 decoration: InputDecoration(
-                  labelText: type == TxnType.receipt
-                      ? 'Harga satuan'
-                      : 'Harga satuan *',
+                  labelText:
+                      type == TxnType.purchaseOrder ||
+                          type == TxnType.salesOrder
+                      ? 'Harga satuan *'
+                      : 'Harga satuan',
                   isDense: true,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
             ],
-            if (type == TxnType.receipt) ...[
+            if (type == TxnType.receipt ||
+                type == TxnType.customerReturn ||
+                type == TxnType.supplierReturn) ...[
               TextField(
                 controller: form.batchController,
                 decoration: const InputDecoration(
@@ -241,6 +254,8 @@ class TxnLineCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
+            ],
+            if (type == TxnType.receipt) ...[
               TextField(
                 controller: form.expiryController,
                 decoration: const InputDecoration(
