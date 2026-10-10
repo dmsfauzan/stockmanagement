@@ -31,6 +31,8 @@ class PurchaseOrderResource extends JsonResource
                 'quantity' => (int) $i->quantity,
                 'received_quantity' => (int) $i->received_quantity,
                 'remaining' => (int) $i->remaining(),
+                'unit_id' => $i->unit_id,
+                'unit_code' => $i->unit?->code,
                 'unit_price' => $i->unit_price,
             ])->values()->all()),
         ];

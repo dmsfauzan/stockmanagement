@@ -31,6 +31,8 @@ class SalesOrderResource extends JsonResource
                 'quantity' => (int) $i->quantity,
                 'fulfilled_quantity' => (int) $i->fulfilled_quantity,
                 'remaining' => $i->remaining(),
+                'unit_id' => $i->unit_id,
+                'unit_code' => $i->unit?->code,
                 'unit_price' => $i->unit_price,
             ])->values()->all()),
         ];

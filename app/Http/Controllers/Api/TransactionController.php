@@ -127,7 +127,7 @@ class TransactionController extends ApiController
     public function purchaseOrders(Request $request): JsonResponse
     {
         $query = $this->applyCommon(
-            PurchaseOrder::query()->with(['supplier:id,name', 'warehouse:id,name', 'items.item:id,sku,name']),
+            PurchaseOrder::query()->with(['supplier:id,name', 'warehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code']),
             $request
         )->orderByDesc('order_date')->orderByDesc('id');
 
@@ -136,7 +136,7 @@ class TransactionController extends ApiController
 
     public function purchaseOrder(PurchaseOrder $purchaseOrder): JsonResponse
     {
-        $purchaseOrder->loadMissing(['supplier:id,name', 'warehouse:id,name', 'items.item:id,sku,name']);
+        $purchaseOrder->loadMissing(['supplier:id,name', 'warehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code']);
 
         return $this->ok(new PurchaseOrderResource($purchaseOrder));
     }
@@ -144,7 +144,7 @@ class TransactionController extends ApiController
     public function salesOrders(Request $request): JsonResponse
     {
         $query = $this->applyCommon(
-            SalesOrder::query()->with(['customer:id,name', 'warehouse:id,name', 'items.item:id,sku,name']),
+            SalesOrder::query()->with(['customer:id,name', 'warehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code']),
             $request
         )->orderByDesc('order_date')->orderByDesc('id');
 
@@ -153,7 +153,7 @@ class TransactionController extends ApiController
 
     public function salesOrder(SalesOrder $salesOrder): JsonResponse
     {
-        $salesOrder->loadMissing(['customer:id,name', 'warehouse:id,name', 'items.item:id,sku,name']);
+        $salesOrder->loadMissing(['customer:id,name', 'warehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code']);
 
         return $this->ok(new SalesOrderResource($salesOrder));
     }

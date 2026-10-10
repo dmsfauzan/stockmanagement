@@ -291,11 +291,16 @@ class ReturnController extends ApiController
      */
     protected function present(CustomerReturn|SupplierReturn $return): array
     {
+        $partyName = $return instanceof CustomerReturn
+            ? $return->customer?->name
+            : ($return instanceof SupplierReturn ? $return->supplier?->name : null);
+
         return [
             'id' => $return->id,
             'number' => $return->number,
             'transaction_date' => $return->transaction_date?->toDateString(),
             'status' => $return->status,
+            'party' => $partyName,
             'warehouse' => $return->warehouse?->name,
             'location' => $return->location?->code,
             'reason' => $return->reason,
