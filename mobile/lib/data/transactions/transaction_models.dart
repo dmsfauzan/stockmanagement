@@ -1,5 +1,13 @@
 /// Jenis dokumen transaksi yang didukung mobile.
-enum TxnType { receipt, issue, adjustment, opname, transfer }
+enum TxnType {
+  receipt,
+  issue,
+  adjustment,
+  opname,
+  transfer,
+  purchaseOrder,
+  salesOrder,
+}
 
 extension TxnTypeX on TxnType {
   String get key => switch (this) {
@@ -8,6 +16,8 @@ extension TxnTypeX on TxnType {
     TxnType.adjustment => 'adjustments',
     TxnType.opname => 'opnames',
     TxnType.transfer => 'transfers',
+    TxnType.purchaseOrder => 'purchase-orders',
+    TxnType.salesOrder => 'sales-orders',
   };
 
   String get label => switch (this) {
@@ -16,6 +26,8 @@ extension TxnTypeX on TxnType {
     TxnType.adjustment => 'Adjustment',
     TxnType.opname => 'Opname',
     TxnType.transfer => 'Transfer',
+    TxnType.purchaseOrder => 'Purchase Order',
+    TxnType.salesOrder => 'Sales Order',
   };
 
   String get listPath => switch (this) {
@@ -24,6 +36,8 @@ extension TxnTypeX on TxnType {
     TxnType.adjustment => '/stock-adjustments',
     TxnType.opname => '/stock-opnames',
     TxnType.transfer => '/stock-transfers',
+    TxnType.purchaseOrder => '/purchase-orders',
+    TxnType.salesOrder => '/sales-orders',
   };
 
   String detailPath(int id) => '$listPath/$id';
@@ -52,7 +66,10 @@ class TxnListRow {
     id: (j['id'] as num).toInt(),
     number: '${j['number'] ?? ''}',
     date:
-        (j['transaction_date'] ?? j['transfer_date'] ?? j['opname_date'])
+        (j['transaction_date'] ??
+                j['transfer_date'] ??
+                j['opname_date'] ??
+                j['order_date'])
             as String?,
     party:
         (j['supplier'] as Map<String, dynamic>?)?['name'] as String? ??
@@ -71,6 +88,7 @@ class TxnLineItem {
     this.sku,
     this.itemName,
     this.quantity = 0,
+    this.remaining,
     this.unitCost,
     this.unitCode,
     this.locationCode,
@@ -89,6 +107,7 @@ class TxnLineItem {
   final String? sku;
   final String? itemName;
   final int quantity;
+  final int? remaining;
   final dynamic unitCost;
   final String? unitCode;
   final String? locationCode;
@@ -107,7 +126,8 @@ class TxnLineItem {
     sku: j['sku'] as String?,
     itemName: j['item_name'] as String?,
     quantity: (j['quantity'] as num?)?.toInt() ?? 0,
-    unitCost: j['unit_cost'],
+    remaining: (j['remaining'] as num?)?.toInt(),
+    unitCost: j['unit_cost'] ?? j['unit_price'],
     unitCode: j['unit_code'] as String?,
     locationCode: j['location_code'] as String?,
     batchNumber: j['batch_number'] as String?,
@@ -232,6 +252,34 @@ class TxnDetail {
         .map((e) => TxnLineItem.fromJson(e as Map<String, dynamic>))
         .toList(),
   );
+
+  factory TxnDetail.purchaseOrder(Map<String, dynamic> j) => TxnDetail(
+    id: (j['id'] as num).toInt(),
+    number: '${j['number'] ?? ''}',
+    status: '${j['status'] ?? ''}',
+    date: j['order_date'] as String?,
+    party: (j['supplier'] as Map<String, dynamic>?)?['name'] as String?,
+    partyLabel: 'Supplier',
+    warehouse: (j['warehouse'] as Map<String, dynamic>?)?['name'] as String?,
+    notes: j['notes'] as String?,
+    lines: ((j['items'] as List?) ?? [])
+        .map((e) => TxnLineItem.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
+
+  factory TxnDetail.salesOrder(Map<String, dynamic> j) => TxnDetail(
+    id: (j['id'] as num).toInt(),
+    number: '${j['number'] ?? ''}',
+    status: '${j['status'] ?? ''}',
+    date: j['order_date'] as String?,
+    party: (j['customer'] as Map<String, dynamic>?)?['name'] as String?,
+    partyLabel: 'Customer',
+    warehouse: (j['warehouse'] as Map<String, dynamic>?)?['name'] as String?,
+    notes: j['notes'] as String?,
+    lines: ((j['items'] as List?) ?? [])
+        .map((e) => TxnLineItem.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
 }
 
 /// Alur workflow per tipe: urutan status + aksi yang valid per status.
@@ -278,6 +326,26 @@ class TxnWorkflow {
           'approved': ['dispatch'],
           'in_transit': ['receive'],
           'received': ['complete'],
+        },
+      ),
+      TxnType.purchaseOrder => const TxnWorkflow(
+        steps: ['draft', 'submitted', 'approved', 'received', 'closed'],
+        actions: {
+          'draft': ['submit'],
+          'submitted': ['approve', 'reject'],
+          'approved': ['close'],
+          'partial': ['close'],
+          'received': ['close'],
+        },
+      ),
+      TxnType.salesOrder => const TxnWorkflow(
+        steps: ['draft', 'submitted', 'approved', 'fulfilled', 'closed'],
+        actions: {
+          'draft': ['submit'],
+          'submitted': ['approve', 'reject'],
+          'approved': ['close'],
+          'partial': ['close'],
+          'fulfilled': ['close'],
         },
       ),
     };

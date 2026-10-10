@@ -40,6 +40,18 @@ String? _permissionFor(TxnType type, String verb) => switch (type) {
     'receive' || 'complete' => 'transfer.receive',
     _ => null,
   },
+  TxnType.purchaseOrder => switch (verb) {
+    'submit' => 'purchase_order.submit',
+    'approve' || 'reject' => 'purchase_order.approve',
+    'close' => 'purchase_order.close',
+    _ => null,
+  },
+  TxnType.salesOrder => switch (verb) {
+    'submit' => 'sales_order.submit',
+    'approve' || 'reject' => 'sales_order.approve',
+    'close' => 'sales_order.close',
+    _ => null,
+  },
 };
 
 const _verbLabels = {
@@ -52,6 +64,7 @@ const _verbLabels = {
   'dispatch': 'Kirim',
   'receive': 'Terima',
   'complete': 'Selesaikan',
+  'close': 'Tutup',
 };
 
 class TransactionDetailScreen extends ConsumerStatefulWidget {

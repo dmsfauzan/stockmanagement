@@ -134,6 +134,13 @@ class _TransactionFormCreateScreenState
           'unit_id': unitId > 0 ? unitId : null,
           'notes': l.notes.isNotEmpty ? l.notes : null,
         },
+        TxnType.purchaseOrder || TxnType.salesOrder => {
+          'item_id': itemId,
+          'quantity': qty,
+          'unit_id': unitId > 0 ? unitId : null,
+          'unit_price': double.tryParse(l.price) ?? 0,
+          'notes': l.notes.isNotEmpty ? l.notes : null,
+        },
       };
     }).toList();
 
@@ -188,10 +195,28 @@ class _TransactionFormCreateScreenState
         'notes': _notes.isNotEmpty ? _notes : null,
         'items': items,
       },
+      TxnType.purchaseOrder => {
+        'order_date': now,
+        'supplier_id': int.tryParse(_supplierId),
+        'warehouse_id': int.tryParse(_warehouseId),
+        'notes': _notes.isNotEmpty ? _notes : null,
+        'items': items,
+      },
+      TxnType.salesOrder => {
+        'order_date': now,
+        'customer_id': int.tryParse(_customerId),
+        'warehouse_id': int.tryParse(_warehouseId),
+        'notes': _notes.isNotEmpty ? _notes : null,
+        'items': items,
+      },
     };
   }
 
   Future<void> _submit() async {
+    for (var i = 0; i < _lines.length; i++) {
+      if (!_lines[i].validateForType(widget.type, context, ref, i)) return;
+    }
+
     setState(() => _saving = true);
 
     try {
@@ -269,27 +294,43 @@ class _TransactionFormCreateScreenState
     );
   }
 
+  bool get _needsLocation =>
+      widget.type == TxnType.issue ||
+      widget.type == TxnType.adjustment ||
+      widget.type == TxnType.opname;
+
   Widget _headerFields() {
     return Column(
       children: [
-        if (widget.type == TxnType.receipt) ...[
+        if (widget.type == TxnType.receipt ||
+            widget.type == TxnType.purchaseOrder) ...[
           PickerTile(
             label: 'Supplier',
             value: _supplierId.isEmpty ? null : '#$_supplierId',
             required: true,
-            onTap: () async =>
-                _supplierId = await _selectSupplier() ?? _supplierId,
+            onTap: () async {
+              final value = await _selectSupplier();
+              if (value != null) setState(() => _supplierId = value);
+            },
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+        if (widget.type == TxnType.issue ||
+            widget.type == TxnType.salesOrder) ...[
+          PickerTile(
+            label: widget.type == TxnType.salesOrder
+                ? 'Customer'
+                : 'Customer (opsional)',
+            value: _customerId.isEmpty ? null : '#$_customerId',
+            required: widget.type == TxnType.salesOrder,
+            onTap: () async {
+              final value = await _selectCustomer();
+              if (value != null) setState(() => _customerId = value);
+            },
           ),
           const SizedBox(height: AppSpacing.md),
         ],
         if (widget.type == TxnType.issue) ...[
-          PickerTile(
-            label: 'Customer (opsional)',
-            value: _customerId.isEmpty ? null : '#$_customerId',
-            onTap: () async =>
-                _customerId = (await _selectCustomer()) ?? _customerId,
-          ),
-          const SizedBox(height: AppSpacing.md),
           TextField(
             decoration: const InputDecoration(labelText: 'Tujuan *'),
             onChanged: (v) => _reasonOrDestination = v,
@@ -310,58 +351,68 @@ class _TransactionFormCreateScreenState
             label: 'Gudang asal',
             value: _warehouseId.isEmpty ? null : '#$_warehouseId',
             required: true,
-            onTap: () async => _warehouseId =
-                await _selectWarehouse(current: _warehouseId, isSource: true) ??
-                _warehouseId,
+            onTap: () async {
+              final value = await _selectWarehouse(
+                current: _warehouseId,
+                isSource: true,
+              );
+              if (value != null) setState(() => _warehouseId = value);
+            },
           ),
           const SizedBox(height: AppSpacing.sm),
           PickerTile(
             label: 'Lokasi asal',
             value: _fromLocationId.isEmpty ? null : '#$_fromLocationId',
             required: true,
-            onTap: () async => _fromLocationId =
-                await _selectLocation(warehouseId: _warehouseId) ??
-                _fromLocationId,
+            onTap: () async {
+              final value = await _selectLocation(warehouseId: _warehouseId);
+              if (value != null) setState(() => _fromLocationId = value);
+            },
           ),
           const SizedBox(height: AppSpacing.md),
           PickerTile(
             label: 'Gudang tujuan',
             value: _warehouseToId.isEmpty ? null : '#$_warehouseToId',
             required: true,
-            onTap: () async => _warehouseToId =
-                await _selectWarehouse(
-                  current: _warehouseToId,
-                  isSource: false,
-                ) ??
-                _warehouseToId,
+            onTap: () async {
+              final value = await _selectWarehouse(
+                current: _warehouseToId,
+                isSource: false,
+              );
+              if (value != null) setState(() => _warehouseToId = value);
+            },
           ),
           const SizedBox(height: AppSpacing.sm),
           PickerTile(
             label: 'Lokasi tujuan',
             value: _toLocationId.isEmpty ? null : '#$_toLocationId',
             required: true,
-            onTap: () async => _toLocationId =
-                await _selectLocation(warehouseId: _warehouseToId) ??
-                _toLocationId,
+            onTap: () async {
+              final value = await _selectLocation(warehouseId: _warehouseToId);
+              if (value != null) setState(() => _toLocationId = value);
+            },
           ),
           const SizedBox(height: AppSpacing.md),
-        ] else if (widget.type != TxnType.transfer) ...[
+        ] else ...[
           PickerTile(
             label: 'Gudang',
             value: _warehouseId.isEmpty ? null : '#$_warehouseId',
             required: true,
-            onTap: () async =>
-                _warehouseId = await _selectWarehouse() ?? _warehouseId,
+            onTap: () async {
+              final value = await _selectWarehouse();
+              if (value != null) setState(() => _warehouseId = value);
+            },
           ),
           const SizedBox(height: AppSpacing.sm),
-          if (widget.type != TxnType.receipt)
+          if (_needsLocation)
             PickerTile(
               label: 'Lokasi',
               value: _locationId.isEmpty ? null : '#$_locationId',
               required: widget.type == TxnType.adjustment,
-              onTap: () async => _locationId =
-                  await _selectLocation(warehouseId: _warehouseId) ??
-                  _locationId,
+              onTap: () async {
+                final value = await _selectLocation(warehouseId: _warehouseId);
+                if (value != null) setState(() => _locationId = value);
+              },
             ),
           const SizedBox(height: AppSpacing.md),
         ],

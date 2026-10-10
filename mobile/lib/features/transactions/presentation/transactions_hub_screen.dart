@@ -36,6 +36,18 @@ class TransactionsHubScreen extends StatelessWidget {
         'Transfer',
         'Antar gudang/lokasi',
       ),
+      (
+        TxnType.purchaseOrder,
+        Icons.shopping_cart_checkout_outlined,
+        'Purchase Order',
+        'Pesanan pembelian ke supplier',
+      ),
+      (
+        TxnType.salesOrder,
+        Icons.point_of_sale_outlined,
+        'Sales Order',
+        'Pesanan penjualan ke customer',
+      ),
     ];
 
     return Scaffold(

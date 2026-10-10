@@ -61,7 +61,9 @@ class TxnLineForm {
 
     if ((type == TxnType.receipt ||
             type == TxnType.issue ||
-            type == TxnType.transfer) &&
+            type == TxnType.transfer ||
+            type == TxnType.purchaseOrder ||
+            type == TxnType.salesOrder) &&
         unitId.isEmpty) {
       errors['items.$index.unit_id'] = 'Satuan wajib diisi.';
     }
@@ -69,6 +71,11 @@ class TxnLineForm {
     if ((type == TxnType.receipt || type == TxnType.issue) &&
         locationId.isEmpty) {
       errors['items.$index.location_id'] = 'Lokasi wajib diisi.';
+    }
+
+    if ((type == TxnType.purchaseOrder || type == TxnType.salesOrder) &&
+        (price.isEmpty || double.tryParse(price) == null)) {
+      errors['items.$index.unit_price'] = 'Harga satuan wajib diisi.';
     }
 
     if (errors.isNotEmpty) {
@@ -207,18 +214,24 @@ class TxnLineCard extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
             ],
-            if (type == TxnType.receipt) ...[
+            if (type == TxnType.receipt ||
+                type == TxnType.purchaseOrder ||
+                type == TxnType.salesOrder) ...[
               TextField(
                 controller: form.priceController,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
-                decoration: const InputDecoration(
-                  labelText: 'Harga satuan',
+                decoration: InputDecoration(
+                  labelText: type == TxnType.receipt
+                      ? 'Harga satuan'
+                      : 'Harga satuan *',
                   isDense: true,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
+            ],
+            if (type == TxnType.receipt) ...[
               TextField(
                 controller: form.batchController,
                 decoration: const InputDecoration(
@@ -234,6 +247,7 @@ class TxnLineCard extends StatelessWidget {
                   isDense: true,
                 ),
               ),
+              const SizedBox(height: AppSpacing.md),
             ],
             TextField(
               controller: form.notesController,
@@ -262,7 +276,6 @@ Future<void> showUnitPicker(
   );
   if (option != null) {
     form.unitIdController.text = '${option.id}';
-    form.searchController.text = option.label;
   }
 }
 

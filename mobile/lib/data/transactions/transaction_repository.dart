@@ -58,6 +58,8 @@ class TransactionRepository {
         TxnType.adjustment => TxnDetail.adjustment(data),
         TxnType.opname => TxnDetail.opname(data),
         TxnType.transfer => TxnDetail.transfer(data),
+        TxnType.purchaseOrder => TxnDetail.purchaseOrder(data),
+        TxnType.salesOrder => TxnDetail.salesOrder(data),
       };
     } on DioException catch (e) {
       throw e.error is ApiException

@@ -101,16 +101,49 @@ void main() {
     expect(detail.lines.first.locationCode, 'A01-01');
   });
 
-  testWidgets('Transactions hub lists five modules', (tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(home: TransactionsHubScreen()),
-    );
+  test('TxnDetail purchase order parses supplier and remaining', () {
+    final detail = TxnDetail.purchaseOrder({
+      'id': 4,
+      'number': 'PO-1',
+      'status': 'submitted',
+      'order_date': '2026-10-10',
+      'supplier': {'id': 1, 'name': 'Supplier A'},
+      'warehouse': {'id': 1, 'name': 'Jakarta'},
+      'items': [
+        {
+          'id': 1,
+          'item_id': 9,
+          'sku': 'BRG-1',
+          'item_name': 'Barang',
+          'quantity': 5,
+          'remaining': 5,
+          'unit_code': 'PCS',
+          'unit_price': 1200,
+        },
+      ],
+    });
+
+    expect(detail.party, 'Supplier A');
+    expect(detail.partyLabel, 'Supplier');
+    expect(detail.lines.first.remaining, 5);
+    expect(detail.lines.first.unitCost, 1200);
+  });
+
+  testWidgets('Transactions hub lists transaction modules', (tester) async {
+    tester.view.physicalSize = const Size(1200, 3000);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MaterialApp(home: TransactionsHubScreen()));
 
     expect(find.text('Barang Masuk'), findsOneWidget);
     expect(find.text('Barang Keluar'), findsOneWidget);
     expect(find.text('Adjustment'), findsOneWidget);
     expect(find.text('Opname'), findsOneWidget);
     expect(find.text('Transfer'), findsOneWidget);
+    expect(find.text('Purchase Order'), findsOneWidget);
+    expect(find.text('Sales Order'), findsOneWidget);
   });
 
   testWidgets('Login screen shows email and password fields', (
