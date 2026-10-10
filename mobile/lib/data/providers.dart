@@ -4,6 +4,7 @@ import '../core/network/dio_client.dart';
 import 'items/item_repository.dart';
 import 'master/master_models.dart';
 import 'stock/stock_repository.dart';
+import 'transactions/transaction_repository.dart';
 
 final stockRepositoryProvider = Provider<StockRepository>(
   (ref) => StockRepository(ref.watch(dioProvider)),
@@ -13,4 +14,7 @@ final itemRepositoryProvider = Provider<ItemRepository>(
 );
 final masterRepositoryProvider = Provider<SimpleListRepository>(
   (ref) => SimpleListRepository(ref.watch(dioProvider)),
+);
+final transactionRepositoryProvider = Provider<TransactionRepository>(
+  (ref) => TransactionRepository(ref.watch(dioProvider)),
 );

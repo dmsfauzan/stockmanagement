@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wsm_mobile/core/config/app_config.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
 import 'package:wsm_mobile/data/stock/stock_repository.dart';
+import 'package:wsm_mobile/data/transactions/transaction_models.dart';
 
 void main() {
   test('AppConfig has a valid API base URL', () {
@@ -49,6 +50,54 @@ void main() {
     expect(item.conversions, hasLength(1));
     expect(item.conversions.first.factor, 12);
     expect(item.bom.first.sku, 'COMP-A');
+  });
+
+  test('TxnListRow parses receipt row', () {
+    final row = TxnListRow.fromJson({
+      'id': 3,
+      'number': 'GR-1',
+      'transaction_date': '2026-10-10',
+      'supplier': {'id': 1, 'name': 'Supplier A'},
+      'warehouse': {'id': 1, 'name': 'Jakarta'},
+      'status': 'submitted',
+    });
+
+    expect(row.number, 'GR-1');
+    expect(row.party, 'Supplier A');
+    expect(row.status, 'submitted');
+  });
+
+  test('TxnWorkflow exposes correct actions per status', () {
+    final wf = TxnWorkflow.of(TxnType.receipt);
+    expect(wf.actions['draft'], contains('submit'));
+    expect(wf.actions['submitted'], containsAll(['approve', 'reject']));
+    expect(wf.actions['approved'], contains('post'));
+
+    final transfer = TxnWorkflow.of(TxnType.transfer);
+    expect(transfer.actions['in_transit'], contains('receive'));
+  });
+
+  test('TxnDetail receipt parses lines with unit and location', () {
+    final detail = TxnDetail.receipt({
+      'id': 1,
+      'number': 'GR-1',
+      'status': 'posted',
+      'items': [
+        {
+          'id': 1,
+          'item_id': 9,
+          'sku': 'BRG-1',
+          'item_name': 'Barang',
+          'quantity': 5,
+          'unit_code': 'PCS',
+          'location_code': 'A01-01',
+        },
+      ],
+    });
+
+    expect(detail.lines, hasLength(1));
+    expect(detail.lines.first.unitCode, 'PCS');
+    expect(detail.lines.first.locationCode, 'A01-01');
   });
 
   testWidgets('Login screen shows email and password fields', (

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
-import '../../../core/widgets/status_badge.dart';
+import '../../../core/widgets/status_badge.dart' show StatusBadge;
 import '../../../data/master/master_models.dart';
 import '../../../data/providers.dart';
 import '../../../data/stock/stock_repository.dart';

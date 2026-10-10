@@ -7,10 +7,14 @@ import 'core/router/app_shell.dart';
 import 'core/theme/app_theme.dart';
 import 'data/master/master_models.dart';
 import 'data/providers.dart';
+import 'data/transactions/transaction_models.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/two_factor_challenge_screen.dart';
 import 'features/common/soon_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/transactions/presentation/transaction_detail_screen.dart';
+import 'features/transactions/presentation/transaction_list_screen.dart';
+import 'features/transactions/presentation/transactions_hub_screen.dart';
 import 'features/items/presentation/item_detail_screen.dart';
 import 'features/master/presentation/master_screens.dart';
 import 'features/more/presentation/more_screen.dart';
@@ -61,10 +65,38 @@ final _router = GoRouter(
           routes: [
             GoRoute(
               path: '/transactions',
-              builder: (context, state) => const SoonScreen(
-                title: 'Transaksi',
-                note: 'Modul transaksi masuk pada Fase 3.',
-              ),
+              builder: (context, state) => const TransactionsHubScreen(),
+            ),
+            GoRoute(
+              path: '/tx/:type',
+              builder: (context, state) {
+                final type = txnTypeFromKey(state.pathParameters['type']);
+
+                if (type == null) {
+                  return const SoonScreen(
+                    title: 'Transaksi',
+                    note: 'Tipe dokumen tidak dikenal.',
+                  );
+                }
+
+                return TransactionListScreen(type: type);
+              },
+            ),
+            GoRoute(
+              path: '/tx/:type/:id',
+              builder: (context, state) {
+                final type = txnTypeFromKey(state.pathParameters['type']);
+                final id = int.tryParse(state.pathParameters['id'] ?? '');
+
+                if (type == null || id == null) {
+                  return const SoonScreen(
+                    title: 'Transaksi',
+                    note: 'Modul ini segera hadir.',
+                  );
+                }
+
+                return TransactionDetailScreen(type: type, id: id);
+              },
             ),
           ],
         ),
