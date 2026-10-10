@@ -96,8 +96,8 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 | POST | `/quarantine/{id}/release` · `/{id}/reject` | `stock.quarantine` | `quantity`, `reason` |
 | GET | `/stock/movements` | `stock.view` | `item_id`, `warehouse_id`, `transaction_type`, `date_from`, `date_to` |
 | GET | `/stock/low` | `stock.view` | `warehouse_id`, `category_id` |
-| GET | `/goods-receipts` · `/{id}` | `goods_receipt.view` | `status`, `warehouse_id`, `date_from`, `date_to`, `search` |
-| GET | `/goods-issues` · `/{id}` | `goods_issue.view` | sama |
+| GET | `/goods-receipts` · `/{id}` | `goods_receipt.view` | `status`, `warehouse_id`, `date_from`, `date_to`, `search` (item: `unit_id/unit_code/location_id/location_code`) |
+| GET | `/goods-issues` · `/{id}` | `goods_issue.view` | sama (item: `unit_id/unit_code/location_id/location_code`) |
 | GET | `/stock-adjustments` · `/{id}` | `stock.adjustment` | `status`, `warehouse_id` |
 | GET | `/stock-opnames` · `/{id}` | `stock_opname.view` | `status`, `warehouse_id` |
 | GET | `/stock-transfers` · `/{id}` | `transfer.view` | `status`, `warehouse_id` |

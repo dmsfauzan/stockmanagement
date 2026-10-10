@@ -37,7 +37,7 @@ class TransactionController extends ApiController
     public function receipts(Request $request): JsonResponse
     {
         $query = $this->applyCommon(
-            GoodsReceipt::query()->with(['supplier:id,name', 'warehouse:id,name', 'receiptItems.item:id,sku,name']),
+            GoodsReceipt::query()->with(['supplier:id,name', 'warehouse:id,name', 'receiptItems.item:id,sku,name', 'receiptItems.unit:id,code', 'receiptItems.location:id,code']),
             $request
         )->orderByDesc('transaction_date')->orderByDesc('id');
 
@@ -46,7 +46,7 @@ class TransactionController extends ApiController
 
     public function receipt(GoodsReceipt $receipt): JsonResponse
     {
-        $receipt->loadMissing(['supplier:id,name', 'warehouse:id,name', 'receiptItems.item:id,sku,name']);
+        $receipt->loadMissing(['supplier:id,name', 'warehouse:id,name', 'receiptItems.item:id,sku,name', 'receiptItems.unit:id,code', 'receiptItems.location:id,code']);
 
         return $this->ok(new GoodsReceiptResource($receipt));
     }
@@ -54,7 +54,7 @@ class TransactionController extends ApiController
     public function issues(Request $request): JsonResponse
     {
         $query = $this->applyCommon(
-            GoodsIssue::query()->with(['customer:id,name', 'warehouse:id,name', 'issueItems.item:id,sku,name']),
+            GoodsIssue::query()->with(['customer:id,name', 'warehouse:id,name', 'issueItems.item:id,sku,name', 'issueItems.unit:id,code', 'issueItems.location:id,code']),
             $request
         )->orderByDesc('transaction_date')->orderByDesc('id');
 
@@ -63,7 +63,7 @@ class TransactionController extends ApiController
 
     public function issue(GoodsIssue $issue): JsonResponse
     {
-        $issue->loadMissing(['customer:id,name', 'warehouse:id,name', 'issueItems.item:id,sku,name']);
+        $issue->loadMissing(['customer:id,name', 'warehouse:id,name', 'issueItems.item:id,sku,name', 'issueItems.unit:id,code', 'issueItems.location:id,code']);
 
         return $this->ok(new GoodsIssueResource($issue));
     }
@@ -105,7 +105,7 @@ class TransactionController extends ApiController
     public function transfers(Request $request): JsonResponse
     {
         $query = StockTransfer::query()
-            ->with(['fromWarehouse:id,name', 'toWarehouse:id,name', 'items.item:id,sku,name'])
+            ->with(['fromWarehouse:id,name', 'toWarehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code'])
             ->when($request->filled('search'), fn ($q) => $q->where('number', 'like', '%'.$request->string('search').'%'))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
             ->when($request->filled('warehouse_id'), fn ($q) => $q->where(function ($inner) use ($request): void {
@@ -119,7 +119,7 @@ class TransactionController extends ApiController
 
     public function transfer(StockTransfer $transfer): JsonResponse
     {
-        $transfer->loadMissing(['fromWarehouse:id,name', 'toWarehouse:id,name', 'items.item:id,sku,name']);
+        $transfer->loadMissing(['fromWarehouse:id,name', 'toWarehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code']);
 
         return $this->ok(new StockTransferResource($transfer));
     }

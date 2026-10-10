@@ -95,6 +95,22 @@ class ApiReadTest extends TestCase
             ->assertJsonStructure(['data' => ['conversions', 'bom']]);
     }
 
+    public function test_receipt_items_expose_unit_and_location(): void
+    {
+        $token = $this->tokenFor('admin@stock.test');
+        $response = $this->withToken($token)->getJson('/api/goods-receipts?per_page=1')->assertOk();
+        $items = $response->json('data.0.items') ?? [];
+
+        if ($items === []) {
+            $this->markTestSkipped('No receipt items in seed.');
+        }
+
+        $this->assertArrayHasKey('unit_id', $items[0]);
+        $this->assertArrayHasKey('unit_code', $items[0]);
+        $this->assertArrayHasKey('location_id', $items[0]);
+        $this->assertArrayHasKey('location_code', $items[0]);
+    }
+
     public function test_paginated_response_has_meta(): void
     {
         $token = $this->tokenFor('admin@stock.test');

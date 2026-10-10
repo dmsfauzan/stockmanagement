@@ -28,6 +28,8 @@ class StockTransferResource extends JsonResource
                 'sku' => $i->item?->sku,
                 'item_name' => $i->item?->name,
                 'quantity' => (int) $i->quantity,
+                'unit_id' => $i->unit_id,
+                'unit_code' => $i->unit?->code,
             ])->values()->all()),
         ];
     }
