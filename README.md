@@ -10,7 +10,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
-[![Tests](https://img.shields.io/badge/tests-392_passing-brightgreen)](#pengujian)
+[![Tests](https://img.shields.io/badge/tests-394_passing-brightgreen)](#pengujian)
 [![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
 
 [Fitur](#fitur) ·
@@ -257,7 +257,7 @@ Cakupan: kalkulasi stok, insufficient stock, low/out status, adjustment, transfe
 
 ## Integrasi API
 
-Ekstrak [API.md](API.md) untuk endpoint, otentikasi, dan contoh. Token bisa didapat via **`POST /api/login`** (email + password, siap untuk aplikasi mobile/SPA), atau lewat **Admin → API Tokens** / `php artisan api:token admin@stock.test`.
+Ekstrak [API.md](API.md) untuk endpoint, otentikasi, dan contoh. Token bisa didapat via **`POST /api/login`** (email + password, siap untuk aplikasi mobile/SPA — lihat `mobile/README.md`), atau lewat **Admin → API Tokens** / `php artisan api:token admin@stock.test`.
 
 **Dokumentasi interaktif (OpenAPI)**: `/docs/api` (UI) dan `/docs/api.json` (spec), di-generate otomatis dari route via **Scramble**. Akses dibatasi (admin `settings.manage` di produksi, bebas di lokal). Ekspor spec: `php artisan scramble:export`.
 

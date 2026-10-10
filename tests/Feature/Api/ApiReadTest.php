@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Item;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -67,6 +68,31 @@ class ApiReadTest extends TestCase
         app('auth')->forgetGuards();
 
         $this->withToken($full)->getJson('/api/goods-receipts')->assertOk();
+    }
+
+    public function test_stock_rows_expose_item_id(): void
+    {
+        $token = $this->tokenFor('admin@stock.test');
+
+        $response = $this->withToken($token)->getJson('/api/stock?per_page=1')->assertOk();
+
+        if (! empty($response->json('data'))) {
+            $this->assertArrayHasKey('item_id', $response->json('data.0'));
+            $this->assertIsInt($response->json('data.0.item_id'));
+        } else {
+            $this->markTestSkipped('No stock balances in seed.');
+        }
+    }
+
+    public function test_item_show_supports_combined_include(): void
+    {
+        $token = $this->tokenFor('admin@stock.test');
+        $item = Item::query()->firstOrFail();
+
+        $this->withToken($token)->getJson("/api/items/{$item->id}?include=conversions,bom")
+            ->assertOk()
+            ->assertJsonPath('data.id', $item->id)
+            ->assertJsonStructure(['data' => ['conversions', 'bom']]);
     }
 
     public function test_paginated_response_has_meta(): void

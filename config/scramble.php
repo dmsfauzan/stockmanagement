@@ -139,7 +139,7 @@ return [
         | --- | --- | --- |
         | Auth | `POST /login`, `/two-factor-challenge`, `/logout` | — (login: publik) |
         | Identitas | `/me` | — |
-        | Master data | `/items` (`?include=conversions\|bom`), `/categories`, `/units`, `/suppliers`, `/customers`, `/warehouses`, `/locations`, `/currencies` | `items.view`, `warehouse.view`, `location.view` |
+        | Master data | `/items` (`include=conversions,bom` dapat digabung), `/categories`, `/units`, `/suppliers`, `/customers`, `/warehouses`, `/locations`, `/currencies` | `items.view`, `warehouse.view`, `location.view` |
         | Stok | `/stock`, `/stock/movements`, `/stock/low` | `stock.view` |
         | Transaksi | `/goods-receipts`, `/goods-issues`, `/stock-adjustments`, `/stock-opnames`, `/stock-transfers`, `/purchase-orders`, `/sales-orders` | `*.view` / `*.create` |
         | Picking | `/pick-lists`, `/pick-lists/{id}`, `POST /goods-issues/{id}/pick-list`, `/pick-lists/{id}/items/{itemId}/confirm`, `/{id}/complete`, `/{id}/pack` | `picking.view` / `.create` / `.pick` / `.pack` |

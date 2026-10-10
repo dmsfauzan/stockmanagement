@@ -25,6 +25,7 @@ class StockBalanceResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'item_id' => (int) ($this->item_id ?? 0),
             'sku' => $this->sku,
             'item_name' => $this->item_name,
             'warehouse' => $this->warehouse_name,

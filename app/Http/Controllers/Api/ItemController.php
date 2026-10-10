@@ -35,11 +35,13 @@ class ItemController extends ApiController
     {
         $with = ['category', 'unit'];
 
-        $include = (string) $request->string('include');
+        $includes = array_filter(array_map('trim', explode(',', (string) $request->string('include'))));
 
-        if ($include === 'conversions') {
+        if (in_array('conversions', $includes, true)) {
             $with[] = 'conversions.unit';
-        } elseif ($include === 'bom') {
+        }
+
+        if (in_array('bom', $includes, true)) {
             $with[] = 'bomComponents.component';
         }
 

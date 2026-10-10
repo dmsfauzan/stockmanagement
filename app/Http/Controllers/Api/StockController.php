@@ -230,6 +230,7 @@ class StockController extends ApiController
             ->whereIn('warehouses.id', WarehouseAccess::ids())
             ->select([
                 'stock_balances.id',
+                'stock_balances.item_id',
                 'stock_balances.quantity_on_hand',
                 'stock_balances.quantity_reserved',
                 'stock_balances.quantity_quarantine',
