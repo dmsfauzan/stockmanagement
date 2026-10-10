@@ -5,8 +5,11 @@ import 'package:wsm_mobile/core/config/app_config.dart';
 import 'package:wsm_mobile/data/assembly/assembly_models.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
 import 'package:wsm_mobile/data/picking/picking_models.dart';
+import 'package:wsm_mobile/data/quality/quality_repository.dart';
+import 'package:wsm_mobile/data/recall/recall_repository.dart';
 import 'package:wsm_mobile/data/requisitions/requisition_models.dart';
 import 'package:wsm_mobile/data/stock/stock_repository.dart';
+import 'package:wsm_mobile/data/tracing/traceability_repository.dart';
 import 'package:wsm_mobile/data/transactions/transaction_models.dart';
 import 'package:wsm_mobile/features/reports/presentation/reports_screen.dart';
 import 'package:wsm_mobile/features/transactions/presentation/transactions_hub_screen.dart';
@@ -240,6 +243,59 @@ void main() {
     expect(detail.lines.first.id, 10);
     expect(detail.lines.first.location, 'A01-01');
     expect(detail.lines.first.pickedQuantity, 2);
+  });
+
+  test('Quarantine row parses raw keys', () {
+    final row = QuarantineRow.fromJson({
+      'id': 1,
+      'item_id': 9,
+      'sku': 'BRG-1',
+      'item_name': 'Barang',
+      'warehouse_name': 'Jakarta',
+      'location_path': 'Jakarta / A / R1 / A01-01',
+      'quantity_on_hand': 10,
+      'quantity_quarantine': 3,
+      'quantity_available': 5,
+    });
+
+    expect(row.warehouse, 'Jakarta');
+    expect(row.quarantine, 3);
+    expect(row.available, 5);
+  });
+
+  test('TraceResult parses events and summary', () {
+    final result = TraceResult.fromJson({
+      'type': 'batch',
+      'value': 'B-1',
+      'summary': {'events': 1, 'in': 10, 'out': 4, 'balance': 6},
+      'events': [
+        {
+          'id': 1,
+          'transaction_type': 'receipt',
+          'quantity_in': 10,
+          'quantity_out': 0,
+          'balance_after': 10,
+        },
+      ],
+    });
+
+    expect(result.value, 'B-1');
+    expect(result.summary['balance'], 6);
+    expect(result.events.first.quantityIn, 10);
+  });
+
+  test('Recall row parses value', () {
+    final row = RecallRow.fromJson({
+      'id': 1,
+      'type': 'batch',
+      'batch_number': 'B-1',
+      'serial_number': null,
+      'reason': 'cacat',
+      'status': 'active',
+    });
+
+    expect(row.value, 'B-1');
+    expect(row.status, 'active');
   });
 
   testWidgets('Reports index lists report modules', (tester) async {

@@ -17,6 +17,11 @@ import 'features/common/soon_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/picking/presentation/picking_detail_screen.dart';
 import 'features/picking/presentation/picking_list_screen.dart';
+import 'features/quality/presentation/quarantine_screen.dart';
+import 'features/recall/presentation/recall_form_screen.dart';
+import 'features/recall/presentation/recall_list_screen.dart';
+import 'features/tools/presentation/tools_screen.dart';
+import 'features/tracing/presentation/traceability_screen.dart';
 import 'features/transactions/presentation/transaction_detail_screen.dart';
 import 'features/transactions/presentation/transaction_form_screen.dart';
 import 'features/transactions/presentation/transaction_list_screen.dart';
@@ -225,6 +230,26 @@ final _router = GoRouter(
             GoRoute(
               path: '/settings',
               builder: (context, state) => const SettingsScreen(),
+            ),
+            GoRoute(
+              path: '/quarantine',
+              builder: (context, state) => const QuarantineScreen(),
+            ),
+            GoRoute(
+              path: '/traceability',
+              builder: (context, state) => const TraceabilityScreen(),
+            ),
+            GoRoute(
+              path: '/recalls',
+              builder: (context, state) => const RecallListScreen(),
+            ),
+            GoRoute(
+              path: '/recalls/create',
+              builder: (context, state) => const RecallFormScreen(),
+            ),
+            GoRoute(
+              path: '/tools',
+              builder: (context, state) => const ToolsScreen(),
             ),
             GoRoute(
               path: '/requisitions',
