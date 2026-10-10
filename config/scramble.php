@@ -69,9 +69,13 @@ return [
 
         API memakai **Laravel Sanctum bearer token** dengan otorisasi berbasis **permission slug** yang sama dengan aplikasi web.
 
-        1. Buat token lewat **Admin → API Tokens**, atau via CLI:
+        1. Dapatkan token: `POST /api/login` dengan `email` + `password` (+ `device_name`), atau buat manual lewat **Admin → API Tokens** / CLI:
 
         ```bash
+        curl -X POST "$APP_URL/api/login" \
+          -H "Accept: application/json" -H "Content-Type: application/json" \
+          -d '{ "email": "staff@stock.test", "password": "password", "device_name": "Pixel-7" }'
+
         php artisan api:token admin@stock.test \
           --abilities=items.view goods_receipt.post \
           --expires=30
@@ -84,7 +88,9 @@ return [
         Accept: application/json
         ```
 
-        > Token hanya ditampilkan **sekali** saat dibuat. Bila `--abilities` dikosongkan, token mewarisi seluruh permission user. Cek identitas dengan `GET /me`.
+        > Bila `--abilities` dikosongkan, token mewarisi seluruh permission user. Cek identitas dengan `GET /me`.
+
+        **Login aplikasi mobile/SPA** — `POST /login` (publik, rate limit 6/menit) mengembalikan `token`. Jika 2FA aktif → respons `{ two_factor_required: true, user_id }`, lanjutkan `POST /two-factor-challenge` (`user_id` + `code`/`recovery_code`). Cabut token dengan `POST /logout`.
 
         ## Format Respons
 
@@ -131,6 +137,7 @@ return [
 
         | Grup | Prefiks | Permission |
         | --- | --- | --- |
+        | Auth | `POST /login`, `/two-factor-challenge`, `/logout` | — (login: publik) |
         | Identitas | `/me` | — |
         | Master data | `/items` (`?include=conversions\|bom`), `/categories`, `/units`, `/suppliers`, `/customers`, `/warehouses`, `/locations`, `/currencies` | `items.view`, `warehouse.view`, `location.view` |
         | Stok | `/stock`, `/stock/movements`, `/stock/low` | `stock.view` |

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AssemblyController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\MasterDataController;
@@ -14,7 +15,15 @@ use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\WriteTransactionController;
 use Illuminate\Support\Facades\Route;
 
+// Public auth endpoints (mobile/SPA token issuance).
+Route::middleware('throttle:6,1')->group(function (): void {
+    Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+    Route::post('/two-factor-challenge', [AuthController::class, 'twoFactorChallenge'])->name('api.two-factor-challenge');
+});
+
 Route::middleware(['throttle:api', 'auth:sanctum', 'active', 'idempotent'])->group(function (): void {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
+
     Route::get('/me', function () {
         return response()->json([
             'success' => true,

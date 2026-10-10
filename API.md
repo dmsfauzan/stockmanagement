@@ -23,6 +23,22 @@ Token hanya ditampilkan sekali saat dibuat. `--abilities` menentukan permission 
 
 Cek identitas: `GET /api/me` → `{ data: { id, name, email, roles, permissions } }`.
 
+### Login dari aplikasi (mobile/SPA)
+
+Mint token langsung dari kredensial user (rate limit 6/menit):
+
+```bash
+curl -X POST "$APP_URL/api/login" \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{ "email": "staff@stock.test", "password": "password", "device_name": "Pixel-7" }'
+```
+
+Respons: `{ success: true, data: { token, user: { id, name, email, roles, permissions } } }`. Simpan `token`, lalu kirim `Authorization: Bearer <token>`.
+
+- **2FA aktif?** `login` mengembalikan `data.two_factor_required: true` + `user_id`. Lanjutkan `POST /api/two-factor-challenge` dengan `{ user_id, code }` atau `{ user_id, recovery_code }` untuk memperoleh token.
+- **Logout**: `POST /api/logout` (butuh token) → mencabut token yang sedang dipakai.
+- Bila `abilities` tak dikirim, token mewarisi seluruh permission user.
+
 ## Format Respons
 
 Sukses:
@@ -63,6 +79,8 @@ Origin yang diizinkan diatur via `CORS_ALLOWED_ORIGINS` (comma-separated; `*` = 
 
 | Method | Path | Permission | Filter |
 |---|---|---|---|
+| POST | `/login` · `/two-factor-challenge` | — (public) | `email`, `password`, `device_name` / `user_id`, `code`, `recovery_code` |
+| POST | `/logout` | token | |
 | GET | `/me` | — | |
 | GET | `/items` · `/items/{id}` | `items.view` | `search`, `category_id`, `status`, `include=conversions\|bom` |
 | GET | `/categories` | `items.view` | `search` |
