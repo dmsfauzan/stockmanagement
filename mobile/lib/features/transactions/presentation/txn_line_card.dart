@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/tokens.dart';
+import '../../../core/widgets/common.dart';
 import '../../../core/widgets/picker.dart';
 import '../../../data/transactions/transaction_models.dart';
 import 'picker_loaders.dart';
@@ -161,9 +162,22 @@ class TxnLineCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  'Baris #${index + 1}',
-                  style: Theme.of(context).textTheme.titleSmall,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySoft,
+                    borderRadius: BorderRadius.circular(AppRadius.chip),
+                  ),
+                  child: Text(
+                    'Baris #${index + 1}',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
                 const Spacer(),
                 IconButton(
@@ -186,13 +200,10 @@ class TxnLineCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: TextField(
+                  child: AppTextField(
+                    label: 'Qty *',
                     controller: form.quantityController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Qty *',
-                      isDense: true,
-                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -227,18 +238,14 @@ class TxnLineCard extends StatelessWidget {
                 type == TxnType.salesOrder ||
                 type == TxnType.customerReturn ||
                 type == TxnType.supplierReturn) ...[
-              TextField(
+              AppTextField(
+                label:
+                    type == TxnType.purchaseOrder || type == TxnType.salesOrder
+                    ? 'Harga satuan *'
+                    : 'Harga satuan',
                 controller: form.priceController,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
-                ),
-                decoration: InputDecoration(
-                  labelText:
-                      type == TxnType.purchaseOrder ||
-                          type == TxnType.salesOrder
-                      ? 'Harga satuan *'
-                      : 'Harga satuan',
-                  isDense: true,
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -246,32 +253,21 @@ class TxnLineCard extends StatelessWidget {
             if (type == TxnType.receipt ||
                 type == TxnType.customerReturn ||
                 type == TxnType.supplierReturn) ...[
-              TextField(
+              AppTextField(
+                label: 'Batch number',
                 controller: form.batchController,
-                decoration: const InputDecoration(
-                  labelText: 'Batch number',
-                  isDense: true,
-                ),
               ),
               const SizedBox(height: AppSpacing.md),
             ],
             if (type == TxnType.receipt) ...[
-              TextField(
+              AppTextField(
+                label: 'Expiry',
+                hint: 'YYYY-MM-DD',
                 controller: form.expiryController,
-                decoration: const InputDecoration(
-                  labelText: 'Expiry (YYYY-MM-DD)',
-                  isDense: true,
-                ),
               ),
               const SizedBox(height: AppSpacing.md),
             ],
-            TextField(
-              controller: form.notesController,
-              decoration: const InputDecoration(
-                labelText: 'Catatan',
-                isDense: true,
-              ),
-            ),
+            AppTextField(label: 'Catatan', controller: form.notesController),
           ],
         ),
       ),

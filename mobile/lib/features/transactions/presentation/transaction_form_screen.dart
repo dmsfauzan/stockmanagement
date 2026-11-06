@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/form_errors.dart';
+import '../../../../core/widgets/common.dart';
 import '../../../../core/widgets/date_field.dart';
 import '../../../../core/widgets/picker.dart';
 import '../../../../data/providers.dart';
@@ -327,8 +328,17 @@ class _TransactionFormCreateScreenState
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          _headerFields(),
-          const Divider(height: AppSpacing.xl),
+          const AppSectionTitle(title: 'Informasi'),
+          const SizedBox(height: AppSpacing.sm),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: _headerFields(),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          const AppSectionTitle(title: 'Item'),
+          const SizedBox(height: AppSpacing.sm),
           for (var i = 0; i < _lines.length; i++)
             TxnLineCard(
               index: i,
@@ -356,29 +366,31 @@ class _TransactionFormCreateScreenState
                 if (mounted) setState(() {});
               },
             ),
-          OutlinedButton.icon(
+          AppButton.secondary(
+            'Tambah baris',
             onPressed: () => setState(() => _lines.add(TxnLineForm.create())),
-            icon: const Icon(Icons.add),
-            label: const Text('Tambah baris'),
+            icon: Icons.add,
           ),
-          const SizedBox(height: AppSpacing.lg),
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Catatan',
-              hintText: 'Opsional',
+          const SizedBox(height: AppSpacing.xl),
+          const AppSectionTitle(title: 'Catatan'),
+          const SizedBox(height: AppSpacing.sm),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Catatan',
+                  hintText: 'Opsional',
+                ),
+                onChanged: (v) => _notes = v,
+              ),
             ),
-            onChanged: (v) => _notes = v,
           ),
-          const SizedBox(height: AppSpacing.lg),
-          FilledButton(
+          const SizedBox(height: AppSpacing.xl),
+          AppButton.primary(
+            'Simpan',
             onPressed: _saving ? null : _submit,
-            child: _saving
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Simpan'),
+            loading: _saving,
           ),
         ],
       ),
@@ -405,6 +417,7 @@ class _TransactionFormCreateScreenState
 
   Widget _headerFields() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         DateField(
           label: _dateLabel,

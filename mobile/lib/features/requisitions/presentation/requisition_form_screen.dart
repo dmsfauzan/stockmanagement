@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/tokens.dart';
 import '../../../core/utils/form_errors.dart';
+import '../../../core/widgets/common.dart';
 import '../../../core/widgets/date_field.dart';
 import '../../../core/widgets/picker.dart';
 import '../../../data/providers.dart';
@@ -163,42 +164,56 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          DateField(
-            label: 'Tanggal permintaan',
-            value: _requestDate,
-            required: true,
-            onChanged: (d) => setState(() => _requestDate = d),
+          const AppSectionTitle(title: 'Informasi'),
+          const SizedBox(height: AppSpacing.sm),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DateField(
+                    label: 'Tanggal permintaan',
+                    value: _requestDate,
+                    required: true,
+                    onChanged: (d) => setState(() => _requestDate = d),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  DateField(
+                    label: 'Dibutuhkan pada',
+                    value: _requiredDate,
+                    firstDate: _requestDate,
+                    onChanged: (d) => setState(() => _requiredDate = d),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  PickerTile(
+                    label: 'Gudang',
+                    value: _warehouseLabel.isEmpty ? null : _warehouseLabel,
+                    required: true,
+                    onTap: _pickWarehouse,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  CheckboxListTile(
+                    value: _submit,
+                    onChanged: (v) => setState(() => _submit = v ?? false),
+                    title: const Text('Langsung ajukan (submit)'),
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          DateField(
-            label: 'Dibutuhkan pada',
-            value: _requiredDate,
-            firstDate: _requestDate,
-            onChanged: (d) => setState(() => _requiredDate = d),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          PickerTile(
-            label: 'Gudang',
-            value: _warehouseLabel.isEmpty ? null : _warehouseLabel,
-            required: true,
-            onTap: _pickWarehouse,
-          ),
-          const SizedBox(height: AppSpacing.md),
-          CheckboxListTile(
-            value: _submit,
-            onChanged: (v) => setState(() => _submit = v ?? false),
-            title: const Text('Langsung ajukan (submit)'),
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-          ),
-          const Divider(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.xl),
+          const AppSectionTitle(title: 'Baris'),
+          const SizedBox(height: AppSpacing.sm),
           for (var i = 0; i < _lines.length; i++)
             Card(
               margin: const EdgeInsets.only(bottom: AppSpacing.md),
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Row(
                       children: [
@@ -229,13 +244,10 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextField(
+                          child: AppTextField(
+                            label: 'Qty *',
                             controller: _lines[i].quantity,
                             keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Qty *',
-                              isDense: true,
-                            ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.md),
@@ -251,43 +263,42 @@ class _RequisitionFormScreenState extends ConsumerState<RequisitionFormScreen> {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    TextField(
+                    AppTextField(
+                      label: 'Estimasi harga',
                       controller: _lines[i].estimatedPrice,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
-                      ),
-                      decoration: const InputDecoration(
-                        labelText: 'Estimasi harga',
-                        isDense: true,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-          OutlinedButton.icon(
+          AppButton.secondary(
+            'Tambah baris',
             onPressed: () => setState(() => _lines.add(_PrLine())),
-            icon: const Icon(Icons.add),
-            label: const Text('Tambah baris'),
+            icon: Icons.add,
           ),
-          const SizedBox(height: AppSpacing.lg),
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Catatan',
-              hintText: 'Opsional',
+          const SizedBox(height: AppSpacing.xl),
+          const AppSectionTitle(title: 'Catatan'),
+          const SizedBox(height: AppSpacing.sm),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Catatan',
+                  hintText: 'Opsional',
+                ),
+                onChanged: (v) => _notes = v,
+              ),
             ),
-            onChanged: (v) => _notes = v,
           ),
-          const SizedBox(height: AppSpacing.lg),
-          FilledButton(
+          const SizedBox(height: AppSpacing.xl),
+          AppButton.primary(
+            'Simpan',
             onPressed: _saving ? null : _save,
-            child: _saving
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Simpan'),
+            loading: _saving,
           ),
         ],
       ),

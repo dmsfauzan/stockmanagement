@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/tokens.dart';
+
 /// Field tanggal dengan pemilih (date picker). Nilai ditampilkan `dd/MM/yyyy`.
 class DateField extends StatelessWidget {
   const DateField({
@@ -19,22 +21,40 @@ class DateField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => _pick(context),
-      borderRadius: BorderRadius.circular(12),
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: required ? '$label *' : label,
-          suffixIcon: const Icon(Icons.calendar_today_outlined, size: 18),
+    final theme = Theme.of(context);
+    final muted = AppColors.muted(theme.brightness);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          required ? '$label *' : label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.text(theme.brightness),
+          ),
         ),
-        child: Text(
-          value == null
-              ? '—'
-              : '${value!.day.toString().padLeft(2, '0')}/'
-                    '${value!.month.toString().padLeft(2, '0')}/'
-                    '${value!.year}',
+        const SizedBox(height: AppSpacing.xs),
+        InkWell(
+          onTap: () => _pick(context),
+          borderRadius: BorderRadius.circular(AppRadius.input),
+          child: InputDecorator(
+            decoration: const InputDecoration(
+              suffixIcon: Icon(Icons.calendar_today_outlined, size: 18),
+            ),
+            child: Text(
+              value == null
+                  ? '—'
+                  : '${value!.day.toString().padLeft(2, '0')}/'
+                        '${value!.month.toString().padLeft(2, '0')}/'
+                        '${value!.year}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: value == null ? muted : null,
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/tokens.dart';
-import '../../../core/widgets/feedback.dart';
+import '../../../core/widgets/common.dart';
 import '../../../data/providers.dart';
 import '../../../data/recall/recall_repository.dart';
 
@@ -97,35 +97,45 @@ class _RecallFormScreenState extends ConsumerState<RecallFormScreen> {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          DropdownButtonFormField<String>(
-            initialValue: _type,
-            decoration: const InputDecoration(labelText: 'Jenis *'),
-            items: const [
-              DropdownMenuItem(value: 'batch', child: Text('Batch')),
-              DropdownMenuItem(value: 'serial', child: Text('Serial')),
-            ],
-            onChanged: (v) => setState(() => _type = v ?? 'batch'),
+          const AppSectionTitle(title: 'Informasi'),
+          const SizedBox(height: AppSpacing.sm),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DropdownButtonFormField<String>(
+                    initialValue: _type,
+                    decoration: const InputDecoration(labelText: 'Jenis *'),
+                    items: const [
+                      DropdownMenuItem(value: 'batch', child: Text('Batch')),
+                      DropdownMenuItem(value: 'serial', child: Text('Serial')),
+                    ],
+                    onChanged: (v) => setState(() => _type = v ?? 'batch'),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(label: 'Nilai *', controller: _value),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    label: 'Alasan *',
+                    controller: _reason,
+                    maxLines: 2,
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
-          TextField(
-            controller: _value,
-            decoration: const InputDecoration(labelText: 'Nilai *'),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          TextField(
-            controller: _reason,
-            maxLines: 2,
-            decoration: const InputDecoration(labelText: 'Alasan *'),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          OutlinedButton.icon(
+          AppButton.secondary(
+            _checking ? 'Memeriksa…' : 'Cek dampak',
             onPressed: _checking ? null : _check,
-            icon: const Icon(Icons.search),
-            label: Text(_checking ? 'Memeriksa…' : 'Cek dampak'),
+            icon: Icons.search,
           ),
           if (impact != null) ...[
-            const SizedBox(height: AppSpacing.lg),
-            const SectionHeader(title: 'Dampak'),
+            const SizedBox(height: AppSpacing.xl),
+            const AppSectionTitle(title: 'Dampak'),
+            const SizedBox(height: AppSpacing.sm),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -140,7 +150,7 @@ class _RecallFormScreenState extends ConsumerState<RecallFormScreen> {
                         padding: const EdgeInsets.only(top: AppSpacing.sm),
                         child: Text(
                           'Sudah ada recall aktif.',
-                          style: TextStyle(color: AppColors.rose),
+                          style: TextStyle(color: AppColors.error),
                         ),
                       ),
                   ],
@@ -148,16 +158,11 @@ class _RecallFormScreenState extends ConsumerState<RecallFormScreen> {
               ),
             ),
           ],
-          const SizedBox(height: AppSpacing.lg),
-          FilledButton(
+          const SizedBox(height: AppSpacing.xl),
+          AppButton.primary(
+            'Tandai Recall',
             onPressed: _saving ? null : _save,
-            child: _saving
-                ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Tandai Recall'),
+            loading: _saving,
           ),
         ],
       ),

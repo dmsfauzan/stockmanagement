@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/tokens.dart';
 import 'barcode_scanner.dart';
+import 'common.dart';
 
 class PickerOption {
   const PickerOption({required this.id, required this.label, this.subtitle});
@@ -137,19 +138,25 @@ class _PickerSheetState extends State<_PickerSheet> {
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Text(
                 widget.title,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: TextField(
-                controller: _search,
-                autofocus: true,
-                textInputAction: TextInputAction.search,
-                decoration: InputDecoration(
-                  hintText: 'Cari…',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: IconButton(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: AppSearchField(
+                      controller: _search,
+                      hint: 'Cari…',
+                      onSubmitted: _load,
+                      onChanged: (_) {},
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  IconButton.filledTonal(
                     icon: const Icon(Icons.qr_code_scanner),
                     tooltip: 'Pindai barcode',
                     onPressed: () async {
@@ -161,8 +168,7 @@ class _PickerSheetState extends State<_PickerSheet> {
                       }
                     },
                   ),
-                ),
-                onSubmitted: _load,
+                ],
               ),
             ),
             Expanded(
@@ -219,21 +225,36 @@ class PickerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.button),
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: required ? '$label *' : label,
-          suffixIcon: const Icon(Icons.unfold_more, size: 18),
+    final theme = Theme.of(context);
+    final muted = AppColors.muted(theme.brightness);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          required ? '$label *' : label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.text(theme.brightness),
+          ),
         ),
-        child: Text(
-          value ?? '—',
-          style: value == null
-              ? TextStyle(color: AppColors.muted(Theme.of(context).brightness))
-              : null,
+        const SizedBox(height: AppSpacing.xs),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.input),
+          child: InputDecorator(
+            decoration: const InputDecoration(
+              suffixIcon: Icon(Icons.unfold_more, size: 18),
+            ),
+            child: Text(
+              value ?? '—',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: value == null ? muted : null,
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
