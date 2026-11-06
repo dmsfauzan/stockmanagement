@@ -6,7 +6,6 @@
 
     <application
         android:name="${applicationName}"
-        android:usesCleartextTraffic="true"
         android:label="Stock Management"
         android:icon="@mipmap/ic_launcher">
         <activity

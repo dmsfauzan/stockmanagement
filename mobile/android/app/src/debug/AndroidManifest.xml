@@ -4,4 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- HTTP polos hanya untuk build debug (Laragon/artisan serve lokal). -->
+    <application android:usesCleartextTraffic="true" />
 </manifest>

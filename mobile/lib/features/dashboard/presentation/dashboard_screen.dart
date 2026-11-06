@@ -19,7 +19,7 @@ final dashboardStockProvider =
       final dio = ref.watch(dioProvider);
 
       try {
-        final res = await dio.get<List<dynamic>>(
+        final res = await dio.get(
           '/stock',
           queryParameters: const {'search': '', 'per_page': 1},
         );

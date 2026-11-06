@@ -1,0 +1,6 @@
+# Salin ke mobile/key.properties lalu isi dengan keystore rilis Anda.
+# File key.properties TIDAK boleh di-commit.
+storePassword=CHANGE_ME
+keyPassword=CHANGE_ME
+keyAlias=wsm-release
+storeFile=../keystore/wsm-release.jks
