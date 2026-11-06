@@ -11,6 +11,7 @@ class AppColors {
   static const gold = Color(0xFFF7B006);
   static const goldSoft = Color(0xFFFEE8BA);
   static const darkBase = Color(0xFF1E2128);
+  static const darkBaseAlt = Color(0xFF141821);
 
   // Alias lama (dipertahankan agar layar lain ikut ter-recolor).
   static const indigo = primary;

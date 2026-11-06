@@ -24,6 +24,8 @@ class DataListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(
@@ -38,7 +40,9 @@ class DataListRow extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           if (badge != null) ...[const SizedBox(width: AppSpacing.sm), badge!],
@@ -49,10 +53,19 @@ class DataListRow extends StatelessWidget {
               subtitle!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AppText.caption,
+              style: AppText.caption.copyWith(
+                color: AppColors.muted(theme.brightness),
+              ),
             )
           : null,
-      trailing: trailing,
+      trailing:
+          trailing ??
+          (onTap != null
+              ? Icon(
+                  Icons.chevron_right,
+                  color: AppColors.muted(theme.brightness),
+                )
+              : null),
     );
   }
 }
@@ -71,12 +84,13 @@ class SegmentedTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final border = AppColors.border(Theme.of(context).brightness);
+    final brightness = Theme.of(context).brightness;
+    final border = AppColors.border(brightness);
 
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.surface(Theme.of(context).brightness),
+        color: AppColors.surfaceVariant(brightness),
         borderRadius: BorderRadius.circular(AppRadius.button),
         border: Border.all(color: border),
       ),
@@ -86,13 +100,23 @@ class SegmentedTabs extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () => onChanged(i),
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
                     color: selected == i
-                        ? AppColors.indigo
+                        ? AppColors.primary
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(AppRadius.button - 2),
+                    boxShadow: selected == i
+                        ? [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
                   ),
                   child: Text(
                     tabs[i],
@@ -102,7 +126,7 @@ class SegmentedTabs extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: selected == i
                           ? Colors.white
-                          : AppColors.muted(Theme.of(context).brightness),
+                          : AppColors.muted(brightness),
                     ),
                   ),
                 ),
@@ -309,7 +333,11 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
+    this.onChanged,
     this.onFieldSubmitted,
+    this.textInputAction,
+    this.autofocus = false,
+    this.enabled = true,
     this.maxLines = 1,
   });
 
@@ -321,7 +349,11 @@ class AppTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
+  final ValueChanged<String>? onChanged;
   final void Function(String)? onFieldSubmitted;
+  final TextInputAction? textInputAction;
+  final bool autofocus;
+  final bool enabled;
   final int maxLines;
 
   @override
@@ -345,7 +377,11 @@ class AppTextField extends StatelessWidget {
           keyboardType: keyboardType,
           maxLines: obscure ? 1 : maxLines,
           validator: validator,
+          onChanged: onChanged,
           onFieldSubmitted: onFieldSubmitted,
+          textInputAction: textInputAction,
+          autofocus: autofocus,
+          enabled: enabled,
           style: theme.textTheme.bodyMedium,
           decoration: InputDecoration(
             hintText: hint,
@@ -392,6 +428,8 @@ class AppMenuItem extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.icon,
+    this.iconColor = AppColors.primary,
+    this.iconBackground,
     this.trailing,
     this.onTap,
   });
@@ -399,6 +437,8 @@ class AppMenuItem extends StatelessWidget {
   final String title;
   final String? subtitle;
   final IconData? icon;
+  final Color iconColor;
+  final Color? iconBackground;
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -414,15 +454,12 @@ class AppMenuItem extends StatelessWidget {
         child: Row(
           children: [
             if (icon != null)
-              Container(
-                height: 44,
-                width: 44,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.primarySoft,
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                ),
-                child: Icon(icon, color: AppColors.primary, size: 22),
+              AppIconBadge(
+                icon: icon!,
+                color: iconColor,
+                background: iconBackground,
+                size: 44,
+                iconSize: 22,
               ),
             if (icon != null) const SizedBox(width: AppSpacing.md),
             Expanded(
