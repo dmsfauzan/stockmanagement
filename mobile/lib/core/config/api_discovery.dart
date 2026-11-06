@@ -5,13 +5,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app_config.dart';
 
 const _cacheKey = 'api_base_url';
-const _probeTimeout = Duration(milliseconds: 1500);
+const _probeTimeout = Duration(milliseconds: 900);
 
-/// Kandidat base URL (emulator Android → host `10.0.2.2`).
-List<String> candidateUrls() => const [
-  'http://10.0.2.2:8000/api',
-  'http://localhost:8000/api',
-];
+/// Kandidat base URL yang dicoba saat startup, diurutkan per platform.
+///
+/// Backend dev disajikan Laragon pada port 80:
+/// - emulator Android → host `10.0.2.2` di path `StockManagement/public/api`
+/// - desktop/web    → `localhost` di path yang sama
+/// - vhost Laragon  → `stockmanagement.test/api`
+/// `:8000/api` tetap didukung bila menjalankan `php artisan serve`.
+List<String> candidateUrls() {
+  const laragonPath = 'StockManagement/public/api';
+  final isAndroid = !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  final host = isAndroid ? '10.0.2.2' : 'localhost';
+
+  return [
+    'http://$host/$laragonPath',
+    'http://stockmanagement.test/api',
+    'http://$host:8000/api',
+    if (isAndroid) 'http://localhost/$laragonPath',
+  ];
+}
 
 /// Heuristik: respons menyerupai API project ini (envelope JSON + status wajar).
 ///

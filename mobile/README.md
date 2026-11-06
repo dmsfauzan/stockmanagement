@@ -17,20 +17,28 @@ Cukup:
 flutter run
 ```
 
-Saat startup, app **menemukan base URL API secara otomatis** (khusus emulator
-Android → host `10.0.2.2`), mencoba `http://10.0.2.2:8000/api` lalu
-`http://localhost:8000/api`, dan menyimpan hasilnya.
+Saat startup, app **menemukan base URL API secara otomatis** berdasarkan
+platform:
 
-Prasyarat backend (dari root project):
+- **Emulator Android** → `http://10.0.2.2/StockManagement/public/api`
+  (host → Laragon port 80).
+- **Desktop/web** → `http://localhost/StockManagement/public/api`.
+- **Vhost Laragon** → `http://stockmanagement.test/api`.
+- `http://<host>:8000/api` tetap dicoba bila memakai `php artisan serve`.
+
+Hasil yang berhasil disimpan (di-cache) untuk startup berikutnya.
+
+Prasyarat backend: cukup Laragon berjalan (Apache port 80). Alternatif tanpa
+Laragon:
 
 ```bash
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 
-Override manual bila perlu (mis. perangkat fisik / rilis):
+Override manual bila perlu (mis. perangkat fisik / LAN / rilis):
 
 ```bash
-flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8000/api
+flutter run --dart-define=API_BASE_URL=http://192.168.1.10/StockManagement/public/api
 ```
 
 Akun demo: `admin@stock.test` / `password`.

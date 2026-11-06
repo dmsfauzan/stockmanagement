@@ -134,7 +134,9 @@ final dioProvider = Provider<Dio>((ref) {
         if (data is Map && data['message'] is String) {
           message = data['message'] as String;
         } else if (e.type == DioExceptionType.connectionTimeout) {
-          message = 'Koneksi timeout.';
+          message =
+              'Koneksi timeout. Server tidak merespons '
+              '(${AppConfig.apiBaseUrl}).';
         } else if (e.type == DioExceptionType.connectionError) {
           message = 'Tidak dapat terhubung ke server. Periksa API_BASE_URL.';
         }

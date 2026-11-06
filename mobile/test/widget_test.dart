@@ -305,8 +305,10 @@ void main() {
     expect(row.status, 'active');
   });
 
-  test('candidateUrls targets emulator host', () {
-    expect(candidateUrls(), contains('http://10.0.2.2:8000/api'));
+  test('candidateUrls includes Laragon API path', () {
+    final urls = candidateUrls();
+    expect(urls.any((u) => u.endsWith('/StockManagement/public/api')), isTrue);
+    expect(urls, contains('http://stockmanagement.test/api'));
   });
 
   test('looksLikeApi accepts JSON envelope and rejects HTML/404', () {
