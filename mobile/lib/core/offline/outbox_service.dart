@@ -74,6 +74,8 @@ class OutboxService {
 
   Future<int> failedCount() => _outbox.failedCount();
 
+  Future<List<OutboxEntry>> failedEntries() => _outbox.failedEntries();
+
   Future<void> discardFailed() => _outbox.discardFailed();
 
   /// Kirim ulang seluruh antrean. Berhenti pada error jaringan berikutnya.

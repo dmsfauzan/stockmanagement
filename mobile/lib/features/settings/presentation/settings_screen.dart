@@ -12,6 +12,44 @@ import '../../../data/auth/auth_repository.dart';
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
+  Future<void> _showFailed(BuildContext context, WidgetRef ref) async {
+    final entries = await ref.read(outboxServiceProvider).failedEntries();
+
+    if (!context.mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Antrean gagal'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: entries.isEmpty
+              ? const Text('Tidak ada antrean gagal.')
+              : ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: entries.length,
+                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  itemBuilder: (_, index) => ListTile(
+                    dense: true,
+                    title: Text(
+                      '${entries[index].method} ${entries[index].url}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text(entries[index].createdAt),
+                  ),
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Tutup'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authStateProvider).valueOrNull?.user;
@@ -148,7 +186,7 @@ class SettingsScreen extends ConsumerWidget {
                       '${ref.watch(outboxFailedCountProvider).valueOrNull} dokumen ditolak server',
                   icon: Icons.error_outline,
                   iconColor: AppColors.error,
-                  trailing: const SizedBox.shrink(),
+                  onTap: () => _showFailed(context, ref),
                 ),
                 AppMenuItem(
                   title: 'Hapus antrean gagal',

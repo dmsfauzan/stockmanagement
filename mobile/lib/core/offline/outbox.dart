@@ -95,6 +95,17 @@ class Outbox {
     return (result.first['c'] as int?) ?? 0;
   }
 
+  Future<List<OutboxEntry>> failedEntries() async {
+    final db = await _open();
+    final rows = await db.query(
+      'outbox',
+      where: 'failed = 1',
+      orderBy: 'id ASC',
+    );
+
+    return rows.map(OutboxEntry.fromMap).toList();
+  }
+
   Future<void> markAttempt(int id, int attempts, String? nextAttemptAt) async {
     final db = await _open();
     await db.update(
