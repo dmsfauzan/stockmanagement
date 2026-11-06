@@ -35,6 +35,7 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
   bool _loading = true;
   bool _loadingMore = false;
   String? _error;
+  int _loadSeq = 0;
 
   static const _statusOptions = {
     '': 'Semua',
@@ -86,6 +87,8 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
   }
 
   Future<void> _load({bool more = false}) async {
+    final seq = ++_loadSeq;
+
     setState(() {
       if (more) {
         _loadingMore = true;
@@ -107,7 +110,7 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
             page: _page,
           );
 
-      if (!mounted) return;
+      if (!mounted || seq != _loadSeq) return;
 
       setState(() {
         if (more) {
@@ -121,10 +124,10 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
         if (_hasMore) _page++;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || seq != _loadSeq) return;
       setState(() => _error = '$e');
     } finally {
-      if (mounted) {
+      if (mounted && seq == _loadSeq) {
         setState(() {
           _loading = false;
           _loadingMore = false;

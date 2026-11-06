@@ -56,6 +56,7 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
   bool _loading = true;
   bool _loadingMore = false;
   String? _error;
+  int _loadSeq = 0;
 
   @override
   void initState() {
@@ -117,6 +118,8 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
   }
 
   Future<void> _load({bool more = false}) async {
+    final seq = ++_loadSeq;
+
     setState(() {
       if (more) {
         _loadingMore = true;
@@ -141,7 +144,7 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
             page: _page,
           );
 
-      if (!mounted) return;
+      if (!mounted || seq != _loadSeq) return;
 
       setState(() {
         if (more) {
@@ -155,10 +158,10 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
         if (_hasMore) _page++;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted || seq != _loadSeq) return;
       setState(() => _error = '$e');
     } finally {
-      if (mounted) {
+      if (mounted && seq == _loadSeq) {
         setState(() {
           _loading = false;
           _loadingMore = false;

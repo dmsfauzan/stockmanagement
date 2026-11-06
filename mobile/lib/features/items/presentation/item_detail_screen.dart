@@ -405,7 +405,13 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
             ),
             const SizedBox(height: AppSpacing.sm),
             Text('$value', style: Theme.of(context).textTheme.headlineSmall),
-            if (hint != null) Text(hint, style: AppText.caption),
+            if (hint != null)
+              Text(
+                hint,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.muted(Theme.of(context).brightness),
+                ),
+              ),
           ],
         ),
       ),

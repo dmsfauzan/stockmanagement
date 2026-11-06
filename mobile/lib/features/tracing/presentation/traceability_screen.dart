@@ -207,7 +207,12 @@ class _TraceabilityScreenState extends ConsumerState<TraceabilityScreen> {
                         Text(
                           '${event.date ?? ''} · ${event.warehouse ?? '-'} · '
                           '${event.location ?? '-'}',
-                          style: AppText.caption,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: AppColors.muted(
+                                  Theme.of(context).brightness,
+                                ),
+                              ),
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
@@ -238,7 +243,12 @@ class _TraceabilityScreenState extends ConsumerState<TraceabilityScreen> {
               color: color,
             ),
           ),
-          Text(label, style: AppText.caption),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.muted(Theme.of(context).brightness),
+            ),
+          ),
         ],
       ),
     );
