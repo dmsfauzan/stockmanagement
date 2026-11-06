@@ -126,12 +126,14 @@ class StockOpnameCount extends Component
                 $system = (int) $row['system_quantity'];
                 $physical = (int) $row['physical_quantity'];
 
-                StockOpnameItem::whereKey($row['id'])->update([
-                    'physical_quantity' => $physical,
-                    'difference' => $physical - $system,
-                    'reason' => $row['reason'] !== '' ? $row['reason'] : null,
-                    'notes' => $row['notes'] !== '' ? $row['notes'] : null,
-                ]);
+                StockOpnameItem::whereKey($row['id'])
+                    ->where('stock_opname_id', $opname->id)
+                    ->update([
+                        'physical_quantity' => $physical,
+                        'difference' => $physical - $system,
+                        'reason' => $row['reason'] !== '' ? $row['reason'] : null,
+                        'notes' => $row['notes'] !== '' ? $row['notes'] : null,
+                    ]);
             }
 
             $opname->update([

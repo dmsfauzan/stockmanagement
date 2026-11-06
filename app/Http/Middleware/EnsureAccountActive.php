@@ -14,6 +14,14 @@ class EnsureAccountActive
         $user = $request->user();
 
         if ($user && method_exists($user, 'isActive') && ! $user->isActive()) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                if ($user->currentAccessToken() && method_exists($user->currentAccessToken(), 'delete')) {
+                    $user->currentAccessToken()->delete();
+                }
+
+                abort(403, __('Akun tidak aktif.'));
+            }
+
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();

@@ -10,6 +10,7 @@ use App\Services\Workflow\RequisitionWorkflow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RequisitionController extends ApiController
 {
@@ -142,6 +143,8 @@ class RequisitionController extends ApiController
     {
         try {
             $result = $callback();
+        } catch (HttpException $e) {
+            throw $e;
         } catch (\RuntimeException $e) {
             return $this->error($e->getMessage(), 422);
         }

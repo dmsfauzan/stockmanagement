@@ -23,6 +23,13 @@ class EnsureIdempotency
             return $next($request);
         }
 
+        if (mb_strlen($key) > 255) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Idempotency-Key terlalu panjang (maks 255 karakter).',
+            ], 422);
+        }
+
         if (! in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
             return $next($request);
         }
@@ -96,6 +103,12 @@ class EnsureIdempotency
             $row->forceFill(['locked_at' => now()])->save();
         }
 
+        if ($row === null) {
+            // Persisting the idempotency record failed; do not block the
+            // request or crash with a null row.
+            return $next($request);
+        }
+
         /** @var Response $response */
         $response = $next($request);
 
@@ -118,6 +131,10 @@ class EnsureIdempotency
         }
 
         $body = method_exists($response, 'getContent') ? (string) $response->getContent() : '';
+
+        if (strlen($body) > 100000) {
+            $body = substr($body, 0, 100000);
+        }
 
         try {
             DB::transaction(function () use ($row, $status, $body, $hash, $method, $path): void {

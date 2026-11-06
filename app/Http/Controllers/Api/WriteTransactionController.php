@@ -29,6 +29,7 @@ use App\Services\Workflow\DocumentWorkflow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class WriteTransactionController extends ApiController
 {
@@ -36,6 +37,8 @@ class WriteTransactionController extends ApiController
     {
         try {
             $callback();
+        } catch (HttpException $e) {
+            throw $e;
         } catch (\RuntimeException $e) {
             return $this->error($e->getMessage(), 422);
         }

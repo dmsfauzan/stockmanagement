@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ReturnController extends ApiController
 {
@@ -19,6 +20,8 @@ class ReturnController extends ApiController
     {
         try {
             $callback();
+        } catch (HttpException $e) {
+            throw $e;
         } catch (\RuntimeException $e) {
             return $this->error($e->getMessage(), 422);
         }

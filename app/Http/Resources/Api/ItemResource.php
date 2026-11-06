@@ -32,7 +32,10 @@ class ItemResource extends JsonResource
             'description' => $this->description,
             'minimum_stock' => (int) $this->minimum_stock,
             'maximum_stock' => (int) $this->maximum_stock,
-            'cost' => $this->cost,
+            'cost' => $this->when(
+                (bool) $request->user()?->hasPermission('reports.view'),
+                fn () => $this->cost,
+            ),
             'status' => $this->status,
             'ownership' => $this->ownership ?? 'owned',
             'consignor' => $this->whenLoaded('consignor', fn () => $this->consignor ? ['id' => $this->consignor->id, 'name' => $this->consignor->name] : null),

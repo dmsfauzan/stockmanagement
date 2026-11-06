@@ -83,7 +83,7 @@ class StockOpnameShow extends Component
     {
         $opname = StockOpname::findOrFail($this->opnameId);
 
-        $this->authorize('view', $opname);
+        $this->authorize('delete', $opname);
 
         if ($opname->status !== OpnameStatus::Draft->value) {
             $this->dispatch('toast', type: 'error', message: __('Hanya draft yang dapat dihapus.'));

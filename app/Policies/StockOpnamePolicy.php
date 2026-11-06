@@ -49,6 +49,19 @@ class StockOpnamePolicy
         return true;
     }
 
+    public function delete(User $user, StockOpname $opname): bool|Response
+    {
+        if (! $user->hasPermission('stock_opname.create')) {
+            return false;
+        }
+
+        if ($opname->status !== 'draft') {
+            return Response::deny('Only draft opnames can be deleted');
+        }
+
+        return true;
+    }
+
     public function approve(User $user, StockOpname $opname): bool|Response
     {
         if (! $user->hasPermission('stock_opname.approve')) {

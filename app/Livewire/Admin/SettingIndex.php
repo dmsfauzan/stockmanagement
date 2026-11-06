@@ -218,7 +218,35 @@ class SettingIndex extends Component
             'values.approval_maker_checker' => ['required', 'in:0,1'],
             'values.approval_flows' => ['nullable', 'string', 'max:10000'],
             'values.integration_webhook_enabled' => ['required', 'in:0,1'],
-            'values.integration_webhook_url' => ['nullable', 'string', 'max:500'],
+            'values.integration_webhook_url' => [
+                'nullable',
+                'string',
+                'max:500',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $url = is_string($value) ? trim($value) : '';
+
+                    if ($url === '') {
+                        return;
+                    }
+
+                    if (filter_var($url, FILTER_VALIDATE_URL) === false
+                        || strtolower((string) parse_url($url, PHP_URL_SCHEME)) !== 'https') {
+                        $fail('URL webhook harus alamat https yang valid.');
+
+                        return;
+                    }
+
+                    $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+
+                    // Block SSRF targets: raw IPs and loopback/metadata hosts.
+                    if ($host === '' || filter_var($host, FILTER_VALIDATE_IP) !== false
+                        || in_array($host, ['localhost', 'metadata.google.internal', 'metadata.azure.internal'], true)) {
+                        $fail('Host webhook tidak diizinkan.');
+
+                        return;
+                    }
+                },
+            ],
             'values.integration_webhook_events' => ['nullable', 'string', 'max:1000'],
             'values.accounting_export_enabled' => ['required', 'in:0,1'],
             'values.accounting_export_period' => ['required', 'in:daily,monthly'],

@@ -46,7 +46,7 @@ class SendWebhookJob implements ShouldQueue
         $delivery->increment('attempts');
 
         try {
-            $response = Http::withHeaders($headers)->timeout(10)->withBody($body, 'application/json')->post($delivery->url);
+            $response = Http::withHeaders($headers)->withoutRedirecting()->timeout(10)->withBody($body, 'application/json')->post($delivery->url);
 
             $delivery->update([
                 'response_status' => $response->status(),
