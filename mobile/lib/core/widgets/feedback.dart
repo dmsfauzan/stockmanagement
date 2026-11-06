@@ -208,37 +208,3 @@ class ListSkeleton extends StatelessWidget {
     );
   }
 }
-
-class SyncProgressBar extends StatelessWidget {
-  const SyncProgressBar({super.key, this.label = 'Menyinkronkan…'});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      color: AppColors.primarySoft,
-      child: Row(
-        children: [
-          const SizedBox(
-            height: 16,
-            width: 16,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Text(
-            label,
-            style: AppText.caption.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

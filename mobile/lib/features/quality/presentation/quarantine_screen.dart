@@ -79,6 +79,8 @@ class _QuarantineScreenState extends ConsumerState<QuarantineScreen> {
           .read(qualityRepositoryProvider)
           .quarantine(search: _query, page: _page);
 
+      if (!mounted) return;
+
       setState(() {
         if (more) {
           _rows.addAll(result.items);
@@ -91,12 +93,15 @@ class _QuarantineScreenState extends ConsumerState<QuarantineScreen> {
         if (_hasMore) _page++;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = '$e');
     } finally {
-      setState(() {
-        _loading = false;
-        _loadingMore = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _loadingMore = false;
+        });
+      }
     }
   }
 
@@ -135,18 +140,22 @@ class _QuarantineScreenState extends ConsumerState<QuarantineScreen> {
       ),
     );
 
+    final quantity = int.tryParse(qty.text.trim()) ?? row.quarantine;
+    final reasonText = reason.text.trim();
+    qty.dispose();
+    reason.dispose();
+
     if (ok != true) return;
 
     setState(() => _busy = true);
 
     try {
       final repo = ref.read(qualityRepositoryProvider);
-      final quantity = int.tryParse(qty.text.trim()) ?? row.quarantine;
 
       if (release) {
-        await repo.release(row.id, quantity: quantity, reason: reason.text);
+        await repo.release(row.id, quantity: quantity, reason: reasonText);
       } else {
-        await repo.reject(row.id, quantity: quantity, reason: reason.text);
+        await repo.reject(row.id, quantity: quantity, reason: reasonText);
       }
       await _load();
     } catch (e) {

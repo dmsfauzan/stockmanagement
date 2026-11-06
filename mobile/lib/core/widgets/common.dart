@@ -284,43 +284,6 @@ class AppButton extends StatelessWidget {
 
 enum AppButtonVariant { primary, secondary, outline, ghost, destructive }
 
-/// Header melengkung ala Semas (radius bawah besar) — dipakai di login,
-/// dashboard, dan layar utama lain.
-class AppHeaderBlob extends StatelessWidget {
-  const AppHeaderBlob({
-    super.key,
-    required this.child,
-    this.color = AppColors.darkBase,
-    this.radius = AppRadius.header,
-    this.padding = const EdgeInsets.fromLTRB(
-      AppSpacing.lg,
-      AppSpacing.lg,
-      AppSpacing.lg,
-      AppSpacing.xl,
-    ),
-  });
-
-  final Widget child;
-  final Color color;
-  final double radius;
-  final EdgeInsetsGeometry padding;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(radius)),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(padding: padding, child: child),
-      ),
-    );
-  }
-}
-
 /// Field berlabel sederhana bergaya Semas.
 class AppTextField extends StatelessWidget {
   const AppTextField({

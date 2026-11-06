@@ -136,28 +136,32 @@ class _RequisitionDetailScreenState
   Future<String?> _askReason() async {
     final controller = TextEditingController();
 
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Alasan penolakan'),
-        content: AppTextField(
-          label: 'Alasan',
-          controller: controller,
-          maxLines: 3,
-          hint: 'Tulis alasan…',
+    try {
+      return await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Alasan penolakan'),
+          content: AppTextField(
+            label: 'Alasan',
+            controller: controller,
+            maxLines: 3,
+            hint: 'Tulis alasan…',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, controller.text.trim()),
+              child: const Text('Tolak'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text.trim()),
-            child: const Text('Tolak'),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   @override

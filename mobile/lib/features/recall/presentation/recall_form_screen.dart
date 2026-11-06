@@ -55,6 +55,7 @@ class _RecallFormScreenState extends ConsumerState<RecallFormScreen> {
       final impact = await ref
           .read(recallRepositoryProvider)
           .impact(type: _type, value: value);
+      if (!mounted) return;
       setState(() => _impact = impact);
     } catch (e) {
       _snack('$e', error: true);

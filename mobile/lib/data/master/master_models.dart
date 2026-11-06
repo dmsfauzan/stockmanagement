@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import '../../core/network/api_exception.dart';
+
 class Category {
   const Category({
     required this.id,
@@ -180,14 +182,31 @@ class SimpleListRepository {
 
   final Dio _dio;
 
+  Future<dynamic> _get(
+    String path, {
+    Map<String, dynamic>? query,
+    String fallback = 'Gagal memuat data.',
+  }) async {
+    try {
+      final res = await _dio.get(path, queryParameters: query);
+
+      return res.data;
+    } on DioException catch (e) {
+      final err = e.error;
+      throw err is ApiException ? err : ApiException(fallback);
+    }
+  }
+
   Future<List<Category>> categories({String? search}) async {
-    final res = await _dio.get(
-      '/categories',
-      queryParameters: {
-        if (search != null && search.isNotEmpty) 'search': search,
-      },
-    );
-    final body = res.data as Map<String, dynamic>;
+    final body =
+        await _get(
+              '/categories',
+              query: {
+                if (search != null && search.isNotEmpty) 'search': search,
+              },
+              fallback: 'Gagal memuat kategori.',
+            )
+            as Map<String, dynamic>;
 
     return ((body['data'] as List?) ?? [])
         .map((e) => Category.fromJson(e as Map<String, dynamic>))
@@ -195,13 +214,15 @@ class SimpleListRepository {
   }
 
   Future<List<Unit>> units({String? search}) async {
-    final res = await _dio.get(
-      '/units',
-      queryParameters: {
-        if (search != null && search.isNotEmpty) 'search': search,
-      },
-    );
-    final body = res.data as Map<String, dynamic>;
+    final body =
+        await _get(
+              '/units',
+              query: {
+                if (search != null && search.isNotEmpty) 'search': search,
+              },
+              fallback: 'Gagal memuat satuan.',
+            )
+            as Map<String, dynamic>;
 
     return ((body['data'] as List?) ?? [])
         .map((e) => Unit.fromJson(e as Map<String, dynamic>))
@@ -209,13 +230,15 @@ class SimpleListRepository {
   }
 
   Future<List<Supplier>> suppliers({String? search}) async {
-    final res = await _dio.get(
-      '/suppliers',
-      queryParameters: {
-        if (search != null && search.isNotEmpty) 'search': search,
-      },
-    );
-    final body = res.data as Map<String, dynamic>;
+    final body =
+        await _get(
+              '/suppliers',
+              query: {
+                if (search != null && search.isNotEmpty) 'search': search,
+              },
+              fallback: 'Gagal memuat supplier.',
+            )
+            as Map<String, dynamic>;
 
     return ((body['data'] as List?) ?? [])
         .map((e) => Supplier.fromJson(e as Map<String, dynamic>))
@@ -223,13 +246,15 @@ class SimpleListRepository {
   }
 
   Future<List<Customer>> customers({String? search}) async {
-    final res = await _dio.get(
-      '/customers',
-      queryParameters: {
-        if (search != null && search.isNotEmpty) 'search': search,
-      },
-    );
-    final body = res.data as Map<String, dynamic>;
+    final body =
+        await _get(
+              '/customers',
+              query: {
+                if (search != null && search.isNotEmpty) 'search': search,
+              },
+              fallback: 'Gagal memuat customer.',
+            )
+            as Map<String, dynamic>;
 
     return ((body['data'] as List?) ?? [])
         .map((e) => Customer.fromJson(e as Map<String, dynamic>))
@@ -237,13 +262,15 @@ class SimpleListRepository {
   }
 
   Future<List<Warehouse>> warehouses({String? search}) async {
-    final res = await _dio.get(
-      '/warehouses',
-      queryParameters: {
-        if (search != null && search.isNotEmpty) 'search': search,
-      },
-    );
-    final body = res.data as Map<String, dynamic>;
+    final body =
+        await _get(
+              '/warehouses',
+              query: {
+                if (search != null && search.isNotEmpty) 'search': search,
+              },
+              fallback: 'Gagal memuat gudang.',
+            )
+            as Map<String, dynamic>;
 
     return ((body['data'] as List?) ?? [])
         .map((e) => Warehouse.fromJson(e as Map<String, dynamic>))
@@ -254,15 +281,17 @@ class SimpleListRepository {
     String? search,
     String? warehouseId,
   }) async {
-    final res = await _dio.get(
-      '/locations',
-      queryParameters: {
-        if (search != null && search.isNotEmpty) 'search': search,
-        if (warehouseId != null && warehouseId.isNotEmpty)
-          'warehouse_id': warehouseId,
-      },
-    );
-    final body = res.data as Map<String, dynamic>;
+    final body =
+        await _get(
+              '/locations',
+              query: {
+                if (search != null && search.isNotEmpty) 'search': search,
+                if (warehouseId != null && warehouseId.isNotEmpty)
+                  'warehouse_id': warehouseId,
+              },
+              fallback: 'Gagal memuat lokasi.',
+            )
+            as Map<String, dynamic>;
 
     return ((body['data'] as List?) ?? [])
         .map((e) => Location.fromJson(e as Map<String, dynamic>))
@@ -270,8 +299,9 @@ class SimpleListRepository {
   }
 
   Future<({String base, List<CurrencyMeta> rows})> currencies() async {
-    final res = await _dio.get('/currencies');
-    final body = res.data as Map<String, dynamic>;
+    final body =
+        await _get('/currencies', fallback: 'Gagal memuat mata uang.')
+            as Map<String, dynamic>;
     final data = (body['data'] ?? {}) as Map<String, dynamic>;
     final base = data['base'] as String? ?? 'IDR';
     final rows = ((data['currencies'] as List?) ?? [])

@@ -83,6 +83,13 @@ class _PickingDetailScreenState extends ConsumerState<PickingDetailScreen> {
       ),
     );
 
+    final pickedQuantity = int.tryParse(qty.text.trim()) ?? line.quantity;
+    final batchNumber = batch.text.trim();
+    final serialNumber = serial.text.trim();
+    qty.dispose();
+    batch.dispose();
+    serial.dispose();
+
     if (result != true) return;
 
     setState(() => _busy = true);
@@ -93,9 +100,9 @@ class _PickingDetailScreenState extends ConsumerState<PickingDetailScreen> {
           .confirm(
             widget.id,
             line.id,
-            pickedQuantity: int.tryParse(qty.text.trim()) ?? line.quantity,
-            batchNumber: batch.text.trim(),
-            serialNumber: serial.text.trim(),
+            pickedQuantity: pickedQuantity,
+            batchNumber: batchNumber,
+            serialNumber: serialNumber,
           );
       await _load();
     } catch (e) {

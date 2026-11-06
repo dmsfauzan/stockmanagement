@@ -52,15 +52,18 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
           .read(stockRepositoryProvider)
           .movements(itemId: widget.itemId);
 
+      if (!mounted) return;
+
       setState(() {
         _item = item;
         _balances = balances;
         _movements = movements;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = '$e');
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
