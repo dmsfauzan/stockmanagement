@@ -212,28 +212,35 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.sm,
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _pickDate(from: true),
-                    icon: const Icon(Icons.date_range, size: 18),
-                    label: Text(_dateFrom ?? 'Dari tanggal'),
-                  ),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: AppButton.outline(
+                        _dateFrom ?? 'Dari tanggal',
+                        icon: Icons.date_range,
+                        onPressed: () => _pickDate(from: true),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: AppButton.outline(
+                        _dateTo ?? 'Sampai tanggal',
+                        icon: Icons.date_range,
+                        onPressed: () => _pickDate(from: false),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _pickDate(from: false),
-                    icon: const Icon(Icons.date_range, size: 18),
-                    label: Text(_dateTo ?? 'Sampai tanggal'),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           Expanded(child: _content()),
@@ -338,23 +345,9 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
   }
 
   Widget _kv(String label, dynamic value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 130,
-            child: Text(label.replaceAll('_', ' '), style: AppText.caption),
-          ),
-          Expanded(
-            child: Text(
-              value == null ? '-' : '$value',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      ),
+    return AppInfoRow(
+      label: label.replaceAll('_', ' '),
+      value: value == null ? '-' : '$value',
     );
   }
 }

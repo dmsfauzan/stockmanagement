@@ -7,7 +7,6 @@ import '../../../core/offline/outbox_service.dart';
 import '../../../core/theme/theme_mode.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/widgets/common.dart';
-import '../../../core/widgets/feedback.dart';
 import '../../../data/auth/auth_repository.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -22,22 +21,31 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          const SectionHeader(title: 'Akun'),
-          Card(
-            child: Column(
-              children: [
-                DataListRow(title: 'Nama', subtitle: user?.name ?? '-'),
-                const Divider(height: 1),
-                DataListRow(title: 'Email', subtitle: user?.email ?? '-'),
-                if ((user?.roles ?? []).isNotEmpty) ...[
-                  const Divider(height: 1),
-                  DataListRow(title: 'Peran', subtitle: user!.roles.join(', ')),
-                ],
-              ],
-            ),
+          const AppSectionTitle(title: 'Akun'),
+          const SizedBox(height: AppSpacing.sm),
+          AppMenuGroup(
+            children: [
+              AppMenuItem(
+                title: 'Nama',
+                subtitle: user?.name ?? '-',
+                trailing: const SizedBox.shrink(),
+              ),
+              AppMenuItem(
+                title: 'Email',
+                subtitle: user?.email ?? '-',
+                trailing: const SizedBox.shrink(),
+              ),
+              if ((user?.roles ?? []).isNotEmpty)
+                AppMenuItem(
+                  title: 'Peran',
+                  subtitle: user!.roles.join(', '),
+                  trailing: const SizedBox.shrink(),
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.lg),
-          const SectionHeader(title: 'Tampilan'),
+          const AppSectionTitle(title: 'Tampilan'),
+          const SizedBox(height: AppSpacing.sm),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
@@ -67,83 +75,75 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          const SectionHeader(title: 'Aplikasi'),
-          Card(
-            child: Column(
-              children: [
-                const DataListRow(
-                  title: 'Versi',
-                  subtitle: '1.0.0',
-                  leading: Icon(Icons.info_outline),
-                ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'API Base URL',
-                  subtitle: AppConfig.apiBaseUrl,
-                  leading: const Icon(Icons.link),
-                ),
-                const Divider(height: 1),
-                const DataListRow(
-                  title: 'Bahasa',
-                  subtitle: 'Indonesia',
-                  leading: Icon(Icons.language_outlined),
-                ),
-              ],
-            ),
+          const AppSectionTitle(title: 'Aplikasi'),
+          const SizedBox(height: AppSpacing.sm),
+          AppMenuGroup(
+            children: [
+              const AppMenuItem(
+                title: 'Versi',
+                subtitle: '1.0.0',
+                icon: Icons.info_outline,
+                trailing: SizedBox.shrink(),
+              ),
+              AppMenuItem(
+                title: 'API Base URL',
+                subtitle: AppConfig.apiBaseUrl,
+                icon: Icons.link,
+                trailing: const SizedBox.shrink(),
+              ),
+              const AppMenuItem(
+                title: 'Bahasa',
+                subtitle: 'Indonesia',
+                icon: Icons.language_outlined,
+                trailing: SizedBox.shrink(),
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.lg),
-          const SectionHeader(title: 'Sinkronisasi Offline'),
-          Card(
-            child: Column(
-              children: [
-                DataListRow(
-                  title: 'Menunggu dikirim',
-                  subtitle:
-                      (ref.watch(outboxCountProvider).valueOrNull ?? 0) == 0
-                      ? 'Tidak ada antrean'
-                      : '${ref.watch(outboxCountProvider).valueOrNull} dokumen',
-                  leading: const Icon(Icons.cloud_upload_outlined),
-                ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'Kirim sekarang',
-                  leading: const Icon(Icons.sync),
-                  onTap: () async {
-                    final result = await ref
-                        .read(outboxServiceProvider)
-                        .flush();
-                    ref.invalidate(outboxCountProvider);
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Terkirim ${result.sent}, gagal ${result.failed}, '
-                          'sisa ${result.remaining}.',
-                        ),
+          const AppSectionTitle(title: 'Sinkronisasi Offline'),
+          const SizedBox(height: AppSpacing.sm),
+          AppMenuGroup(
+            children: [
+              AppMenuItem(
+                title: 'Menunggu dikirim',
+                subtitle: (ref.watch(outboxCountProvider).valueOrNull ?? 0) == 0
+                    ? 'Tidak ada antrean'
+                    : '${ref.watch(outboxCountProvider).valueOrNull} dokumen',
+                icon: Icons.cloud_upload_outlined,
+                trailing: const SizedBox.shrink(),
+              ),
+              AppMenuItem(
+                title: 'Kirim sekarang',
+                icon: Icons.sync,
+                onTap: () async {
+                  final result = await ref.read(outboxServiceProvider).flush();
+                  ref.invalidate(outboxCountProvider);
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Terkirim ${result.sent}, gagal ${result.failed}, '
+                        'sisa ${result.remaining}.',
                       ),
-                    );
-                  },
-                ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'Kosongkan antrean',
-                  leading: const Icon(
-                    Icons.delete_outline,
-                    color: AppColors.rose,
-                  ),
-                  onTap: () async {
-                    await ref.read(outboxServiceProvider).clear();
-                    ref.invalidate(outboxCountProvider);
-                  },
-                ),
-              ],
-            ),
+                    ),
+                  );
+                },
+              ),
+              AppMenuItem(
+                title: 'Kosongkan antrean',
+                icon: Icons.delete_outline,
+                onTap: () async {
+                  await ref.read(outboxServiceProvider).clear();
+                  ref.invalidate(outboxCountProvider);
+                },
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.lg),
           Card(
-            child: DataListRow(
+            child: AppMenuItem(
               title: 'Keluar',
-              leading: const Icon(Icons.logout, color: AppColors.rose),
+              icon: Icons.logout,
               onTap: () async {
                 await ref.read(authStateProvider.notifier).logout();
                 if (context.mounted) context.go('/login');

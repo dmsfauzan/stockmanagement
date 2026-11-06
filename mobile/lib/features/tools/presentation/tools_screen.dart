@@ -22,21 +22,54 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Alat')),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: SegmentedTabs(
-              tabs: const ['Konversi Kurs', 'Saran Put-Away'],
-              selected: _tab,
-              onChanged: (i) => setState(() => _tab = i),
+          AppHeaderBlob(
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  tooltip: 'Kembali',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                const Expanded(
+                  child: Text(
+                    'Alat',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
-            child: IndexedStack(
-              index: _tab,
-              children: const [_CurrencyTab(), _PutAwayTab()],
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: SegmentedTabs(
+                    tabs: const ['Konversi Kurs', 'Saran Put-Away'],
+                    selected: _tab,
+                    onChanged: (i) => setState(() => _tab = i),
+                  ),
+                ),
+                Expanded(
+                  child: IndexedStack(
+                    index: _tab,
+                    children: const [_CurrencyTab(), _PutAwayTab()],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -118,24 +151,40 @@ class _CurrencyTabState extends ConsumerState<_CurrencyTab> {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
-        TextField(
-          controller: _amount,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: const InputDecoration(labelText: 'Jumlah'),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Row(
-          children: [
-            Expanded(child: _currencyDropdown('Dari', _from, (v) => _from = v)),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(child: _currencyDropdown('Ke', _to, (v) => _to = v)),
-          ],
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              children: [
+                AppTextField(
+                  label: 'Jumlah',
+                  controller: _amount,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _currencyDropdown('Dari', _from, (v) => _from = v),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: _currencyDropdown('Ke', _to, (v) => _to = v),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        FilledButton.icon(
-          onPressed: _loading ? null : _convert,
-          icon: const Icon(Icons.swap_horiz),
-          label: const Text('Konversi'),
+        AppButton.primary(
+          'Konversi',
+          icon: Icons.swap_horiz,
+          loading: _loading,
+          onPressed: _convert,
         ),
         if (_error != null) ...[
           const SizedBox(height: AppSpacing.lg),
@@ -150,27 +199,9 @@ class _CurrencyTabState extends ConsumerState<_CurrencyTab> {
                 children: [
                   for (final entry in _result!.entries)
                     if (entry.value is! List)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 3),
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 120,
-                              child: Text(
-                                entry.key.replaceAll('_', ' '),
-                                style: AppText.caption,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                '${entry.value}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                      AppInfoRow(
+                        label: entry.key.replaceAll('_', ' '),
+                        value: '${entry.value}',
                       ),
                 ],
               ),
@@ -281,30 +312,40 @@ class _PutAwayTabState extends ConsumerState<_PutAwayTab> {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
-        PickerTile(
-          label: 'Gudang',
-          value: _warehouseLabel.isEmpty ? null : _warehouseLabel,
-          required: true,
-          onTap: _pickWarehouse,
-        ),
-        const SizedBox(height: AppSpacing.md),
-        PickerTile(
-          label: 'Barang',
-          value: _itemLabel.isEmpty ? null : _itemLabel,
-          required: true,
-          onTap: _pickItem,
-        ),
-        const SizedBox(height: AppSpacing.md),
-        TextField(
-          controller: _quantity,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: 'Jumlah'),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              children: [
+                PickerTile(
+                  label: 'Gudang',
+                  value: _warehouseLabel.isEmpty ? null : _warehouseLabel,
+                  required: true,
+                  onTap: _pickWarehouse,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                PickerTile(
+                  label: 'Barang',
+                  value: _itemLabel.isEmpty ? null : _itemLabel,
+                  required: true,
+                  onTap: _pickItem,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppTextField(
+                  label: 'Jumlah',
+                  controller: _quantity,
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        FilledButton.icon(
-          onPressed: _loading ? null : _run,
-          icon: const Icon(Icons.place_outlined),
-          label: const Text('Cari Lokasi'),
+        AppButton.primary(
+          'Cari Lokasi',
+          icon: Icons.place_outlined,
+          loading: _loading,
+          onPressed: _run,
         ),
         if (_error != null) ...[
           const SizedBox(height: AppSpacing.lg),
@@ -348,25 +389,9 @@ class _PutAwayTabState extends ConsumerState<_PutAwayTab> {
           children: [
             for (final entry in item.entries)
               if (entry.value is! List)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 130,
-                        child: Text(
-                          '${entry.key}'.replaceAll('_', ' '),
-                          style: AppText.caption,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          '${entry.value}',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
+                AppInfoRow(
+                  label: '${entry.key}'.replaceAll('_', ' '),
+                  value: '${entry.value}',
                 ),
           ],
         ),

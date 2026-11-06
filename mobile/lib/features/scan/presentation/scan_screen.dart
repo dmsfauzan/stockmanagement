@@ -125,14 +125,42 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
             alignment: Alignment.bottomCenter,
             child: Container(
               width: double.infinity,
-              color: Colors.black54,
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Text(
-                _busy
-                    ? 'Mencari barang…'
-                    : 'Arahkan kamera ke barcode / QR barang.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white),
+              margin: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.darkBase.withValues(alpha: 0.85),
+                borderRadius: BorderRadius.circular(AppRadius.card),
+              ),
+              child: Row(
+                children: [
+                  if (_busy)
+                    const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  else
+                    const Icon(
+                      Icons.qr_code_scanner,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Text(
+                      _busy
+                          ? 'Mencari barang…'
+                          : 'Arahkan kamera ke barcode / QR barang.',
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

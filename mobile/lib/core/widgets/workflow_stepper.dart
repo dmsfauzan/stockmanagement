@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/widgets/status_badge.dart';
+import '../theme/tokens.dart';
+import 'status_badge.dart';
 
 class WorkflowStepper extends StatelessWidget {
   const WorkflowStepper({
@@ -37,12 +38,12 @@ class WorkflowStepper extends StatelessWidget {
                   ? const Icon(
                       Icons.check_circle,
                       size: 22,
-                      color: Color(0xFF059669),
+                      color: AppColors.success,
                     )
-                  : const Icon(
+                  : Icon(
                       Icons.circle_outlined,
                       size: 22,
-                      color: Color(0xFF94A3B8),
+                      color: AppColors.muted(Theme.of(context).brightness),
                     ),
               const SizedBox(height: 4),
               StatusBadge(status: step, label: step.toUpperCase()),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/tokens.dart';
+import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../data/providers.dart';
@@ -58,54 +59,64 @@ class _TraceabilityScreenState extends ConsumerState<TraceabilityScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              children: [
-                Row(
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
                   children: [
-                    Expanded(
-                      child: DropdownButtonFormField<String>(
-                        initialValue: _type,
-                        decoration: const InputDecoration(
-                          labelText: 'Jenis',
-                          isDense: true,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            initialValue: _type,
+                            decoration: const InputDecoration(
+                              labelText: 'Jenis',
+                              isDense: true,
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'batch',
+                                child: Text('Batch'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'serial',
+                                child: Text('Serial'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'lot',
+                                child: Text('Lot'),
+                              ),
+                            ],
+                            onChanged: (v) =>
+                                setState(() => _type = v ?? 'batch'),
+                          ),
                         ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'batch',
-                            child: Text('Batch'),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          flex: 2,
+                          child: TextField(
+                            controller: _value,
+                            textInputAction: TextInputAction.search,
+                            decoration: const InputDecoration(
+                              labelText: 'Nilai',
+                              hintText: 'Nomor batch/serial',
+                              isDense: true,
+                            ),
+                            onSubmitted: (_) => _search(),
                           ),
-                          DropdownMenuItem(
-                            value: 'serial',
-                            child: Text('Serial'),
-                          ),
-                          DropdownMenuItem(value: 'lot', child: Text('Lot')),
-                        ],
-                        onChanged: (v) => setState(() => _type = v ?? 'batch'),
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      flex: 2,
-                      child: TextField(
-                        controller: _value,
-                        textInputAction: TextInputAction.search,
-                        decoration: const InputDecoration(
-                          labelText: 'Nilai',
-                          hintText: 'Nomor batch/serial',
-                          isDense: true,
-                        ),
-                        onSubmitted: (_) => _search(),
-                      ),
+                    const SizedBox(height: AppSpacing.md),
+                    AppButton.primary(
+                      'Lacak',
+                      icon: Icons.search,
+                      loading: _loading,
+                      onPressed: _search,
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.md),
-                FilledButton.icon(
-                  onPressed: _loading ? null : _search,
-                  icon: const Icon(Icons.search),
-                  label: const Text('Lacak'),
-                ),
-              ],
+              ),
             ),
           ),
           Expanded(child: _body()),
@@ -161,34 +172,54 @@ class _TraceabilityScreenState extends ConsumerState<TraceabilityScreen> {
             margin: const EdgeInsets.only(bottom: AppSpacing.md),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          event.referenceNumber ?? event.referenceLabel ?? '-',
-                          style: const TextStyle(fontWeight: FontWeight.w600),
+                  AppIconBadge(
+                    icon: event.quantityIn > 0
+                        ? Icons.south_west
+                        : Icons.north_east,
+                    color: event.quantityIn > 0
+                        ? AppColors.success
+                        : AppColors.error,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                event.referenceNumber ??
+                                    event.referenceLabel ??
+                                    '-',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            StatusBadge(
+                              status: event.type ?? '',
+                              label: (event.type ?? '').toUpperCase(),
+                            ),
+                          ],
                         ),
-                      ),
-                      StatusBadge(
-                        status: event.type ?? '',
-                        label: (event.type ?? '').toUpperCase(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    '${event.date ?? ''} · ${event.warehouse ?? '-'} · '
-                    '${event.location ?? '-'}',
-                    style: AppText.caption,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    '${event.quantityIn > 0 ? '+${event.quantityIn}' : ''}'
-                    '${event.quantityOut > 0 ? ' -${event.quantityOut}' : ''}'
-                    '  → saldo ${event.balanceAfter}',
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          '${event.date ?? ''} · ${event.warehouse ?? '-'} · '
+                          '${event.location ?? '-'}',
+                          style: AppText.caption,
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          '${event.quantityIn > 0 ? '+${event.quantityIn}' : ''}'
+                          '${event.quantityOut > 0 ? ' -${event.quantityOut}' : ''}'
+                          '  → saldo ${event.balanceAfter}',
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
