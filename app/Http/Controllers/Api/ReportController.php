@@ -38,6 +38,7 @@ class ReportController extends ApiController
             ->join('racks', 'locations.rack_id', '=', 'racks.id')
             ->join('zones', 'racks.zone_id', '=', 'zones.id')
             ->join('categories', 'items.category_id', '=', 'categories.id')
+            ->whereIn('warehouses.id', $this->warehouseIds())
             ->whereNull('items.deleted_at')
             ->select([
                 'stock_balances.quantity_on_hand',
@@ -101,6 +102,7 @@ class ReportController extends ApiController
             ->join('items', 'goods_receipt_items.item_id', '=', 'items.id')
             ->leftJoin('suppliers', 'goods_receipts.supplier_id', '=', 'suppliers.id')
             ->join('warehouses', 'goods_receipts.warehouse_id', '=', 'warehouses.id')
+            ->whereIn('goods_receipts.warehouse_id', $this->warehouseIds())
             ->where('goods_receipts.status', 'posted')
             ->select([
                 'goods_receipts.number as receipt_number',
@@ -149,6 +151,7 @@ class ReportController extends ApiController
             ->join('items', 'goods_issue_items.item_id', '=', 'items.id')
             ->leftJoin('customers', 'goods_issues.customer_id', '=', 'customers.id')
             ->join('warehouses', 'goods_issues.warehouse_id', '=', 'warehouses.id')
+            ->whereIn('goods_issues.warehouse_id', $this->warehouseIds())
             ->where('goods_issues.status', 'posted')
             ->select([
                 'goods_issues.number as issue_number',
@@ -195,6 +198,7 @@ class ReportController extends ApiController
             ->leftJoin('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('locations', 'stock_movements.location_id', '=', 'locations.id')
             ->leftJoin('users', 'stock_movements.created_by', '=', 'users.id')
+            ->whereIn('stock_movements.warehouse_id', $this->warehouseIds())
             ->select([
                 'stock_movements.id',
                 'stock_movements.created_at',
@@ -279,6 +283,7 @@ class ReportController extends ApiController
             ->join('stock_opname_items', 'stock_opname_items.stock_opname_id', '=', 'stock_opnames.id')
             ->join('items', 'items.id', '=', 'stock_opname_items.item_id')
             ->join('warehouses', 'warehouses.id', '=', 'stock_opnames.warehouse_id')
+            ->whereIn('stock_opnames.warehouse_id', $this->warehouseIds())
             ->leftJoin('locations', 'locations.id', '=', 'stock_opnames.location_id')
             ->select([
                 'stock_opnames.number as opname_number',
@@ -328,6 +333,7 @@ class ReportController extends ApiController
             ->join('stock_adjustment_items', 'stock_adjustment_items.stock_adjustment_id', '=', 'stock_adjustments.id')
             ->join('items', 'items.id', '=', 'stock_adjustment_items.item_id')
             ->join('warehouses', 'warehouses.id', '=', 'stock_adjustments.warehouse_id')
+            ->whereIn('stock_adjustments.warehouse_id', $this->warehouseIds())
             ->leftJoin('locations', 'locations.id', '=', 'stock_adjustments.location_id')
             ->select([
                 'stock_adjustments.number as adj_number',
@@ -382,6 +388,10 @@ class ReportController extends ApiController
             ->join('warehouses as tw', 'tw.id', '=', 'stock_transfers.to_warehouse_id')
             ->leftJoin('locations as fl', 'fl.id', '=', 'stock_transfers.from_location_id')
             ->leftJoin('locations as tl', 'tl.id', '=', 'stock_transfers.to_location_id')
+            ->where(function ($inner): void {
+                $inner->whereIn('stock_transfers.from_warehouse_id', $this->warehouseIds())
+                    ->orWhereIn('stock_transfers.to_warehouse_id', $this->warehouseIds());
+            })
             ->select([
                 'stock_transfers.number as tr_number',
                 'stock_transfers.transfer_date',
@@ -432,6 +442,7 @@ class ReportController extends ApiController
         $soon = "SELECT COUNT(*) FROM stock_movements sm WHERE sm.warehouse_id = warehouses.id AND sm.transaction_type = 'incoming' AND sm.expiry_date IS NOT NULL AND sm.expiry_date >= '{$today}' AND sm.expiry_date <= '{$warn}'";
 
         $q = DB::table('warehouses')
+            ->whereIn('warehouses.id', $this->warehouseIds())
             ->leftJoin('stock_balances', 'stock_balances.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('items', function ($join): void {
                 $join->on('items.id', '=', 'stock_balances.item_id')->whereNull('items.deleted_at');
@@ -514,6 +525,7 @@ class ReportController extends ApiController
         $q = DB::table('stock_movements')
             ->join('items', 'stock_movements.item_id', '=', 'items.id')
             ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
+            ->whereIn('stock_movements.warehouse_id', $this->warehouseIds())
             ->whereIn('stock_movements.transaction_type', ['outgoing', 'adjustment_out', 'transfer_out'])
             ->where('stock_movements.total_cost', '>', 0)
             ->whereNull('items.deleted_at')
@@ -558,6 +570,7 @@ class ReportController extends ApiController
         $q = DB::table('stock_movements')
             ->join('items', 'stock_movements.item_id', '=', 'items.id')
             ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
+            ->whereIn('stock_movements.warehouse_id', $this->warehouseIds())
             ->whereNull('items.deleted_at')
             ->select([
                 'stock_movements.created_at',
@@ -616,6 +629,10 @@ class ReportController extends ApiController
         $from = $request->filled('date_from') ? Carbon::parse((string) $request->input('date_from'))->startOfDay() : null;
         $to = $request->filled('date_to') ? Carbon::parse((string) $request->input('date_to'))->endOfDay() : null;
         $warehouseId = $request->filled('warehouse_id') ? $request->integer('warehouse_id') : null;
+
+        if ($warehouseId !== null) {
+            $this->authorizeWarehouse($warehouseId);
+        }
 
         $rows = JournalService::journalRows($from, $to, $warehouseId);
         $totals = JournalService::totals($rows);
@@ -728,6 +745,8 @@ class ReportController extends ApiController
             'item_id' => ['required', 'exists:items,id'],
             'quantity' => ['required', 'integer', 'min:1'],
         ]);
+
+        $this->authorizeWarehouse($data['warehouse_id']);
 
         return $this->ok(CapacityService::suggestLocation(
             (int) $data['warehouse_id'],

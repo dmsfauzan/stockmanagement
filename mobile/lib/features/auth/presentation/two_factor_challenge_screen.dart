@@ -6,9 +6,9 @@ import '../../../core/network/api_exception.dart';
 import '../../../data/auth/auth_repository.dart';
 
 class TwoFactorChallengeScreen extends ConsumerStatefulWidget {
-  const TwoFactorChallengeScreen({super.key, required this.userId});
+  const TwoFactorChallengeScreen({super.key, required this.challengeToken});
 
-  final int userId;
+  final String challengeToken;
 
   @override
   ConsumerState<TwoFactorChallengeScreen> createState() =>
@@ -31,7 +31,7 @@ class _TwoFactorChallengeScreenState
 
     try {
       await repo.challengeTwoFactor(
-        userId: widget.userId,
+        challengeToken: widget.challengeToken,
         code: _code.text.trim().isEmpty ? null : _code.text.trim(),
         recoveryCode: _recovery.text.trim().isEmpty
             ? null

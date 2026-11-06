@@ -4,6 +4,7 @@ namespace App\Services\Accounting;
 
 use App\Enums\TransactionType;
 use App\Models\Setting;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +68,7 @@ class JournalService
             ->join('items', 'stock_movements.item_id', '=', 'items.id')
             ->join('warehouses', 'stock_movements.warehouse_id', '=', 'warehouses.id')
             ->whereNull('items.deleted_at')
+            ->when(auth()->check(), fn ($query) => $query->whereIn('stock_movements.warehouse_id', WarehouseAccess::ids()))
             ->when($from !== null, fn ($query) => $query->where('stock_movements.created_at', '>=', $from))
             ->when($to !== null, fn ($query) => $query->where('stock_movements.created_at', '<=', $to))
             ->when($warehouseId !== null, fn ($query) => $query->where('stock_movements.warehouse_id', $warehouseId))

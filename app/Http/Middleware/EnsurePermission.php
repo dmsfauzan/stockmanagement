@@ -30,11 +30,9 @@ class EnsurePermission
         $token = method_exists($user, 'currentAccessToken') ? $user->currentAccessToken() : null;
 
         if ($token instanceof PersonalAccessToken) {
-            $abilities = (array) ($token->abilities ?? []);
-
-            // A token with no explicit abilities inherits the user's full access
-            // (legacy behaviour). Only enforce when abilities are defined.
-            if ($abilities !== [] && ! $token->can('*') && ! $token->can($required)) {
+            // A token without explicit abilities must not inherit full access;
+            // every issued token now carries the user's permission slugs.
+            if (! $token->can('*') && ! $token->can($required)) {
                 return $this->deny($request, 'Unauthorized. Token lacks ability: '.$required);
             }
         }

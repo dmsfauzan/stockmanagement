@@ -28,6 +28,10 @@ class TransactionController extends ApiController
 
     protected function applyCommon($query, Request $request, ?string $warehouseColumn = 'warehouse_id')
     {
+        $query = $warehouseColumn !== null
+            ? $this->scopeWarehouse($query, $warehouseColumn)
+            : $query;
+
         return $query
             ->when($request->filled('search'), fn ($q) => $q->where('number', 'like', '%'.$request->string('search').'%'))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
@@ -46,6 +50,8 @@ class TransactionController extends ApiController
 
     public function receipt(GoodsReceipt $receipt): JsonResponse
     {
+        $this->authorizeWarehouse($receipt->warehouse_id);
+
         $receipt->loadMissing(['supplier:id,name', 'warehouse:id,name', 'receiptItems.item:id,sku,name', 'receiptItems.unit:id,code', 'receiptItems.location:id,code']);
 
         return $this->ok(new GoodsReceiptResource($receipt));
@@ -63,6 +69,8 @@ class TransactionController extends ApiController
 
     public function issue(GoodsIssue $issue): JsonResponse
     {
+        $this->authorizeWarehouse($issue->warehouse_id);
+
         $issue->loadMissing(['customer:id,name', 'warehouse:id,name', 'issueItems.item:id,sku,name', 'issueItems.unit:id,code', 'issueItems.location:id,code']);
 
         return $this->ok(new GoodsIssueResource($issue));
@@ -80,6 +88,8 @@ class TransactionController extends ApiController
 
     public function adjustment(StockAdjustment $adjustment): JsonResponse
     {
+        $this->authorizeWarehouse($adjustment->warehouse_id);
+
         $adjustment->loadMissing(['warehouse:id,name', 'items.item:id,sku,name']);
 
         return $this->ok(new StockAdjustmentResource($adjustment));
@@ -97,6 +107,8 @@ class TransactionController extends ApiController
 
     public function opname(StockOpname $opname): JsonResponse
     {
+        $this->authorizeWarehouse($opname->warehouse_id);
+
         $opname->loadMissing(['warehouse:id,name', 'location:id,code', 'items.item:id,sku,name']);
 
         return $this->ok(new StockOpnameResource($opname));
@@ -104,7 +116,7 @@ class TransactionController extends ApiController
 
     public function transfers(Request $request): JsonResponse
     {
-        $query = StockTransfer::query()
+        $query = $this->scopeTransferWarehouses(StockTransfer::query())
             ->with(['fromWarehouse:id,name', 'toWarehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code'])
             ->when($request->filled('search'), fn ($q) => $q->where('number', 'like', '%'.$request->string('search').'%'))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
@@ -119,6 +131,9 @@ class TransactionController extends ApiController
 
     public function transfer(StockTransfer $transfer): JsonResponse
     {
+        $this->authorizeWarehouse($transfer->from_warehouse_id);
+        $this->authorizeWarehouse($transfer->to_warehouse_id);
+
         $transfer->loadMissing(['fromWarehouse:id,name', 'toWarehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code']);
 
         return $this->ok(new StockTransferResource($transfer));
@@ -136,6 +151,8 @@ class TransactionController extends ApiController
 
     public function purchaseOrder(PurchaseOrder $purchaseOrder): JsonResponse
     {
+        $this->authorizeWarehouse($purchaseOrder->warehouse_id);
+
         $purchaseOrder->loadMissing(['supplier:id,name', 'warehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code']);
 
         return $this->ok(new PurchaseOrderResource($purchaseOrder));
@@ -153,6 +170,8 @@ class TransactionController extends ApiController
 
     public function salesOrder(SalesOrder $salesOrder): JsonResponse
     {
+        $this->authorizeWarehouse($salesOrder->warehouse_id);
+
         $salesOrder->loadMissing(['customer:id,name', 'warehouse:id,name', 'items.item:id,sku,name', 'items.unit:id,code']);
 
         return $this->ok(new SalesOrderResource($salesOrder));

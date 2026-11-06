@@ -3,6 +3,7 @@
 namespace App\Services\Inventory;
 
 use App\Models\StockMovement;
+use App\Services\Support\WarehouseAccess;
 use Illuminate\Support\Collection;
 
 /**
@@ -12,26 +13,32 @@ use Illuminate\Support\Collection;
  */
 class TraceabilityService
 {
-    public static function forBatch(string $batchNumber): array
+    /** @param array<int, int>|null $warehouseIds */
+    public static function forBatch(string $batchNumber, ?array $warehouseIds = null): array
     {
-        return static::build('batch', $batchNumber);
+        return static::build('batch', $batchNumber, $warehouseIds);
     }
 
-    public static function forSerial(string $serialNumber): array
+    /** @param array<int, int>|null $warehouseIds */
+    public static function forSerial(string $serialNumber, ?array $warehouseIds = null): array
     {
-        return static::build('serial', $serialNumber);
+        return static::build('serial', $serialNumber, $warehouseIds);
     }
 
     /**
+     * @param  array<int, int>|null  $warehouseIds
      * @return array{type:string, value:string, events:array<int, array<string, mixed>>, summary:array<string, int>}
      */
-    protected static function build(string $type, string $value): array
+    protected static function build(string $type, string $value, ?array $warehouseIds = null): array
     {
         $column = $type === 'serial' ? 'serial_number' : 'batch_number';
+
+        $warehouseIds ??= auth()->check() ? WarehouseAccess::ids() : null;
 
         $movements = StockMovement::query()
             ->with(['item:id,sku,name', 'warehouse:id,name', 'location:id,code', 'creator:id,name'])
             ->where($column, $value)
+            ->when($warehouseIds !== null, fn ($q) => $q->whereIn('warehouse_id', $warehouseIds))
             ->orderBy('created_at')
             ->orderBy('id')
             ->get();
@@ -105,6 +112,11 @@ class TraceabilityService
             return collect();
         }
 
-        return StockMovement::query()->where($column, $value)->get();
+        $warehouseIds = auth()->check() ? WarehouseAccess::ids() : null;
+
+        return StockMovement::query()
+            ->where($column, $value)
+            ->when($warehouseIds !== null, fn ($q) => $q->whereIn('warehouse_id', $warehouseIds))
+            ->get();
     }
 }

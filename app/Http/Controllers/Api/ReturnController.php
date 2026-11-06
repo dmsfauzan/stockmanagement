@@ -30,7 +30,7 @@ class ReturnController extends ApiController
 
     public function customerReturns(Request $request): JsonResponse
     {
-        $query = CustomerReturn::query()
+        $query = $this->scopeWarehouse(CustomerReturn::query())
             ->with(['customer:id,name', 'warehouse:id,name'])
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
             ->orderByDesc('transaction_date')
@@ -52,7 +52,8 @@ class ReturnController extends ApiController
 
     public function customerReturn(int $id): JsonResponse
     {
-        $return = CustomerReturn::with(['customer', 'warehouse', 'location', 'items.item', 'items.unit'])->findOrFail($id);
+        $return = $this->findAccessible(CustomerReturn::class, $id)
+            ->load(['customer', 'warehouse', 'location', 'items.item', 'items.unit']);
 
         return $this->ok($this->present($return));
     }
@@ -76,6 +77,8 @@ class ReturnController extends ApiController
             'items.*.batch_number' => ['nullable', 'string', 'max:60'],
             'items.*.serial_number' => ['nullable', 'string', 'max:80'],
         ]);
+
+        $this->authorizeWarehouse($data['warehouse_id']);
 
         $return = DB::transaction(function () use ($data): CustomerReturn {
             $return = CustomerReturn::create([
@@ -137,7 +140,7 @@ class ReturnController extends ApiController
 
     public function supplierReturns(Request $request): JsonResponse
     {
-        $query = SupplierReturn::query()
+        $query = $this->scopeWarehouse(SupplierReturn::query())
             ->with(['supplier:id,name', 'warehouse:id,name'])
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
             ->orderByDesc('transaction_date')
@@ -159,7 +162,8 @@ class ReturnController extends ApiController
 
     public function supplierReturn(int $id): JsonResponse
     {
-        $return = SupplierReturn::with(['supplier', 'warehouse', 'location', 'items.item', 'items.unit'])->findOrFail($id);
+        $return = $this->findAccessible(SupplierReturn::class, $id)
+            ->load(['supplier', 'warehouse', 'location', 'items.item', 'items.unit']);
 
         return $this->ok($this->present($return));
     }
@@ -183,6 +187,8 @@ class ReturnController extends ApiController
             'items.*.batch_number' => ['nullable', 'string', 'max:60'],
             'items.*.serial_number' => ['nullable', 'string', 'max:80'],
         ]);
+
+        $this->authorizeWarehouse($data['warehouse_id']);
 
         $return = DB::transaction(function () use ($data): SupplierReturn {
             $return = SupplierReturn::create([
@@ -249,7 +255,7 @@ class ReturnController extends ApiController
         $out = [];
 
         $collect = function (Builder $query, string $kind) use ($from, $to, &$out): int {
-            $rows = $query->with(['items', 'warehouse'])
+            $rows = $this->scopeWarehouse($query)->with(['items', 'warehouse'])
                 ->when($from !== null, fn ($q) => $q->where('transaction_date', '>=', $from->toDateString()))
                 ->when($to !== null, fn ($q) => $q->where('transaction_date', '<=', $to->toDateString()))
                 ->get();

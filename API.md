@@ -37,9 +37,10 @@ curl -X POST "$APP_URL/api/login" \
 
 Respons: `{ success: true, data: { token, user: { id, name, email, roles, permissions } } }`. Simpan `token`, lalu kirim `Authorization: Bearer <token>`.
 
-- **2FA aktif?** `login` mengembalikan `data.two_factor_required: true` + `user_id`. Lanjutkan `POST /api/two-factor-challenge` dengan `{ user_id, code }` atau `{ user_id, recovery_code }` untuk memperoleh token.
+- **2FA aktif?** `login` mengembalikan `data.two_factor_required: true` + `data.challenge_token`. Lanjutkan `POST /api/two-factor-challenge` dengan `{ challenge_token, code }` atau `{ challenge_token, recovery_code }` untuk memperoleh token. Challenge token berumur pendek (5 menit), sekali pakai, dan hanya terbit setelah langkah password berhasil.
 - **Logout**: `POST /api/logout` (butuh token) → mencabut token yang sedang dipakai.
-- Bila `abilities` tak dikirim, token mewarisi seluruh permission user.
+- Jika `security.require_2fa_admin` aktif, admin tanpa 2FA tidak dapat memperoleh token API.
+- Abilities token selalu diambil dari permission user di server (tidak dapat dipilih client); token juga memiliki masa berlaku (default 30 hari, atur via `SANCTUM_EXPIRATION` menit).
 
 ## Format Respons
 

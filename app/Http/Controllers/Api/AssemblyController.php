@@ -77,6 +77,8 @@ class AssemblyController extends ApiController
             abort(403);
         }
 
+        abort_unless(auth()->user()?->hasPermission('assembly.post'), 403, __('Anda tidak memiliki izin posting assembly.'));
+
         $kitId = (int) $data['item_id'];
 
         if (! BomService::isKit($kitId)) {
@@ -103,7 +105,7 @@ class AssemblyController extends ApiController
                 'item_id' => $component->component_item_id,
                 'role' => 'component',
                 'quantity' => (int) $component->quantity,
-                'unit_cost' => (float) ($component->component?->cost ?? 0),
+                'unit_cost' => (float) ($component->component->cost ?? 0),
             ]);
         }
 

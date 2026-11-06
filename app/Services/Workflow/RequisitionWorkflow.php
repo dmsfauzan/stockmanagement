@@ -16,9 +16,24 @@ use Illuminate\Support\Facades\DB;
  */
 class RequisitionWorkflow
 {
+    protected static function assertWarehouseAccess(PurchaseRequisition $requisition): void
+    {
+        $user = auth()->user();
+
+        if (! $user || $user->allowsAllWarehouses()) {
+            return;
+        }
+
+        if (! $user->canAccessWarehouse((int) $requisition->warehouse_id)) {
+            abort(403, __('Anda tidak memiliki akses ke gudang dokumen ini.'));
+        }
+    }
+
     public static function submit(int $id): void
     {
         $req = PurchaseRequisition::findOrFail($id);
+
+        static::assertWarehouseAccess($req);
 
         if ($req->status !== 'draft') {
             throw new \RuntimeException('Hanya requisition draft yang dapat diajukan.');
@@ -32,6 +47,8 @@ class RequisitionWorkflow
     {
         $req = PurchaseRequisition::findOrFail($id);
 
+        static::assertWarehouseAccess($req);
+
         if ($req->status !== 'submitted') {
             throw new \RuntimeException('Hanya requisition diajukan yang dapat disetujui.');
         }
@@ -43,6 +60,8 @@ class RequisitionWorkflow
     public static function reject(int $id, string $reason): void
     {
         $req = PurchaseRequisition::findOrFail($id);
+
+        static::assertWarehouseAccess($req);
 
         if ($req->status !== 'submitted') {
             throw new \RuntimeException('Hanya requisition diajukan yang dapat ditolak.');
@@ -56,6 +75,8 @@ class RequisitionWorkflow
     {
         return DB::transaction(function () use ($id, $supplierId, $currencyCode): PurchaseOrder {
             $req = PurchaseRequisition::with('items')->findOrFail($id);
+
+            static::assertWarehouseAccess($req);
 
             if ($req->status !== 'approved') {
                 throw new \RuntimeException('Hanya requisition yang disetujui yang dapat dikonversi ke PO.');

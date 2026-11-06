@@ -31,6 +31,10 @@ class EnsureTwoFactorForAdmin
             return $next($request);
         }
 
+        if ($request->is('api/*') || $request->expectsJson()) {
+            abort(403, __('Aktifkan two-factor authentication sebelum melanjutkan.'));
+        }
+
         // Allow access to the setup page, profile, logout and notifications.
         if ($request->routeIs('profile.*') || $request->routeIs('logout') || $request->routeIs('notifications.*')) {
             return $next($request);

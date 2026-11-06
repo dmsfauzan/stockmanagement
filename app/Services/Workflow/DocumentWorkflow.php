@@ -24,6 +24,34 @@ use Illuminate\Database\Eloquent\Model;
 
 class DocumentWorkflow
 {
+    /**
+     * Ensure the authenticated user may touch this document's warehouses.
+     *
+     * Called once at the start of every workflow transition so both the web
+     * UI and the API honour warehouse scoping, not only the permission layer.
+     */
+    protected static function assertWarehouseAccess(Model $document): void
+    {
+        $user = auth()->user();
+
+        if (! $user || $user->allowsAllWarehouses()) {
+            return;
+        }
+
+        $accessible = $user->accessibleWarehouseIds();
+        $required = array_values(array_filter([
+            $document->getAttribute('warehouse_id'),
+            $document->getAttribute('from_warehouse_id'),
+            $document->getAttribute('to_warehouse_id'),
+        ], fn ($value) => $value !== null));
+
+        foreach ($required as $warehouseId) {
+            if (! in_array((int) $warehouseId, $accessible, true)) {
+                abort(403, __('Anda tidak memiliki akses ke gudang dokumen ini.'));
+            }
+        }
+    }
+
     protected static function ensure(bool $condition): void
     {
         if (! $condition) {
@@ -69,6 +97,8 @@ class DocumentWorkflow
     {
         $receipt = GoodsReceipt::findOrFail($id);
 
+        static::assertWarehouseAccess($receipt);
+
         static::ensure($receipt->statusEnum()->canTransitionTo(TransactionStatus::Submitted));
 
         $receipt->update([
@@ -88,6 +118,8 @@ class DocumentWorkflow
     {
         $receipt = GoodsReceipt::findOrFail($id);
 
+        static::assertWarehouseAccess($receipt);
+
         static::ensure($receipt->statusEnum()->canTransitionTo(TransactionStatus::Approved));
 
         if (DocumentApproval::approve($receipt)) {
@@ -102,6 +134,8 @@ class DocumentWorkflow
     public static function rejectReceipt(int $id, string $reason): void
     {
         $receipt = GoodsReceipt::findOrFail($id);
+
+        static::assertWarehouseAccess($receipt);
 
         static::ensure($receipt->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
         static::ensureReason($reason);
@@ -123,6 +157,8 @@ class DocumentWorkflow
     {
         $receipt = GoodsReceipt::findOrFail($id);
 
+        static::assertWarehouseAccess($receipt);
+
         static::ensure($receipt->statusEnum()->canTransitionTo(TransactionStatus::Posted));
 
         InventoryService::postGoodsReceipt($receipt);
@@ -131,6 +167,8 @@ class DocumentWorkflow
     public static function submitIssue(int $id): void
     {
         $issue = GoodsIssue::findOrFail($id);
+
+        static::assertWarehouseAccess($issue);
 
         static::ensure($issue->statusEnum()->canTransitionTo(TransactionStatus::Submitted));
 
@@ -158,6 +196,8 @@ class DocumentWorkflow
     {
         $issue = GoodsIssue::findOrFail($id);
 
+        static::assertWarehouseAccess($issue);
+
         static::ensure($issue->statusEnum()->canTransitionTo(TransactionStatus::Approved));
 
         if (DocumentApproval::approve($issue)) {
@@ -172,6 +212,8 @@ class DocumentWorkflow
     public static function rejectIssue(int $id, string $reason): void
     {
         $issue = GoodsIssue::findOrFail($id);
+
+        static::assertWarehouseAccess($issue);
 
         static::ensure($issue->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
         static::ensureReason($reason);
@@ -198,6 +240,8 @@ class DocumentWorkflow
     {
         $issue = GoodsIssue::findOrFail($id);
 
+        static::assertWarehouseAccess($issue);
+
         static::ensure($issue->statusEnum()->canTransitionTo(TransactionStatus::Posted));
 
         InventoryService::postGoodsIssue($issue);
@@ -206,6 +250,8 @@ class DocumentWorkflow
     public static function submitAdjustment(int $id): void
     {
         $adjustment = StockAdjustment::findOrFail($id);
+
+        static::assertWarehouseAccess($adjustment);
 
         static::ensure($adjustment->statusEnum()->canTransitionTo(TransactionStatus::Submitted));
 
@@ -226,6 +272,8 @@ class DocumentWorkflow
     {
         $adjustment = StockAdjustment::findOrFail($id);
 
+        static::assertWarehouseAccess($adjustment);
+
         static::ensure($adjustment->statusEnum()->canTransitionTo(TransactionStatus::Approved));
 
         if (DocumentApproval::approve($adjustment)) {
@@ -240,6 +288,8 @@ class DocumentWorkflow
     public static function rejectAdjustment(int $id, string $reason): void
     {
         $adjustment = StockAdjustment::findOrFail($id);
+
+        static::assertWarehouseAccess($adjustment);
 
         static::ensure($adjustment->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
         static::ensureReason($reason);
@@ -261,6 +311,8 @@ class DocumentWorkflow
     {
         $adjustment = StockAdjustment::findOrFail($id);
 
+        static::assertWarehouseAccess($adjustment);
+
         static::ensure($adjustment->statusEnum()->canTransitionTo(TransactionStatus::Posted));
 
         InventoryService::postStockAdjustment($adjustment);
@@ -269,6 +321,8 @@ class DocumentWorkflow
     public static function startCountingOpname(int $id): void
     {
         $opname = StockOpname::findOrFail($id);
+
+        static::assertWarehouseAccess($opname);
 
         static::ensure($opname->statusEnum()->canTransitionTo(OpnameStatus::Counting));
 
@@ -279,6 +333,8 @@ class DocumentWorkflow
     public static function submitOpname(int $id): void
     {
         $opname = StockOpname::findOrFail($id);
+
+        static::assertWarehouseAccess($opname);
 
         static::ensure($opname->statusEnum()->canTransitionTo(OpnameStatus::Submitted));
 
@@ -301,6 +357,8 @@ class DocumentWorkflow
     {
         $opname = StockOpname::findOrFail($id);
 
+        static::assertWarehouseAccess($opname);
+
         static::ensure($opname->statusEnum()->canTransitionTo(OpnameStatus::Rejected));
         static::ensureReason($reason);
         DocumentApproval::reject($opname, $reason);
@@ -319,6 +377,8 @@ class DocumentWorkflow
     public static function approveAndCompleteOpname(int $id): void
     {
         $opname = StockOpname::findOrFail($id);
+
+        static::assertWarehouseAccess($opname);
 
         static::ensure($opname->statusEnum()->canTransitionTo(OpnameStatus::Approved));
 
@@ -341,6 +401,8 @@ class DocumentWorkflow
     public static function requestTransfer(int $id): void
     {
         $transfer = StockTransfer::findOrFail($id);
+
+        static::assertWarehouseAccess($transfer);
 
         static::ensure($transfer->statusEnum()->canTransitionTo(TransferStatus::Requested));
 
@@ -368,6 +430,8 @@ class DocumentWorkflow
     {
         $transfer = StockTransfer::findOrFail($id);
 
+        static::assertWarehouseAccess($transfer);
+
         static::ensure($transfer->statusEnum()->canTransitionTo(TransferStatus::Approved));
 
         if (DocumentApproval::approve($transfer)) {
@@ -382,6 +446,8 @@ class DocumentWorkflow
     public static function rejectTransfer(int $id, string $reason): void
     {
         $transfer = StockTransfer::findOrFail($id);
+
+        static::assertWarehouseAccess($transfer);
 
         static::ensure($transfer->statusEnum()->canTransitionTo(TransferStatus::Rejected));
         static::ensureReason($reason);
@@ -408,6 +474,8 @@ class DocumentWorkflow
     {
         $transfer = StockTransfer::findOrFail($id);
 
+        static::assertWarehouseAccess($transfer);
+
         static::ensure($transfer->statusEnum() === TransferStatus::Approved);
 
         InventoryService::dispatchStockTransfer($transfer);
@@ -417,6 +485,8 @@ class DocumentWorkflow
     {
         $transfer = StockTransfer::findOrFail($id);
 
+        static::assertWarehouseAccess($transfer);
+
         static::ensure($transfer->statusEnum() === TransferStatus::InTransit);
 
         InventoryService::receiveStockTransfer($transfer);
@@ -425,6 +495,8 @@ class DocumentWorkflow
     public static function completeTransfer(int $id): void
     {
         $transfer = StockTransfer::findOrFail($id);
+
+        static::assertWarehouseAccess($transfer);
 
         static::ensure($transfer->statusEnum()->canTransitionTo(TransferStatus::Completed));
 
@@ -440,6 +512,8 @@ class DocumentWorkflow
     public static function submitPo(int $id): void
     {
         $order = PurchaseOrder::findOrFail($id);
+
+        static::assertWarehouseAccess($order);
 
         static::ensure($order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Submitted));
 
@@ -460,6 +534,8 @@ class DocumentWorkflow
     {
         $order = PurchaseOrder::findOrFail($id)->load('items');
 
+        static::assertWarehouseAccess($order);
+
         static::ensure($order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Approved));
 
         if (DocumentApproval::approve($order)) {
@@ -474,6 +550,8 @@ class DocumentWorkflow
     public static function rejectPo(int $id, string $reason): void
     {
         $order = PurchaseOrder::findOrFail($id);
+
+        static::assertWarehouseAccess($order);
 
         static::ensure($order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Rejected));
         static::ensureReason($reason);
@@ -493,6 +571,8 @@ class DocumentWorkflow
     {
         $order = PurchaseOrder::findOrFail($id);
 
+        static::assertWarehouseAccess($order);
+
         static::ensure($order->statusEnum()->canTransitionTo(PurchaseOrderStatus::Closed));
 
         $order->update([
@@ -507,6 +587,8 @@ class DocumentWorkflow
     public static function submitSo(int $id): void
     {
         $order = SalesOrder::findOrFail($id);
+
+        static::assertWarehouseAccess($order);
 
         static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Submitted));
 
@@ -527,6 +609,8 @@ class DocumentWorkflow
     {
         $order = SalesOrder::findOrFail($id)->load('items');
 
+        static::assertWarehouseAccess($order);
+
         static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Approved));
 
         if (DocumentApproval::approve($order)) {
@@ -541,6 +625,8 @@ class DocumentWorkflow
     public static function rejectSo(int $id, string $reason): void
     {
         $order = SalesOrder::findOrFail($id);
+
+        static::assertWarehouseAccess($order);
 
         static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Rejected));
         static::ensureReason($reason);
@@ -563,6 +649,8 @@ class DocumentWorkflow
     {
         $ret = CustomerReturn::findOrFail($id);
 
+        static::assertWarehouseAccess($ret);
+
         static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Submitted));
         static::ensure($ret->items()->exists());
 
@@ -583,6 +671,8 @@ class DocumentWorkflow
     {
         $ret = CustomerReturn::findOrFail($id);
 
+        static::assertWarehouseAccess($ret);
+
         static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Approved));
 
         if (DocumentApproval::approve($ret)) {
@@ -597,6 +687,8 @@ class DocumentWorkflow
     public static function rejectCustomerReturn(int $id, string $reason): void
     {
         $ret = CustomerReturn::findOrFail($id);
+
+        static::assertWarehouseAccess($ret);
 
         static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
         static::ensureReason($reason);
@@ -619,6 +711,8 @@ class DocumentWorkflow
     {
         $ret = CustomerReturn::findOrFail($id);
 
+        static::assertWarehouseAccess($ret);
+
         static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Posted));
 
         InventoryService::postCustomerReturn($ret);
@@ -628,6 +722,8 @@ class DocumentWorkflow
     {
         $ret = CustomerReturn::findOrFail($id);
 
+        static::assertWarehouseAccess($ret);
+
         static::ensureReason($reason);
 
         InventoryService::reverseCustomerReturn($ret, $reason);
@@ -636,6 +732,8 @@ class DocumentWorkflow
     public static function submitSupplierReturn(int $id): void
     {
         $ret = SupplierReturn::findOrFail($id);
+
+        static::assertWarehouseAccess($ret);
 
         static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Submitted));
         static::ensure($ret->items()->exists());
@@ -657,6 +755,8 @@ class DocumentWorkflow
     {
         $ret = SupplierReturn::findOrFail($id);
 
+        static::assertWarehouseAccess($ret);
+
         static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Approved));
 
         if (DocumentApproval::approve($ret)) {
@@ -671,6 +771,8 @@ class DocumentWorkflow
     public static function rejectSupplierReturn(int $id, string $reason): void
     {
         $ret = SupplierReturn::findOrFail($id);
+
+        static::assertWarehouseAccess($ret);
 
         static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Rejected));
         static::ensureReason($reason);
@@ -693,6 +795,8 @@ class DocumentWorkflow
     {
         $ret = SupplierReturn::findOrFail($id);
 
+        static::assertWarehouseAccess($ret);
+
         static::ensure($ret->statusEnum()->canTransitionTo(TransactionStatus::Posted));
 
         InventoryService::postSupplierReturn($ret);
@@ -702,6 +806,8 @@ class DocumentWorkflow
     {
         $ret = SupplierReturn::findOrFail($id);
 
+        static::assertWarehouseAccess($ret);
+
         static::ensureReason($reason);
 
         InventoryService::reverseSupplierReturn($ret, $reason);
@@ -710,6 +816,8 @@ class DocumentWorkflow
     public static function closeSo(int $id): void
     {
         $order = SalesOrder::findOrFail($id);
+
+        static::assertWarehouseAccess($order);
 
         static::ensure($order->statusEnum()->canTransitionTo(SalesOrderStatus::Closed));
 

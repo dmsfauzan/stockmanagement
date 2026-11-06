@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\Support\ApiTokenService;
 use App\Services\Support\TwoFactorService;
@@ -17,8 +18,6 @@ class AuthController extends ApiController
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
             'device_name' => ['nullable', 'string', 'max:100'],
-            'abilities' => ['nullable', 'array'],
-            'abilities.*' => ['string'],
         ]);
 
         $user = User::where('email', $request->string('email'))->first();
@@ -31,14 +30,18 @@ class AuthController extends ApiController
             return $this->error('Akun tidak aktif.', 403);
         }
 
+        if ($this->requiresTwoFactorSetup($user)) {
+            return $this->error('Aktifkan two-factor authentication sebelum menggunakan API.', 403);
+        }
+
         if ($user->hasTwoFactorEnabled()) {
             return $this->ok([
                 'two_factor_required' => true,
-                'user_id' => $user->id,
+                'challenge_token' => ApiTokenService::issueTwoFactorChallenge((int) $user->id),
             ], 'Two-factor required.', 200);
         }
 
-        $abilities = array_filter($request->input('abilities') ?? $user->permissionSlugs());
+        $abilities = array_values(array_filter($user->permissionSlugs()));
         $deviceName = trim((string) $request->input('device_name', 'mobile'));
 
         if ($deviceName === '') {
@@ -63,15 +66,32 @@ class AuthController extends ApiController
     public function twoFactorChallenge(Request $request, TwoFactorService $twoFactor): JsonResponse
     {
         $request->validate([
-            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'challenge_token' => ['required', 'string', 'max:128'],
             'code' => ['nullable', 'string', 'max:64'],
             'recovery_code' => ['nullable', 'string', 'max:64'],
             'device_name' => ['nullable', 'string', 'max:100'],
-            'abilities' => ['nullable', 'array'],
-            'abilities.*' => ['string'],
         ]);
 
-        $user = User::findOrFail($request->integer('user_id'));
+        $challengeToken = (string) $request->input('challenge_token');
+        $challenge = ApiTokenService::resolveTwoFactorChallenge($challengeToken);
+
+        if ($challenge === null) {
+            return $this->error('Sesi verifikasi 2FA tidak valid atau kedaluwarsa. Silakan login ulang.', 419);
+        }
+
+        if (ApiTokenService::registerTwoFactorAttempt($challengeToken) > ApiTokenService::maxTwoFactorAttempts()) {
+            ApiTokenService::forgetTwoFactorChallenge($challengeToken);
+
+            return $this->error('Terlalu banyak percobaan verifikasi. Silakan login ulang.', 429);
+        }
+
+        $user = User::find($challenge['user_id']);
+
+        if (! $user) {
+            ApiTokenService::forgetTwoFactorChallenge($challengeToken);
+
+            return $this->error('Sesi verifikasi 2FA tidak valid. Silakan login ulang.', 419);
+        }
 
         if (! $user->isActive()) {
             return $this->error('Akun tidak aktif.', 403);
@@ -95,8 +115,10 @@ class AuthController extends ApiController
             return $this->error('Kode verifikasi tidak valid.', 401);
         }
 
+        ApiTokenService::forgetTwoFactorChallenge($challengeToken);
+
         $fresh = $user->fresh();
-        $abilities = array_filter($request->input('abilities') ?? $fresh->permissionSlugs());
+        $abilities = array_values(array_filter($fresh->permissionSlugs()));
         $deviceName = trim((string) $request->input('device_name', 'mobile'));
 
         if ($deviceName === '') {
@@ -116,6 +138,19 @@ class AuthController extends ApiController
                 'permissions' => $fresh->permissionSlugs(),
             ],
         ], 'Login berhasil.');
+    }
+
+    /**
+     * When the "require 2FA for admin" setting is on, an admin without 2FA
+     * must not be able to mint an API token with a password alone.
+     */
+    private function requiresTwoFactorSetup(User $user): bool
+    {
+        if ($user->hasTwoFactorEnabled() || ! $user->hasRole('admin')) {
+            return false;
+        }
+
+        return (string) (Setting::get('security.require_2fa_admin', '0') ?? '0') === '1';
     }
 
     public function logout(Request $request): JsonResponse

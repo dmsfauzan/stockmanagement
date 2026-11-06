@@ -126,7 +126,7 @@ class SalesOrderTest extends TestCase
             DB::table('role_permission')->insert(['role_id' => $roleId, 'permission_id' => $permId]);
         }
 
-        $user = User::factory()->create();
+        $user = User::factory()->create(['all_warehouses' => true]);
         DB::table('user_role')->insert(['user_id' => $user->id, 'role_id' => $roleId]);
 
         return $user;

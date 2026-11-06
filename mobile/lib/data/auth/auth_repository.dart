@@ -68,9 +68,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
   final Ref _ref;
 
-  int? _pendingTwoFactorUserId;
+  String? _pendingTwoFactorChallenge;
 
-  Future<int?> pendingTwoFactorUserId() async => _pendingTwoFactorUserId;
+  Future<String?> pendingTwoFactorChallenge() async =>
+      _pendingTwoFactorChallenge;
 
   Future<void> restore() async {
     try {
@@ -95,7 +96,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       final result = await repo.login(email: email, password: password);
 
       if (result.twoFactorRequired) {
-        _pendingTwoFactorUserId = result.userId;
+        _pendingTwoFactorChallenge = result.challengeToken;
         state = const AsyncValue.data(AuthState());
         return false;
       }
@@ -120,10 +121,14 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
 /// Hasil login: token (bila langsung) atau flag 2FA.
 class LoginResult {
-  const LoginResult({this.user, this.userId, this.twoFactorRequired = false});
+  const LoginResult({
+    this.user,
+    this.challengeToken,
+    this.twoFactorRequired = false,
+  });
 
   final AuthUser? user;
-  final int? userId;
+  final String? challengeToken;
   final bool twoFactorRequired;
 }
 
@@ -153,7 +158,7 @@ class AuthRepository {
       if (data['two_factor_required'] == true) {
         return LoginResult(
           twoFactorRequired: true,
-          userId: (data['user_id'] as num?)?.toInt(),
+          challengeToken: data['challenge_token'] as String?,
         );
       }
 
@@ -171,7 +176,7 @@ class AuthRepository {
   }
 
   Future<void> challengeTwoFactor({
-    required int userId,
+    required String challengeToken,
     String? code,
     String? recoveryCode,
   }) async {
@@ -179,7 +184,7 @@ class AuthRepository {
       final res = await _dio.post(
         '/two-factor-challenge',
         data: {
-          'user_id': userId,
+          'challenge_token': challengeToken,
           if (code != null && code.isNotEmpty) 'code': code,
           if (recoveryCode != null && recoveryCode.isNotEmpty)
             'recovery_code': recoveryCode,

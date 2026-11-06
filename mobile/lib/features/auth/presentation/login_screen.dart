@@ -51,7 +51,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         return;
       }
 
-      final pending = await notifier.pendingTwoFactorUserId();
+      final pending = await notifier.pendingTwoFactorChallenge();
       if (!mounted) return;
 
       if (pending != null) {

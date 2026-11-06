@@ -65,21 +65,31 @@ class ApiLoginTest extends TestCase
             'two_factor_recovery_codes' => TwoFactorService::hashRecoveryCodes(['ABCDEFGHIJ']),
         ])->save();
 
-        $this->postJson('/api/login', [
+        $challenge = $this->postJson('/api/login', [
             'email' => 'admin@stock.test',
             'password' => 'password',
         ])->assertOk()->assertJsonPath('data.two_factor_required', true);
 
+        $challengeToken = $challenge->json('data.challenge_token');
+        $this->assertIsString($challengeToken);
+        $this->assertArrayNotHasKey('user_id', (array) $challenge->json('data'));
+
+        // A raw user id without the password-issued challenge token is rejected.
         $this->postJson('/api/two-factor-challenge', [
             'user_id' => $user->id,
             'recovery_code' => 'ABCDEFGHIJ',
-            'device_name' => 'Pixel-7',
-        ])->assertCreated()->assertJsonPath('data.user.id', $user->id);
+        ])->assertStatus(422);
 
         $this->postJson('/api/two-factor-challenge', [
-            'user_id' => $user->id,
+            'challenge_token' => $challengeToken,
             'recovery_code' => 'SALAH',
         ])->assertStatus(401);
+
+        $this->postJson('/api/two-factor-challenge', [
+            'challenge_token' => $challengeToken,
+            'recovery_code' => 'ABCDEFGHIJ',
+            'device_name' => 'Pixel-7',
+        ])->assertCreated()->assertJsonPath('data.user.id', $user->id);
     }
 
     public function test_logout_revokes_current_token(): void

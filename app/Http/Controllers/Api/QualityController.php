@@ -19,6 +19,7 @@ class QualityController extends ApiController
             ->join('locations', 'stock_balances.location_id', '=', 'locations.id')
             ->join('racks', 'locations.rack_id', '=', 'racks.id')
             ->join('zones', 'racks.zone_id', '=', 'zones.id')
+            ->whereIn('warehouses.id', $this->warehouseIds())
             ->whereNull('items.deleted_at')
             ->where('stock_balances.quantity_quarantine', '>', 0)
             ->when($request->filled('warehouse_id'), fn ($q) => $q->where('warehouses.id', $request->integer('warehouse_id')))
@@ -66,6 +67,10 @@ class QualityController extends ApiController
 
         if (! $balance) {
             return $this->error('Stock balance not found', 404);
+        }
+
+        if (! in_array((int) $balance->warehouse_id, $this->warehouseIds(), true)) {
+            abort(403, __('Anda tidak memiliki akses ke gudang ini.'));
         }
 
         $data = $request->validate([

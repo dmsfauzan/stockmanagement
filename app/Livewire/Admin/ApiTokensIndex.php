@@ -66,6 +66,8 @@ class ApiTokensIndex extends Component
 
     public function createToken(): void
     {
+        abort_unless(auth()->user()->hasPermission('settings.manage'), 403);
+
         $this->validate([
             'selectedUserId' => ['required', 'exists:users,id'],
             'tokenName' => ['required', 'string', 'min:2', 'max:80'],
