@@ -183,13 +183,9 @@ class _QuarantineScreenState extends ConsumerState<QuarantineScreen> {
               AppSpacing.lg,
               AppSpacing.sm,
             ),
-            child: TextField(
+            child: AppSearchField(
               controller: _search,
-              textInputAction: TextInputAction.search,
-              decoration: const InputDecoration(
-                hintText: 'Cari SKU / nama…',
-                prefixIcon: Icon(Icons.search),
-              ),
+              hint: 'Cari SKU / nama…',
               onChanged: _onSearchChanged,
               onSubmitted: (value) {
                 _debounce?.cancel();
@@ -233,13 +229,22 @@ class _QuarantineScreenState extends ConsumerState<QuarantineScreen> {
       );
     }
 
+    final theme = Theme.of(context);
+
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView.separated(
         controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.xl,
+        ),
         itemCount: _rows.length + (_loadingMore ? 1 : 0),
-        separatorBuilder: (context, index) => const Divider(height: 1),
+        separatorBuilder: (context, index) =>
+            const SizedBox(height: AppSpacing.sm),
         itemBuilder: (context, index) {
           if (index >= _rows.length) {
             return const Padding(
@@ -249,27 +254,65 @@ class _QuarantineScreenState extends ConsumerState<QuarantineScreen> {
           }
 
           final row = _rows[index];
+          final quantity = Text(
+            'Karantina ${row.quarantine}',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          );
 
-          return DataListRow(
-            title: '${row.sku ?? ''} — ${row.itemName ?? ''}',
-            subtitle: '${row.warehouse ?? '-'} · ${row.location ?? '-'}',
-            trailing: canManage
-                ? PopupMenuButton<bool>(
-                    enabled: !_busy,
-                    onSelected: (release) => _act(row, release),
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(value: true, child: Text('Rilis')),
-                      PopupMenuItem(value: false, child: Text('Tolak')),
-                    ],
-                    child: Text(
-                      'Karantina ${row.quarantine}',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                  )
-                : Text(
-                    'Karantina ${row.quarantine}',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+          return Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppIconBadge(
+                    icon: Icons.health_and_safety_outlined,
+                    color: AppColors.warning,
                   ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${row.sku ?? ''} — ${row.itemName ?? ''}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          '${row.warehouse ?? '-'} · ${row.location ?? '-'}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.muted(theme.brightness),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  if (canManage)
+                    PopupMenuButton<bool>(
+                      enabled: !_busy,
+                      onSelected: (release) => _act(row, release),
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(value: true, child: Text('Rilis')),
+                        PopupMenuItem(value: false, child: Text('Tolak')),
+                      ],
+                      child: quantity,
+                    )
+                  else
+                    quantity,
+                ],
+              ),
+            ),
           );
         },
       ),

@@ -196,13 +196,9 @@ class _ItemsScreenState extends ConsumerState<ItemsScreen> {
               AppSpacing.lg,
               AppSpacing.sm,
             ),
-            child: TextField(
+            child: AppSearchField(
               controller: _search,
-              textInputAction: TextInputAction.search,
-              decoration: const InputDecoration(
-                hintText: 'Cari SKU / nama…',
-                prefixIcon: Icon(Icons.search),
-              ),
+              hint: 'Cari SKU / nama…',
               onChanged: _onSearchChanged,
               onSubmitted: (value) {
                 _debounce?.cancel();
@@ -256,13 +252,22 @@ class _ItemsScreenState extends ConsumerState<ItemsScreen> {
       );
     }
 
+    final theme = Theme.of(context);
+
     return RefreshIndicator(
       onRefresh: () => _load(),
       child: ListView.separated(
         controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.xl,
+        ),
         itemCount: _rows.length + (_loadingMore ? 1 : 0),
-        separatorBuilder: (context, index) => const Divider(height: 1),
+        separatorBuilder: (context, index) =>
+            const SizedBox(height: AppSpacing.sm),
         itemBuilder: (context, index) {
           if (index >= _rows.length) {
             return const Padding(
@@ -273,18 +278,64 @@ class _ItemsScreenState extends ConsumerState<ItemsScreen> {
 
           final row = _rows[index];
 
-          return DataListRow(
-            title: '${row.sku} — ${row.name}',
-            subtitle: '${row.categoryName ?? '-'} · ${row.unitCode ?? '-'}',
-            badge: row.ownership == 'consignment'
-                ? const StatusBadge(status: 'quarantine', label: 'KONSINYASI')
-                : (row.status != null
-                      ? StatusBadge(
-                          status: row.status!,
-                          label: (row.status ?? '').toUpperCase(),
-                        )
-                      : null),
-            onTap: () => context.push('/item/${row.id}'),
+          final badge = row.ownership == 'consignment'
+              ? const StatusBadge(status: 'quarantine', label: 'KONSINYASI')
+              : (row.status != null
+                    ? StatusBadge(
+                        status: row.status!,
+                        label: (row.status ?? '').toUpperCase(),
+                      )
+                    : null);
+
+          return Card(
+            margin: EdgeInsets.zero,
+            child: InkWell(
+              onTap: () => context.push('/item/${row.id}'),
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppIconBadge(icon: Icons.inventory_2_outlined),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${row.sku} — ${row.name}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            '${row.categoryName ?? '-'} · ${row.unitCode ?? '-'}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.muted(theme.brightness),
+                            ),
+                          ),
+                          if (badge != null) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            badge,
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppColors.muted(theme.brightness),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
@@ -319,6 +370,7 @@ class SimpleListScreen<T> extends ConsumerWidget {
 
           if (snapshot.hasError) {
             return ListView(
+              padding: const EdgeInsets.all(AppSpacing.lg),
               children: [ErrorCard(message: '${snapshot.error}')],
             );
           }
@@ -329,15 +381,20 @@ class SimpleListScreen<T> extends ConsumerWidget {
             return const EmptyState(title: 'Tidak ada data');
           }
 
-          return ListView.separated(
-            itemCount: items.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final item = items[index];
-              final sub = subtitleOf?.call(item);
-
-              return DataListRow(title: titleOf(item), subtitle: sub);
-            },
+          return ListView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            children: [
+              AppMenuGroup(
+                children: [
+                  for (final item in items)
+                    AppMenuItem(
+                      title: titleOf(item),
+                      subtitle: subtitleOf?.call(item),
+                      trailing: const SizedBox.shrink(),
+                    ),
+                ],
+              ),
+            ],
           );
         },
       ),

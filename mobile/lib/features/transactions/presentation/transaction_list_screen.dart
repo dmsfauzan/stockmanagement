@@ -166,13 +166,9 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
               AppSpacing.lg,
               AppSpacing.sm,
             ),
-            child: TextField(
+            child: AppSearchField(
               controller: _search,
-              textInputAction: TextInputAction.search,
-              decoration: const InputDecoration(
-                hintText: 'Cari nomor…',
-                prefixIcon: Icon(Icons.search),
-              ),
+              hint: 'Cari nomor…',
               onChanged: _onSearchChanged,
               onSubmitted: (value) {
                 _debounce?.cancel();
@@ -315,13 +311,22 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
       );
     }
 
+    final theme = Theme.of(context);
+
     return RefreshIndicator(
       onRefresh: () => _load(),
       child: ListView.separated(
         controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.xl,
+        ),
         itemCount: _rows.length + (_loadingMore ? 1 : 0),
-        separatorBuilder: (context, index) => const Divider(height: 1),
+        separatorBuilder: (context, index) =>
+            const SizedBox(height: AppSpacing.sm),
         itemBuilder: (context, index) {
           if (index >= _rows.length) {
             return const Padding(
@@ -332,16 +337,58 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
 
           final row = _rows[index];
 
-          return DataListRow(
-            title: row.number,
-            subtitle: '${formatDate(row.date)} · ${row.warehouse ?? '-'}',
-            badge: StatusBadge(
-              status: row.status,
-              label: row.status.toUpperCase(),
+          return Card(
+            margin: EdgeInsets.zero,
+            child: InkWell(
+              onTap: () => context
+                  .push('/tx/${widget.type.key}/${row.id}')
+                  .then((_) => _load()),
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppIconBadge(icon: Icons.receipt_long_outlined),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            row.number,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            '${formatDate(row.date)} · ${row.warehouse ?? '-'}',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.muted(theme.brightness),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          StatusBadge(
+                            status: row.status,
+                            label: row.status.toUpperCase(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppColors.muted(theme.brightness),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            onTap: () => context
-                .push('/tx/${widget.type.key}/${row.id}')
-                .then((_) => _load()),
           );
         },
       ),

@@ -140,13 +140,9 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
               AppSpacing.lg,
               AppSpacing.sm,
             ),
-            child: TextField(
+            child: AppSearchField(
               controller: _search,
-              textInputAction: TextInputAction.search,
-              decoration: const InputDecoration(
-                hintText: 'Cari SKU / nama barang…',
-                prefixIcon: Icon(Icons.search),
-              ),
+              hint: 'Cari SKU / nama barang…',
               onChanged: _onSearchChanged,
               onSubmitted: (value) {
                 _debounce?.cancel();
@@ -238,13 +234,22 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
       );
     }
 
+    final theme = Theme.of(context);
+
     return RefreshIndicator(
       onRefresh: () => _load(),
       child: ListView.separated(
         controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.xl,
+        ),
         itemCount: _rows.length + (_loadingMore ? 1 : 0),
-        separatorBuilder: (context, index) => const Divider(height: 1),
+        separatorBuilder: (context, index) =>
+            const SizedBox(height: AppSpacing.sm),
         itemBuilder: (context, index) {
           if (index >= _rows.length) {
             return const Padding(
@@ -255,32 +260,74 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
 
           final row = _rows[index];
 
-          return DataListRow(
-            title: '${row.sku} — ${row.itemName}',
-            subtitle: '${row.warehouse ?? '-'} · ${row.location ?? '-'}',
-            badge: row.status != null
-                ? StatusBadge(
-                    status: row.status!,
-                    label: row.status!.toUpperCase(),
-                  )
-                : null,
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '${row.onHand}',
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+          return Card(
+            margin: EdgeInsets.zero,
+            child: InkWell(
+              onTap: row.itemId > 0
+                  ? () => context.push('/item/${row.itemId}')
+                  : null,
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const AppIconBadge(icon: Icons.inventory_2_outlined),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${row.sku} — ${row.itemName}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            '${row.warehouse ?? '-'} · ${row.location ?? '-'}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.muted(theme.brightness),
+                            ),
+                          ),
+                          if (row.status != null) ...[
+                            const SizedBox(height: AppSpacing.sm),
+                            StatusBadge(
+                              status: row.status!,
+                              label: row.status!.toUpperCase(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${row.onHand}',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'avail ${row.available}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.muted(theme.brightness),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                Text(
-                  'avail ${row.available}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+              ),
             ),
-            onTap: row.itemId > 0
-                ? () => context.push('/item/${row.itemId}')
-                : null,
           );
         },
       ),

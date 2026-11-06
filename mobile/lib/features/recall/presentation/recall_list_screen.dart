@@ -169,13 +169,22 @@ class _RecallListScreenState extends ConsumerState<RecallListScreen> {
       );
     }
 
+    final theme = Theme.of(context);
+
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView.separated(
         controller: _scroll,
         physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.xl,
+        ),
         itemCount: _rows.length + (_loadingMore ? 1 : 0),
-        separatorBuilder: (context, index) => const Divider(height: 1),
+        separatorBuilder: (context, index) =>
+            const SizedBox(height: AppSpacing.sm),
         itemBuilder: (context, index) {
           if (index >= _rows.length) {
             return const Padding(
@@ -186,20 +195,60 @@ class _RecallListScreenState extends ConsumerState<RecallListScreen> {
 
           final row = _rows[index];
 
-          return DataListRow(
-            title: '${row.type ?? ''} · ${row.value}',
-            subtitle: row.reason,
-            badge: StatusBadge(
-              status: row.status,
-              label: row.status.toUpperCase(),
+          return Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const AppIconBadge(
+                    icon: Icons.report_gmailerrorred_outlined,
+                    color: AppColors.error,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${row.type ?? ''} · ${row.value}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (row.reason != null) ...[
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            row.reason!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.muted(theme.brightness),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: AppSpacing.sm),
+                        StatusBadge(
+                          status: row.status,
+                          label: row.status.toUpperCase(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (row.status == 'active' && canManage) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    IconButton(
+                      onPressed: _busy ? null : () => _lift(row),
+                      icon: const Icon(Icons.undo),
+                      tooltip: 'Cabut recall',
+                    ),
+                  ],
+                ],
+              ),
             ),
-            trailing: (row.status == 'active' && canManage)
-                ? IconButton(
-                    onPressed: _busy ? null : () => _lift(row),
-                    icon: const Icon(Icons.undo),
-                    tooltip: 'Cabut recall',
-                  )
-                : null,
           );
         },
       ),
