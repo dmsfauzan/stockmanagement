@@ -35,4 +35,23 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Currency Exchange Rates
+    |--------------------------------------------------------------------------
+    | Default provider is free (open.er-api.com) and updates daily. Set a key
+    | if you switch to a provider that requires one.
+    */
+
+    'fx' => [
+        'url' => env('FX_RATES_URL', 'https://open.er-api.com/v6/latest'),
+        'key' => env('FX_RATES_KEY'),
+        'key_param' => env('FX_RATES_KEY_PARAM', 'access_key'),
+        'timeout' => env('FX_RATES_TIMEOUT', 10),
+        // Path CA bundle opsional; dipakai bila file ada (mengatasi Windows/
+        // PHP CLI tanpa cacert). Jika tidak ada, verifikasi sistem dipakai.
+        'ca_bundle' => env('FX_RATES_CA_BUNDLE', storage_path('certs/cacert.pem')),
+        'verify' => env('FX_RATES_VERIFY', true),
+    ],
+
 ];

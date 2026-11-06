@@ -32,3 +32,6 @@ Thumbs.db
 /mobile/keystore/
 *.jks
 *.keystore
+
+# CA bundle lokal untuk sinkronisasi kurs
+/storage/certs/

@@ -189,3 +189,23 @@ curl -X POST "$APP_URL/api/goods-receipts/1/post"    -H "Authorization: Bearer $
 ```
 
 Setelah `post`, `stock_balances` bertambah dan satu baris `stock_movements` (ledger) tercatat.
+
+## Kurs mata uang
+
+`GET /api/currencies` mengembalikan `rate_to_base` (1 unit valas = X mata uang dasar),
+plus `source` dan `updated_at` dari sinkronisasi terakhir.
+
+Kurs diperbarui otomatis dari penyedia eksternal (default `open.er-api.com`, gratis,
+update harian):
+
+- Terjadwal tiap 6 jam lewat `php artisan currency:sync-rates` (lihat scheduler).
+- Manual dari **Admin → Mata Uang → Sinkronkan Kurs** atau CLI:
+
+  ```bash
+  php artisan currency:sync-rates
+  php artisan currency:sync-rates --date=2026-11-06
+  ```
+
+- Konfigurasi: `FX_RATES_URL`, `FX_RATES_KEY`, `FX_RATES_KEY_PARAM`, `FX_RATES_TIMEOUT`.
+- Hanya mata uang **aktif** yang terdaftar yang diperbarui; input manual tetap bisa
+  menimpa kurs pada tanggal tertentu.

@@ -1,21 +1,44 @@
 <div>
     <x-ui.page-header title="Mata Uang" subtitle="Kelola mata uang & kurs terhadap mata uang dasar">
         <x-slot:actions>
+            <button type="button" wire:click="syncRates" wire:loading.attr="disabled" class="app-btn app-btn-secondary">
+                <span wire:loading.remove wire:target="syncRates">{{ __('Sinkronkan Kurs') }}</span>
+                <span wire:loading wire:target="syncRates">{{ __('Menyinkronkan…') }}</span>
+            </button>
             <button type="button" wire:click="openCreate" class="app-btn app-btn-primary">{{ __('Tambah Mata Uang') }}</button>
         </x-slot:actions>
     </x-ui.page-header>
 
+    @if ($lastSyncAt)
+        <div class="mb-3 flex flex-wrap items-center gap-2 text-xs text-app-muted">
+            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 font-medium text-emerald-600 dark:text-emerald-400">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                {{ __('Kurs otomatis aktif') }}
+            </span>
+            <span>{{ __('Terakhir sinkron :time · Sumber :source', ['time' => $lastSyncAt, 'source' => $lastSyncSource ?? '-']) }}</span>
+        </div>
+    @endif
+
     <x-ui.card padding="p-0">
         <div class="overflow-x-auto">
             <table class="app-table">
-                <thead><tr><th>{{ __('Kode') }}</th><th>{{ __('Nama') }}</th><th>{{ __('Simbol') }}</th><th class="text-right">{{ __('Kurs ke Dasar') }}</th><th>{{ __('Dasar') }}</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>{{ __('Kode') }}</th><th>{{ __('Nama') }}</th><th>{{ __('Simbol') }}</th><th class="text-right">{{ __('Kurs') }}</th><th>{{ __('Sumber') }}</th><th>{{ __('Diperbarui') }}</th><th>{{ __('Dasar') }}</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                     @foreach ($currencies as $currency)
+                        @php($latest = $currency->exchangeRates->first())
                         <tr>
                             <td class="font-medium text-app-text">{{ $currency->code }}</td>
                             <td class="text-app-text">{{ $currency->name }}</td>
                             <td class="text-app-muted">{{ $currency->symbol ?? '-' }}</td>
-                            <td class="text-right">{{ $currency->is_base ? '1' : number_format((float) ($currency->exchangeRates->first()->rate ?? 1), 4) }}</td>
+                            <td class="text-right font-medium text-app-text">
+                                @if ($currency->is_base)
+                                    1
+                                @else
+                                    1 {{ $currency->code }} = {{ number_format((float) ($latest->rate ?? 1), 2, ',', '.') }} {{ $baseCode }}
+                                @endif
+                            </td>
+                            <td class="text-xs text-app-muted">{{ $latest?->source ?? '-' }}</td>
+                            <td class="text-xs text-app-muted">{{ $latest?->fetched_at?->diffForHumans() ?? '-' }}</td>
                             <td>{!! $currency->is_base ? '<x-ui.status-badge status="active" label="Base" />' : '-' !!}</td>
                             <td><x-ui.status-badge :status="$currency->is_active ? 'active' : 'inactive'" /></td>
                             <td class="text-right"><button type="button" wire:click="openEdit({{ $currency->id }})" class="app-btn app-btn-ghost !py-1.5 text-xs">{{ __('Ubah') }}</button></td>

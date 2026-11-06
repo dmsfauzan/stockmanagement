@@ -13,13 +13,31 @@ class CurrencyController extends ApiController
     {
         $base = CurrencyService::baseCode();
 
-        $rows = Currency::active()->map(fn ($currency) => [
-            'code' => $currency->code,
-            'name' => $currency->name,
-            'symbol' => $currency->symbol,
-            'is_base' => (bool) $currency->is_base,
-            'rate_to_base' => CurrencyService::rate($currency->code),
-        ]);
+        $currencies = Currency::query()
+            ->where('is_active', true)
+            ->with([
+                'exchangeRates' => fn ($query) => $query
+                    ->orderByDesc('effective_date')
+                    ->limit(1),
+            ])
+            ->orderBy('code')
+            ->get();
+
+        $rows = $currencies->map(function (Currency $currency): array {
+            $latest = $currency->exchangeRates->first();
+
+            return [
+                'code' => $currency->code,
+                'name' => $currency->name,
+                'symbol' => $currency->symbol,
+                'is_base' => (bool) $currency->is_base,
+                'rate_to_base' => $currency->is_base
+                    ? 1.0
+                    : (float) ($latest->rate ?? 1),
+                'source' => $latest?->source,
+                'updated_at' => $latest?->fetched_at?->toIso8601String(),
+            ];
+        });
 
         return $this->ok(['base' => $base, 'currencies' => $rows->values()->all()], 'OK');
     }

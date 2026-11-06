@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Currency;
 use App\Models\ExchangeRate;
+use App\Services\Integration\ExchangeRateService;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\CurrencyService;
 use Illuminate\Validation\Rule;
@@ -31,11 +32,46 @@ class CurrencyIndex extends Component
 
     public string $effective_date = '';
 
+    public ?string $lastSyncAt = null;
+
+    public ?string $lastSyncSource = null;
+
     public function mount(): void
     {
         abort_unless(auth()->user()->hasPermission('settings.manage'), 403);
 
         $this->effective_date = now()->format('Y-m-d');
+        $this->refreshSyncInfo();
+    }
+
+    protected function refreshSyncInfo(): void
+    {
+        $last = ExchangeRate::query()
+            ->whereNotNull('fetched_at')
+            ->latest('fetched_at')
+            ->first();
+
+        $this->lastSyncAt = $last?->fetched_at?->diffForHumans();
+        $this->lastSyncSource = $last?->source;
+    }
+
+    public function syncRates(): void
+    {
+        abort_unless(auth()->user()->hasPermission('settings.manage'), 403);
+
+        $result = app(ExchangeRateService::class)->sync();
+
+        $this->refreshSyncInfo();
+
+        if ($result['ok']) {
+            $this->dispatch(
+                'toast',
+                type: 'success',
+                message: __('Kurs disinkronkan: ').$result['message'].' ('.($result['source'] ?? '-').')',
+            );
+        } else {
+            $this->dispatch('toast', type: 'error', message: $result['message']);
+        }
     }
 
     public function openCreate(): void
