@@ -11,7 +11,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com)
 [![CI](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml/badge.svg)](https://github.com/dmsfauzan/stockmanagement/actions/workflows/tests.yml)
 [![Tests](https://img.shields.io/badge/tests-413_passing-brightgreen)](#pengujian)
-[![License](https://img.shields.io/badge/license-MIT-blue)](#lisensi)
+[![License](https://img.shields.io/badge/license-Proprietary-red)](#berkontribusi--lisensi)
 
 [Fitur](#fitur) ·
 [Mulai Cepat](#mulai-cepat) ·
@@ -334,6 +334,18 @@ Penerima notifikasi diatur via `BACKUP_MAIL_TO` (default `MAIL_FROM_ADDRESS`). J
 
 ## Berkontribusi & Lisensi
 
-Pull request dipersilakan — jalankan `php artisan test` dan `vendor/bin/pint` sebelum submit.
+Repositori ini bersifat **privat/tertutup** — kontribusi hanya untuk pemegang lisensi.
+Jalankan `php artisan test` dan `vendor/bin/pint` sebelum submit perubahan.
 
-Lisensi **MIT**. UI terinspirasi Metronic, ditulis ulang dari nol dengan Tailwind — bukan salinan kode Metronic, jadi aman lisensi.
+**Lisensi: Proprietary (All Rights Reserved)** — lihat [`LICENSE`](LICENSE) dan
+[`EULA.md`](EULA.md). Perangkat Lunak ini **bukan** open source; dilarang menyalin,
+mendistribusikan, atau menjual kembali tanpa izin tertulis dari pemilik lisensi.
+
+Pemilik Lisensi: **Dimas Fauzan Dwiputra** · `dmsfauzandwptra@gmail.com`.
+
+> Sebelum dipublikasikan/dijual: lengkapi placeholder yang tersisa pada `EULA.md`
+> (mis. `<KOTA/KABUPATEN>` dan paket komersial) sesuai kebutuhan.
+
+UI terinspirasi Metronic, ditulis ulang dari nol dengan Tailwind — bukan salinan kode
+Metronic. Sebelum distribusi komersial, audit ulang lisensi seluruh dependensi
+(`composer licenses` / `npm ls`) karena lisensi Perangkat Lunak kini proprietary.
