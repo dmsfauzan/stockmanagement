@@ -9,6 +9,7 @@ import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../data/assembly/assembly_models.dart';
+import '../../../data/auth/auth_repository.dart';
 import '../../../data/providers.dart';
 
 class AssemblyListScreen extends ConsumerStatefulWidget {
@@ -102,13 +103,23 @@ class _AssemblyListScreenState extends ConsumerState<AssemblyListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final canCreate =
+        ref
+            .watch(authStateProvider)
+            .valueOrNull
+            ?.user
+            ?.can('assembly.create') ??
+        false;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Perakitan')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            context.push('/assembly-orders/create').then((_) => _load()),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: canCreate
+          ? FloatingActionButton(
+              onPressed: () =>
+                  context.push('/assembly-orders/create').then((_) => _load()),
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: Column(
         children: [
           Padding(

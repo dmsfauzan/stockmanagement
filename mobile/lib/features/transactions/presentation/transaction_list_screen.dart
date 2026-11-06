@@ -9,9 +9,22 @@ import '../../../core/utils/format.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../data/auth/auth_repository.dart';
 import '../../../data/master/master_models.dart';
 import '../../../data/providers.dart';
 import '../../../data/transactions/transaction_models.dart';
+
+const _createPermissions = <TxnType, String>{
+  TxnType.receipt: 'goods_receipt.create',
+  TxnType.issue: 'goods_issue.create',
+  TxnType.adjustment: 'stock.adjustment',
+  TxnType.opname: 'stock_opname.create',
+  TxnType.transfer: 'transfer.create',
+  TxnType.purchaseOrder: 'purchase_order.create',
+  TxnType.salesOrder: 'sales_order.create',
+  TxnType.customerReturn: 'customer_return.create',
+  TxnType.supplierReturn: 'supplier_return.create',
+};
 
 class TransactionListScreen extends ConsumerStatefulWidget {
   const TransactionListScreen({super.key, required this.type});
@@ -128,6 +141,8 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
             page: _page,
           );
 
+      if (!mounted) return;
+
       setState(() {
         if (more) {
           _rows.addAll(result.items);
@@ -140,23 +155,36 @@ class _TransactionListScreenState extends ConsumerState<TransactionListScreen> {
         if (_hasMore) _page++;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = '$e');
     } finally {
-      setState(() {
-        _loading = false;
-        _loadingMore = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _loadingMore = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final canCreate =
+        ref
+            .watch(authStateProvider)
+            .valueOrNull
+            ?.user
+            ?.can(_createPermissions[widget.type] ?? '') ??
+        false;
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.type.label)),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/tx/${widget.type.key}/create'),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: canCreate
+          ? FloatingActionButton(
+              onPressed: () => context.push('/tx/${widget.type.key}/create'),
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: Column(
         children: [
           Padding(

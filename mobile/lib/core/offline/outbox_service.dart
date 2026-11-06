@@ -136,7 +136,8 @@ class OutboxService {
                   .toIso8601String(),
             );
             failed++;
-            break;
+            // Lanjut ke entri berikutnya; jangan blokir seluruh antrean.
+            continue;
           }
         }
       }

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,9 +7,11 @@ import 'package:wsm_mobile/core/config/api_discovery.dart';
 import 'package:wsm_mobile/core/network/api_exception.dart';
 import 'package:wsm_mobile/core/offline/outbox_entry.dart';
 import 'package:wsm_mobile/core/offline/outbox_service.dart';
+import 'package:wsm_mobile/core/storage/secure_store.dart';
 import 'package:wsm_mobile/core/utils/format.dart';
 import 'package:wsm_mobile/core/utils/form_errors.dart';
 import 'package:wsm_mobile/core/widgets/common.dart';
+import 'package:wsm_mobile/data/auth/auth_repository.dart';
 import 'package:wsm_mobile/data/assembly/assembly_models.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
 import 'package:wsm_mobile/data/picking/picking_models.dart';
@@ -178,7 +181,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const MaterialApp(home: TransactionsHubScreen()));
+    await tester.pumpWidget(_hubApp());
+    await tester.pumpAndSettle();
 
     expect(find.text('Barang Masuk'), findsOneWidget);
     expect(find.text('Barang Keluar'), findsOneWidget);
@@ -199,7 +203,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const MaterialApp(home: TransactionsHubScreen()));
+    await tester.pumpWidget(_hubApp());
+    await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
     expect(find.text('Barang Masuk'), findsOneWidget);
@@ -443,4 +448,43 @@ class _Smoke extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       const Scaffold(body: Center(child: Text('Stock Management')));
+}
+
+Widget _hubApp() {
+  const user = AuthUser(
+    id: 1,
+    name: 'QA',
+    email: 'qa@stock.test',
+    roles: ['admin'],
+    permissions: [
+      'goods_receipt.view',
+      'goods_issue.view',
+      'stock.adjustment',
+      'stock_opname.view',
+      'transfer.view',
+      'purchase_order.view',
+      'sales_order.view',
+      'customer_return.view',
+      'supplier_return.view',
+      'requisition.view',
+      'assembly.view',
+      'picking.view',
+    ],
+  );
+
+  return ProviderScope(
+    overrides: [
+      authRepositoryProvider.overrideWithValue(_FakeAuthRepository(user)),
+    ],
+    child: const MaterialApp(home: TransactionsHubScreen()),
+  );
+}
+
+class _FakeAuthRepository extends AuthRepository {
+  _FakeAuthRepository(this._user) : super(Dio(), SecureStore());
+
+  final AuthUser _user;
+
+  @override
+  Future<AuthUser> me() async => _user;
 }

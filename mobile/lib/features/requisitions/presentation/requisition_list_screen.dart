@@ -9,6 +9,7 @@ import '../../../core/utils/format.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../data/auth/auth_repository.dart';
 import '../../../data/providers.dart';
 import '../../../data/requisitions/requisition_models.dart';
 
@@ -105,13 +106,23 @@ class _RequisitionListScreenState extends ConsumerState<RequisitionListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final canCreate =
+        ref
+            .watch(authStateProvider)
+            .valueOrNull
+            ?.user
+            ?.can('requisition.create') ??
+        false;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Purchase Requisition')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            context.push('/requisitions/create').then((_) => _load()),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: canCreate
+          ? FloatingActionButton(
+              onPressed: () =>
+                  context.push('/requisitions/create').then((_) => _load()),
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: Column(
         children: [
           Padding(

@@ -107,6 +107,8 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
             page: _page,
           );
 
+      if (!mounted) return;
+
       setState(() {
         if (more) {
           _rows.addAll(result.items);
@@ -119,12 +121,15 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
         if (_hasMore) _page++;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => _error = '$e');
     } finally {
-      setState(() {
-        _loading = false;
-        _loadingMore = false;
-      });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _loadingMore = false;
+        });
+      }
     }
   }
 

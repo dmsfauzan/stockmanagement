@@ -81,34 +81,38 @@ class MoreScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                AppMenuGroup(
-                  children: [
-                    AppMenuItem(
-                      title: 'Master Data',
-                      subtitle: 'Barang, kategori, supplier, gudang',
-                      icon: Icons.folder_outlined,
-                      onTap: () => context.push('/master'),
-                    ),
-                    AppMenuItem(
-                      title: 'Karantina',
-                      subtitle: 'Stok menunggu inspeksi',
-                      icon: Icons.verified_outlined,
-                      onTap: () => context.push('/quarantine'),
-                    ),
-                    AppMenuItem(
-                      title: 'Lacak Batch/Serial',
-                      subtitle: 'Telusuri asal & pergerakan',
-                      icon: Icons.timeline_outlined,
-                      onTap: () => context.push('/traceability'),
-                    ),
-                    AppMenuItem(
-                      title: 'Recall',
-                      subtitle: 'Tarik batch bermasalah',
-                      icon: Icons.report_gmailerrorred_outlined,
-                      onTap: () => context.push('/recalls'),
-                    ),
-                  ],
-                ),
+                if (user?.can('items.view') ?? false)
+                  AppMenuGroup(
+                    children: [
+                      AppMenuItem(
+                        title: 'Master Data',
+                        subtitle: 'Barang, kategori, supplier, gudang',
+                        icon: Icons.folder_outlined,
+                        onTap: () => context.push('/master'),
+                      ),
+                      if (user?.can('stock.quarantine') ?? false)
+                        AppMenuItem(
+                          title: 'Karantina',
+                          subtitle: 'Stok menunggu inspeksi',
+                          icon: Icons.verified_outlined,
+                          onTap: () => context.push('/quarantine'),
+                        ),
+                      if (user?.can('stock.movement') ?? false)
+                        AppMenuItem(
+                          title: 'Lacak Batch/Serial',
+                          subtitle: 'Telusuri asal & pergerakan',
+                          icon: Icons.timeline_outlined,
+                          onTap: () => context.push('/traceability'),
+                        ),
+                      if (user?.can('stock.movement') ?? false)
+                        AppMenuItem(
+                          title: 'Recall',
+                          subtitle: 'Tarik batch bermasalah',
+                          icon: Icons.report_gmailerrorred_outlined,
+                          onTap: () => context.push('/recalls'),
+                        ),
+                    ],
+                  ),
                 const SizedBox(height: AppSpacing.lg),
                 AppMenuGroup(
                   children: [
@@ -118,12 +122,13 @@ class MoreScreen extends ConsumerWidget {
                       icon: Icons.handyman_outlined,
                       onTap: () => context.push('/tools'),
                     ),
-                    AppMenuItem(
-                      title: 'Laporan',
-                      subtitle: 'Stok, valuasi, jurnal, dsb.',
-                      icon: Icons.bar_chart_outlined,
-                      onTap: () => context.push('/reports'),
-                    ),
+                    if (user?.can('reports.view') ?? false)
+                      AppMenuItem(
+                        title: 'Laporan',
+                        subtitle: 'Stok, valuasi, jurnal, dsb.',
+                        icon: Icons.bar_chart_outlined,
+                        onTap: () => context.push('/reports'),
+                      ),
                     AppMenuItem(
                       title: 'Pengaturan',
                       subtitle: 'Tema, sinkronisasi offline',
