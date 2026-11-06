@@ -10,6 +10,8 @@ const _probeTimeout = Duration(milliseconds: 900);
 /// Kandidat base URL yang dicoba saat startup, diurutkan per platform.
 ///
 /// Backend dev disajikan Laragon pada port 80:
+/// - `127.0.0.1:8080` → hasil `adb reverse tcp:8080 tcp:80` (paling andal di
+///   emulator; dicoba lebih dulu).
 /// - emulator Android → host `10.0.2.2` di path `StockManagement/public/api`
 /// - desktop/web    → `localhost` di path yang sama
 /// - vhost Laragon  → `stockmanagement.test/api`
@@ -20,6 +22,7 @@ List<String> candidateUrls() {
   final host = isAndroid ? '10.0.2.2' : 'localhost';
 
   return [
+    'http://127.0.0.1:8080/$laragonPath',
     'http://$host/$laragonPath',
     'http://stockmanagement.test/api',
     'http://$host:8000/api',

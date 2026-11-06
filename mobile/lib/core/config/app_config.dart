@@ -11,9 +11,9 @@ class AppConfig {
   /// Override eksplisit via `--dart-define` (kosong bila tidak diberikan).
   static const String overrideBaseUrl = String.fromEnvironment('API_BASE_URL');
 
-  /// Default: Laragon pada host (emulator Android → `10.0.2.2`), port 80.
+  /// Default: `adb reverse tcp:8080 tcp:80` → Laragon port 80 di host.
   static const String defaultBaseUrl =
-      'http://10.0.2.2/StockManagement/public/api';
+      'http://127.0.0.1:8080/StockManagement/public/api';
 
   static String _baseUrl = overrideBaseUrl.isNotEmpty
       ? overrideBaseUrl

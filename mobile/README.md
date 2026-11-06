@@ -20,13 +20,23 @@ flutter run
 Saat startup, app **menemukan base URL API secara otomatis** berdasarkan
 platform:
 
-- **Emulator Android** → `http://10.0.2.2/StockManagement/public/api`
-  (host → Laragon port 80).
+- **Emulator Android (paling andal)** → `http://127.0.0.1:8080/StockManagement/public/api`
+  via `adb reverse tcp:8080 tcp:80` (lihat catatan di bawah).
+- Emulator Android tanpa reverse → `http://10.0.2.2/StockManagement/public/api`.
 - **Desktop/web** → `http://localhost/StockManagement/public/api`.
 - **Vhost Laragon** → `http://stockmanagement.test/api`.
 - `http://<host>:8000/api` tetap dicoba bila memakai `php artisan serve`.
 
-Hasil yang berhasil disimpan (di-cache) untuk startup berikutnya.
+> **Penting (emulator):** jalankan sekali per emulator agar port host diteruskan
+> ke device — mengatasi kasus `10.0.2.2` tidak bisa dijangkau
+> (Hyper-V/VPN/mode jaringan tertentu):
+>
+> ```bash
+> adb reverse tcp:8080 tcp:80
+> ```
+>
+> Ulangi setelah emulator restart. Hasil yang berhasil disimpan (di-cache)
+> untuk startup berikutnya.
 
 Prasyarat backend: cukup Laragon berjalan (Apache port 80). Alternatif tanpa
 Laragon:
