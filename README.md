@@ -137,20 +137,23 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    subgraph UI[Browser]
-        B[Blade + Livewire + Alpine + Tailwind]
+    subgraph UI["Browser"]
+        B["Blade + Livewire + Alpine + Tailwind"]
     end
-    subgraph APP[Laravel 13]
-        MW[Middleware: auth, permission, EnsureAccountActive]
-        LW[Livewire Components]
-        SVC[Services: InventoryService · LedgerService<br/>ReservationService · ExpiryService<br/>DocumentNumberService · AuditLogger]
-        POL[Policies & Gates]
+
+    subgraph APP["Laravel 13"]
+        MW["Middleware: auth · permission · EnsureAccountActive"]
+        LW["Livewire Components"]
+        SVC["Services: InventoryService · LedgerService<br/>ReservationService · ExpiryService<br/>DocumentNumberService · AuditLogger"]
+        POL["Policies & Gates"]
     end
-    subgraph DB[(MySQL 8)]
-        LEDGER[(stock_movements<br/>single source of truth)]
-        BAL[(stock_balances<br/>cached)]
+
+    subgraph DB["MySQL 8"]
+        LEDGER[("stock_movements<br/>single source of truth")]
+        BAL[("stock_balances<br/>cached")]
     end
-    B --> MW --> LW --> SVC --> DB
+
+    B --> MW --> LW --> SVC
     SVC --> LEDGER --> BAL
 ```
 
