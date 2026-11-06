@@ -132,6 +132,7 @@ class SettingsScreen extends ConsumerWidget {
               AppMenuItem(
                 title: 'Kosongkan antrean',
                 icon: Icons.delete_outline,
+                iconColor: AppColors.error,
                 onTap: () async {
                   await ref.read(outboxServiceProvider).clear();
                   ref.invalidate(outboxCountProvider);
@@ -144,6 +145,7 @@ class SettingsScreen extends ConsumerWidget {
             child: AppMenuItem(
               title: 'Keluar',
               icon: Icons.logout,
+              iconColor: AppColors.error,
               onTap: () async {
                 await ref.read(authStateProvider.notifier).logout();
                 if (context.mounted) context.go('/login');

@@ -377,11 +377,9 @@ class _TransactionFormCreateScreenState
           Card(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Catatan',
-                  hintText: 'Opsional',
-                ),
+              child: AppTextField(
+                label: 'Catatan',
+                hint: 'Opsional',
                 onChanged: (v) => _notes = v,
               ),
             ),
@@ -478,24 +476,22 @@ class _TransactionFormCreateScreenState
           const SizedBox(height: AppSpacing.md),
         ],
         if (widget.type == TxnType.issue) ...[
-          TextField(
-            decoration: const InputDecoration(labelText: 'Tujuan *'),
+          AppTextField(
+            label: 'Tujuan *',
             onChanged: (v) => _reasonOrDestination = v,
           ),
           const SizedBox(height: AppSpacing.md),
         ],
         if (_isReturn) ...[
-          TextField(
-            decoration: const InputDecoration(labelText: 'Alasan retur'),
+          AppTextField(
+            label: 'Alasan retur',
             onChanged: (v) => _reasonOrDestination = v,
           ),
           const SizedBox(height: AppSpacing.md),
         ],
         if (widget.type == TxnType.adjustment) ...[
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Alasan penyesuaian *',
-            ),
+          AppTextField(
+            label: 'Alasan penyesuaian *',
             onChanged: (v) => _reasonOrDestination = v,
           ),
           const SizedBox(height: AppSpacing.md),

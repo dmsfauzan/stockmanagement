@@ -159,6 +159,7 @@ class MoreScreen extends ConsumerWidget {
                   child: AppMenuItem(
                     title: 'Keluar',
                     icon: Icons.logout,
+                    iconColor: AppColors.error,
                     trailing: const SizedBox.shrink(),
                     onTap: () async {
                       await ref.read(authStateProvider.notifier).logout();

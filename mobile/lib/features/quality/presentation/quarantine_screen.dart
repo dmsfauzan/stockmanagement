@@ -113,16 +113,13 @@ class _QuarantineScreenState extends ConsumerState<QuarantineScreen> {
           children: [
             Text('${row.sku ?? ''} — ${row.itemName ?? ''}'),
             const SizedBox(height: AppSpacing.sm),
-            TextField(
+            AppTextField(
+              label: 'Jumlah',
               controller: qty,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Jumlah'),
             ),
             const SizedBox(height: AppSpacing.sm),
-            TextField(
-              controller: reason,
-              decoration: const InputDecoration(labelText: 'Alasan (opsional)'),
-            ),
+            AppTextField(label: 'Alasan (opsional)', controller: reason),
           ],
         ),
         actions: [

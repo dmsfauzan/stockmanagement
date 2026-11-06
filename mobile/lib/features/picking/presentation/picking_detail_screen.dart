@@ -59,21 +59,15 @@ class _PickingDetailScreenState extends ConsumerState<PickingDetailScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
+            AppTextField(
+              label: 'Jumlah diambil',
               controller: qty,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Jumlah diambil'),
             ),
             const SizedBox(height: AppSpacing.sm),
-            TextField(
-              controller: batch,
-              decoration: const InputDecoration(labelText: 'Batch (opsional)'),
-            ),
+            AppTextField(label: 'Batch (opsional)', controller: batch),
             const SizedBox(height: AppSpacing.sm),
-            TextField(
-              controller: serial,
-              decoration: const InputDecoration(labelText: 'Serial (opsional)'),
-            ),
+            AppTextField(label: 'Serial (opsional)', controller: serial),
           ],
         ),
         actions: [

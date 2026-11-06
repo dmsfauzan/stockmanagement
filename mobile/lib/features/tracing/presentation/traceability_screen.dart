@@ -94,15 +94,12 @@ class _TraceabilityScreenState extends ConsumerState<TraceabilityScreen> {
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
                           flex: 2,
-                          child: TextField(
+                          child: AppTextField(
+                            label: 'Nilai',
+                            hint: 'Nomor batch/serial',
                             controller: _value,
                             textInputAction: TextInputAction.search,
-                            decoration: const InputDecoration(
-                              labelText: 'Nilai',
-                              hintText: 'Nomor batch/serial',
-                              isDense: true,
-                            ),
-                            onSubmitted: (_) => _search(),
+                            onFieldSubmitted: (_) => _search(),
                           ),
                         ),
                       ],

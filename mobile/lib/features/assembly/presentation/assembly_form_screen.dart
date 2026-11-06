@@ -193,11 +193,9 @@ class _AssemblyFormScreenState extends ConsumerState<AssemblyFormScreen> {
           Card(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              child: TextField(
-                decoration: const InputDecoration(
-                  labelText: 'Catatan',
-                  hintText: 'Opsional',
-                ),
+              child: AppTextField(
+                label: 'Catatan',
+                hint: 'Opsional',
                 onChanged: (v) => _notes = v,
               ),
             ),

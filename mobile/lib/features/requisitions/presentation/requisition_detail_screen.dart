@@ -140,10 +140,11 @@ class _RequisitionDetailScreenState
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Alasan penolakan'),
-        content: TextField(
+        content: AppTextField(
+          label: 'Alasan',
           controller: controller,
           maxLines: 3,
-          decoration: const InputDecoration(hintText: 'Tulis alasan…'),
+          hint: 'Tulis alasan…',
         ),
         actions: [
           TextButton(
