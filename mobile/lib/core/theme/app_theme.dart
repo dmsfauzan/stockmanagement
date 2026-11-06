@@ -45,6 +45,16 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.background(brightness),
       splashFactory: InkSparkle.splashFactory,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: _FadeThroughTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.windows: _FadeThroughTransitionsBuilder(),
+          TargetPlatform.linux: _FadeThroughTransitionsBuilder(),
+          TargetPlatform.fuchsia: _FadeThroughTransitionsBuilder(),
+        },
+      ),
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -205,6 +215,37 @@ class AppTheme {
       ),
       listTileTheme: ListTileThemeData(
         iconColor: isLight ? AppColors.slate500 : AppColors.slate400,
+      ),
+    );
+  }
+}
+
+/// Transisi halaman halus: fade + sedikit geser naik (lintas platform).
+class _FadeThroughTransitionsBuilder extends PageTransitionsBuilder {
+  const _FadeThroughTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final curved = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+
+    return FadeTransition(
+      opacity: curved,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.02),
+          end: Offset.zero,
+        ).animate(curved),
+        child: child,
       ),
     );
   }
