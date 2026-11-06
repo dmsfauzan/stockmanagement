@@ -8,6 +8,7 @@ import 'package:wsm_mobile/core/offline/outbox_entry.dart';
 import 'package:wsm_mobile/core/offline/outbox_service.dart';
 import 'package:wsm_mobile/core/utils/format.dart';
 import 'package:wsm_mobile/core/utils/form_errors.dart';
+import 'package:wsm_mobile/core/widgets/common.dart';
 import 'package:wsm_mobile/data/assembly/assembly_models.dart';
 import 'package:wsm_mobile/data/items/item_repository.dart';
 import 'package:wsm_mobile/data/picking/picking_models.dart';
@@ -378,6 +379,45 @@ void main() {
     );
 
     expect(find.text('Stock Management'), findsOneWidget);
+  });
+
+  testWidgets('AppTextField emits onChanged', (WidgetTester tester) async {
+    var captured = '';
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AppTextField(
+            label: 'Catatan',
+            onChanged: (value) => captured = value,
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextFormField), 'halo');
+    expect(captured, 'halo');
+  });
+
+  testWidgets('AppMenuGroup renders items with dividers', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: AppMenuGroup(
+            children: [
+              AppMenuItem(title: 'Satu'),
+              AppMenuItem(title: 'Dua'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Satu'), findsOneWidget);
+    expect(find.text('Dua'), findsOneWidget);
+    expect(find.byType(Divider), findsOneWidget);
   });
 }
 
