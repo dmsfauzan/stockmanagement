@@ -37,7 +37,7 @@ class WsmApp extends ConsumerWidget {
 
           return MediaQuery(
             data: mq.copyWith(
-              textScaler: mq.textScaler.clamp(maxScaleFactor: 1.4),
+              textScaler: mq.textScaler.clamp(maxScaleFactor: 1.6),
             ),
             child: SessionListener(child: child ?? const SizedBox.shrink()),
           );

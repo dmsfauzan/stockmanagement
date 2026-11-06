@@ -55,6 +55,7 @@ class _PickingDetailScreenState extends ConsumerState<PickingDetailScreen> {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: Text('Konfirmasi ${line.sku ?? ''}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,

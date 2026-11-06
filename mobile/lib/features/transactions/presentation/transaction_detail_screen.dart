@@ -181,6 +181,7 @@ class _TransactionDetailScreenState
       return await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
+          scrollable: true,
           title: const Text('Alasan penolakan'),
           content: AppTextField(
             label: 'Alasan',

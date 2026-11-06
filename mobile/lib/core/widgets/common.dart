@@ -120,6 +120,8 @@ class SegmentedTabs extends StatelessWidget {
                   ),
                   child: Text(
                     tabs[i],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -246,7 +248,14 @@ class AppButton extends StatelessWidget {
                 Icon(icon, size: 18),
                 const SizedBox(width: AppSpacing.sm),
               ],
-              Text(label),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ],
           );
 
@@ -682,6 +691,8 @@ class AppInfoRow extends StatelessWidget {
             width: 124,
             child: Text(
               label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: AppColors.muted(theme.brightness),
               ),

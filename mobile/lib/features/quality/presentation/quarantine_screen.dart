@@ -112,6 +112,7 @@ class _QuarantineScreenState extends ConsumerState<QuarantineScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: Text(release ? 'Rilis karantina' : 'Tolak karantina'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
