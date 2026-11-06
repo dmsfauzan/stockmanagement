@@ -220,85 +220,109 @@ class _TransactionDetailScreenState
   }
 
   Widget _buildDetail(BuildContext context, TxnDetail detail) {
+    final info = <Widget>[
+      if (detail.date != null)
+        AppInfoRow(label: 'Tanggal', value: formatDate(detail.date)),
+      if (detail.party != null)
+        AppInfoRow(label: detail.partyLabel ?? 'Pihak', value: detail.party),
+      if (detail.warehouse != null)
+        AppInfoRow(label: 'Warehouse', value: detail.warehouse),
+      if (detail.destination != null)
+        AppInfoRow(label: 'Tujuan', value: detail.destination),
+      if (detail.reason != null)
+        AppInfoRow(label: 'Alasan/Lokasi', value: detail.reason),
+      if (detail.requiresInspection)
+        const AppInfoRow(
+          label: 'Inspeksi',
+          value: 'Perlu inspeksi (karantina)',
+        ),
+      if (detail.notes != null && detail.notes!.isNotEmpty)
+        AppInfoRow(label: 'Catatan', value: detail.notes),
+    ];
+
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.zero,
       children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+        AppHeaderBlob(
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  detail.number,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              StatusBadge(
+                status: detail.status,
+                label: detail.status.toUpperCase(),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (info.isNotEmpty)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: info,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: AppSpacing.lg),
+              const AppSectionTitle(title: 'Alur'),
+              const SizedBox(height: AppSpacing.md),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: WorkflowStepper(
+                    steps: TxnWorkflow.of(widget.type).steps,
+                    currentStatus: detail.status,
+                  ),
+                ),
+              ),
+              if (widget.type == TxnType.issue &&
+                  (detail.status == 'approved' || detail.status == 'partial') &&
+                  (ref
+                          .watch(authStateProvider)
+                          .valueOrNull
+                          ?.user
+                          ?.can('picking.create') ??
+                      false)) ...[
+                const SizedBox(height: AppSpacing.lg),
+                AppButton.primary(
+                  'Buat Pick List',
+                  icon: Icons.checklist_outlined,
+                  onPressed: _busy ? null : _generatePickList,
+                ),
+              ],
+              const SizedBox(height: AppSpacing.lg),
+              AppSectionTitle(title: 'Item (${detail.lines.length})'),
+              const SizedBox(height: AppSpacing.md),
+              Card(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: Text(
-                        detail.number,
-                        style: Theme.of(context).textTheme.titleLarge,
+                    for (final line in detail.lines) _lineTile(line),
+                    if (detail.lines.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(AppSpacing.lg),
+                        child: Text('Belum ada item.'),
                       ),
-                    ),
-                    StatusBadge(
-                      status: detail.status,
-                      label: detail.status.toUpperCase(),
-                    ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                if (detail.date != null)
-                  _row('Tanggal', formatDate(detail.date)),
-                if (detail.party != null)
-                  _row(detail.partyLabel ?? 'Pihak', detail.party!),
-                if (detail.warehouse != null)
-                  _row('Warehouse', detail.warehouse!),
-                if (detail.destination != null)
-                  _row('Tujuan', detail.destination!),
-                if (detail.reason != null)
-                  _row('Alasan/Lokasi', detail.reason!),
-                if (detail.requiresInspection)
-                  _row('Inspeksi', 'Perlu inspeksi (karantina)'),
-                if (detail.notes != null && detail.notes!.isNotEmpty)
-                  _row('Catatan', detail.notes!),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        const SectionHeader(title: 'Alur'),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: WorkflowStepper(
-              steps: TxnWorkflow.of(widget.type).steps,
-              currentStatus: detail.status,
-            ),
-          ),
-        ),
-        if (widget.type == TxnType.issue &&
-            (detail.status == 'approved' || detail.status == 'partial') &&
-            (ref
-                    .watch(authStateProvider)
-                    .valueOrNull
-                    ?.user
-                    ?.can('picking.create') ??
-                false)) ...[
-          const SizedBox(height: AppSpacing.lg),
-          FilledButton.icon(
-            onPressed: _busy ? null : _generatePickList,
-            icon: const Icon(Icons.checklist_outlined),
-            label: const Text('Buat Pick List'),
-          ),
-        ],
-        const SizedBox(height: AppSpacing.lg),
-        SectionHeader(title: 'Item (${detail.lines.length})'),
-        Card(
-          child: Column(
-            children: [
-              for (final line in detail.lines) _lineTile(line),
-              if (detail.lines.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(AppSpacing.lg),
-                  child: Text('Belum ada item.'),
-                ),
+              ),
             ],
           ),
         ),
@@ -352,32 +376,19 @@ class _TransactionDetailScreenState
             for (final verb in allowed) ...[
               Expanded(
                 child: verb == 'reject'
-                    ? OutlinedButton(
+                    ? AppButton.outline(
+                        _verbLabels[verb] ?? verb,
                         onPressed: () => _run(verb),
-                        child: Text(_verbLabels[verb] ?? verb),
                       )
-                    : FilledButton(
+                    : AppButton.primary(
+                        _verbLabels[verb] ?? verb,
                         onPressed: () => _run(verb),
-                        child: Text(_verbLabels[verb] ?? verb),
                       ),
               ),
               if (verb != allowed.last) const SizedBox(width: AppSpacing.sm),
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _row(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(width: 110, child: Text(label, style: AppText.caption)),
-          Expanded(child: Text(value)),
-        ],
       ),
     );
   }

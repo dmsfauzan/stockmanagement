@@ -160,59 +160,78 @@ class _PickingDetailScreenState extends ConsumerState<PickingDetailScreen> {
 
   Widget _buildDetail(BuildContext context, PickListDetail detail) {
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.zero,
       children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        detail.number,
-                        style: Theme.of(context).textTheme.titleLarge,
+        AppHeaderBlob(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      detail.number,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    StatusBadge(
-                      status: detail.status,
-                      label: detail.status.toUpperCase(),
-                    ),
-                  ],
-                ),
-                if (detail.warehouse != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: AppSpacing.sm),
-                    child: Text(detail.warehouse!, style: AppText.caption),
                   ),
+                  const SizedBox(width: AppSpacing.sm),
+                  StatusBadge(
+                    status: detail.status,
+                    label: detail.status.toUpperCase(),
+                  ),
+                ],
+              ),
+              if (detail.warehouse != null) ...[
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  detail.warehouse!,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.68),
+                    fontSize: 13,
+                  ),
+                ),
               ],
-            ),
+            ],
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
-        SectionHeader(title: 'Item (${detail.lines.length})'),
-        Card(
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final line in detail.lines)
-                DataListRow(
-                  title: '${line.sku ?? ''} · ${line.location ?? '-'}',
-                  subtitle: 'Diambil ${line.pickedQuantity}/${line.quantity}',
-                  badge: StatusBadge(
-                    status: line.status,
-                    label: line.status.toUpperCase(),
-                  ),
-                  trailing:
-                      (line.status == 'pending' || line.status == 'picking')
-                      ? IconButton(
-                          onPressed: _busy ? null : () => _confirm(line),
-                          icon: const Icon(Icons.check_circle_outline),
-                          tooltip: 'Konfirmasi',
-                        )
-                      : null,
+              AppSectionTitle(title: 'Item (${detail.lines.length})'),
+              const SizedBox(height: AppSpacing.md),
+              Card(
+                child: Column(
+                  children: [
+                    for (final line in detail.lines)
+                      DataListRow(
+                        title: '${line.sku ?? ''} · ${line.location ?? '-'}',
+                        subtitle:
+                            'Diambil ${line.pickedQuantity}/${line.quantity}',
+                        badge: StatusBadge(
+                          status: line.status,
+                          label: line.status.toUpperCase(),
+                        ),
+                        trailing:
+                            (line.status == 'pending' ||
+                                line.status == 'picking')
+                            ? IconButton(
+                                onPressed: _busy ? null : () => _confirm(line),
+                                icon: const Icon(Icons.check_circle_outline),
+                                tooltip: 'Konfirmasi',
+                              )
+                            : null,
+                      ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),
@@ -230,9 +249,9 @@ class _PickingDetailScreenState extends ConsumerState<PickingDetailScreen> {
     if ((detail.status == 'pending' || detail.status == 'picking') && canPick) {
       buttons.add(
         Expanded(
-          child: FilledButton(
+          child: AppButton.primary(
+            'Selesaikan picking',
             onPressed: () => _run('complete'),
-            child: const Text('Selesaikan picking'),
           ),
         ),
       );
@@ -241,10 +260,7 @@ class _PickingDetailScreenState extends ConsumerState<PickingDetailScreen> {
     if (detail.status == 'picked' && canPack) {
       buttons.add(
         Expanded(
-          child: FilledButton(
-            onPressed: () => _run('pack'),
-            child: const Text('Pack'),
-          ),
+          child: AppButton.primary('Pack', onPressed: () => _run('pack')),
         ),
       );
     }

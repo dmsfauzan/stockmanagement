@@ -73,24 +73,66 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
           ? ListView(
               children: [ErrorCard(message: _error!, onRetry: _load)],
             )
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: SegmentedTabs(
-                    tabs: const ['Info', 'Inventory', 'Movement', 'Summary'],
-                    selected: _tab,
-                    onChanged: (i) => setState(() => _tab = i),
+          : _loaded(_item!),
+    );
+  }
+
+  Widget _loaded(ItemDetail item) {
+    return Column(
+      children: [
+        AppHeaderBlob(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      item.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
+                  if (item.status != null) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    StatusBadge(
+                      status: item.status!,
+                      label: item.status!.toUpperCase(),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                '${item.sku}${item.barcode != null ? ' · ${item.barcode}' : ''}',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.68),
+                  fontSize: 13,
                 ),
-                Expanded(
-                  child: IndexedStack(
-                    index: _tab,
-                    children: [_info(), _inventory(), _movement(), _summary()],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: SegmentedTabs(
+            tabs: const ['Info', 'Inventory', 'Movement', 'Summary'],
+            selected: _tab,
+            onChanged: (i) => setState(() => _tab = i),
+          ),
+        ),
+        Expanded(
+          child: IndexedStack(
+            index: _tab,
+            children: [_info(), _inventory(), _movement(), _summary()],
+          ),
+        ),
+      ],
     );
   }
 
@@ -111,44 +153,31 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.name,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                  ],
+                AppInfoRow(
+                  label: 'Kategori',
+                  value: item.category?.name ?? '-',
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  '${item.sku}${item.barcode != null ? ' · ${item.barcode}' : ''}',
-                  style: AppText.caption,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                _row('Kategori', item.category?.name ?? '-'),
-                _row('Satuan', item.unit?.code ?? '-'),
-                _row('Brand', item.brand ?? '-'),
-                _row(
-                  'Kepemilikan',
-                  item.ownership == 'consignment'
+                AppInfoRow(label: 'Satuan', value: item.unit?.code ?? '-'),
+                AppInfoRow(label: 'Brand', value: item.brand ?? '-'),
+                AppInfoRow(
+                  label: 'Kepemilikan',
+                  value: item.ownership == 'consignment'
                       ? 'Konsinyasi — ${item.consignorName ?? '-'}'
                       : 'Milik Sendiri',
                 ),
-                _row(
-                  'Min / Max',
-                  '${item.minimumStock} / ${item.maximumStock}',
+                AppInfoRow(
+                  label: 'Min / Max',
+                  value: '${item.minimumStock} / ${item.maximumStock}',
                 ),
-                _row('Status', item.status ?? '-'),
-                _row('Deskripsi', item.description ?? '-'),
+                AppInfoRow(label: 'Deskripsi', value: item.description ?? '-'),
               ],
             ),
           ),
         ),
         if (item.conversions.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
-          const SectionHeader(title: 'Konversi Satuan'),
+          const AppSectionTitle(title: 'Konversi Satuan'),
+          const SizedBox(height: AppSpacing.md),
           Card(
             child: Column(
               children: [
@@ -163,7 +192,8 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
         ],
         if (item.bom.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
-          const SectionHeader(title: 'Bill of Materials'),
+          const AppSectionTitle(title: 'Bill of Materials'),
+          const SizedBox(height: AppSpacing.md),
           Card(
             child: Column(
               children: [
@@ -318,19 +348,6 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
             if (hint != null) Text(hint, style: AppText.caption),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _row(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(width: 110, child: Text(label, style: AppText.caption)),
-          Expanded(child: Text(value)),
-        ],
       ),
     );
   }

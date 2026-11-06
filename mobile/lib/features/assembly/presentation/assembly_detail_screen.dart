@@ -63,69 +63,76 @@ class _AssemblyDetailScreenState extends ConsumerState<AssemblyDetailScreen> {
 
   Widget _buildDetail(BuildContext context, AssemblyDetail detail) {
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.zero,
       children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        detail.number,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                    StatusBadge(
-                      status: detail.status,
-                      label: detail.status.toUpperCase(),
-                    ),
-                  ],
+        AppHeaderBlob(
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  detail.number,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                _row('Jenis', detail.type ?? '-'),
-                _row('Barang', '${detail.itemId ?? '-'}'),
-                _row('Jumlah', '${detail.quantity}'),
-              ],
-            ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              StatusBadge(
+                status: detail.status,
+                label: detail.status.toUpperCase(),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
-        SectionHeader(title: 'Komponen (${detail.lines.length})'),
-        Card(
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (final line in detail.lines)
-                DataListRow(
-                  title: 'Item #${line.itemId ?? '-'}',
-                  subtitle: line.role,
-                  trailing: Text('${line.quantity}'),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppInfoRow(label: 'Jenis', value: detail.type ?? '-'),
+                      AppInfoRow(
+                        label: 'Barang',
+                        value: '${detail.itemId ?? '-'}',
+                      ),
+                      AppInfoRow(label: 'Jumlah', value: '${detail.quantity}'),
+                    ],
+                  ),
                 ),
-              if (detail.lines.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(AppSpacing.lg),
-                  child: Text('Belum ada komponen.'),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              AppSectionTitle(title: 'Komponen (${detail.lines.length})'),
+              const SizedBox(height: AppSpacing.md),
+              Card(
+                child: Column(
+                  children: [
+                    for (final line in detail.lines)
+                      DataListRow(
+                        title: 'Item #${line.itemId ?? '-'}',
+                        subtitle: line.role,
+                        trailing: Text('${line.quantity}'),
+                      ),
+                    if (detail.lines.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(AppSpacing.lg),
+                        child: Text('Belum ada komponen.'),
+                      ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  Widget _row(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(width: 120, child: Text(label, style: AppText.caption)),
-          Expanded(child: Text(value)),
-        ],
-      ),
     );
   }
 }

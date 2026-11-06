@@ -179,71 +179,96 @@ class _RequisitionDetailScreenState
   }
 
   Widget _buildDetail(BuildContext context, RequisitionDetail detail) {
+    final info = <Widget>[
+      if (detail.requestDate != null)
+        AppInfoRow(
+          label: 'Tgl permintaan',
+          value: formatDate(detail.requestDate),
+        ),
+      if (detail.requiredDate != null)
+        AppInfoRow(label: 'Dibutuhkan', value: formatDate(detail.requiredDate)),
+      if (detail.warehouse != null)
+        AppInfoRow(label: 'Gudang', value: detail.warehouse),
+      if (detail.notes != null && detail.notes!.isNotEmpty)
+        AppInfoRow(label: 'Catatan', value: detail.notes),
+    ];
+
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.zero,
       children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        detail.number,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                    StatusBadge(
-                      status: detail.status,
-                      label: detail.status.toUpperCase(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                if (detail.requestDate != null)
-                  _row('Tgl permintaan', formatDate(detail.requestDate)),
-                if (detail.requiredDate != null)
-                  _row('Dibutuhkan', formatDate(detail.requiredDate)),
-                if (detail.warehouse != null) _row('Gudang', detail.warehouse!),
-                if (detail.notes != null && detail.notes!.isNotEmpty)
-                  _row('Catatan', detail.notes!),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        const SectionHeader(title: 'Alur'),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: WorkflowStepper(
-              steps: RequisitionWorkflow.steps,
-              currentStatus: detail.status,
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        SectionHeader(title: 'Item (${detail.lines.length})'),
-        Card(
-          child: Column(
+        AppHeaderBlob(
+          child: Row(
             children: [
-              for (final line in detail.lines)
-                DataListRow(
-                  title: '${line.sku ?? ''} — ${line.itemName ?? ''}',
-                  trailing: Text(
-                    '${line.quantity}'
-                    '${line.estimatedPrice != null ? ' · ${line.estimatedPrice}' : ''}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+              Expanded(
+                child: Text(
+                  detail.number,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              if (detail.lines.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(AppSpacing.lg),
-                  child: Text('Belum ada item.'),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              StatusBadge(
+                status: detail.status,
+                label: detail.status.toUpperCase(),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (info.isNotEmpty)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: info,
+                    ),
+                  ),
                 ),
+              const SizedBox(height: AppSpacing.lg),
+              const AppSectionTitle(title: 'Alur'),
+              const SizedBox(height: AppSpacing.md),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: WorkflowStepper(
+                    steps: RequisitionWorkflow.steps,
+                    currentStatus: detail.status,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              AppSectionTitle(title: 'Item (${detail.lines.length})'),
+              const SizedBox(height: AppSpacing.md),
+              Card(
+                child: Column(
+                  children: [
+                    for (final line in detail.lines)
+                      DataListRow(
+                        title: '${line.sku ?? ''} — ${line.itemName ?? ''}',
+                        trailing: Text(
+                          '${line.quantity}'
+                          '${line.estimatedPrice != null ? ' · ${line.estimatedPrice}' : ''}',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    if (detail.lines.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(AppSpacing.lg),
+                        child: Text('Belum ada item.'),
+                      ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -270,32 +295,19 @@ class _RequisitionDetailScreenState
             for (final verb in allowed) ...[
               Expanded(
                 child: verb == 'reject'
-                    ? OutlinedButton(
+                    ? AppButton.outline(
+                        _verbLabels[verb] ?? verb,
                         onPressed: () => _run(verb),
-                        child: Text(_verbLabels[verb] ?? verb),
                       )
-                    : FilledButton(
+                    : AppButton.primary(
+                        _verbLabels[verb] ?? verb,
                         onPressed: () => _run(verb),
-                        child: Text(_verbLabels[verb] ?? verb),
                       ),
               ),
               if (verb != allowed.last) const SizedBox(width: AppSpacing.sm),
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _row(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(width: 120, child: Text(label, style: AppText.caption)),
-          Expanded(child: Text(value)),
-        ],
       ),
     );
   }
