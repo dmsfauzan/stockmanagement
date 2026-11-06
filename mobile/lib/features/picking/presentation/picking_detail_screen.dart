@@ -156,42 +156,12 @@ class _PickingDetailScreenState extends ConsumerState<PickingDetailScreen> {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        AppHeaderBlob(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      detail.number,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  StatusBadge(
-                    status: detail.status,
-                    label: detail.status.toUpperCase(),
-                  ),
-                ],
-              ),
-              if (detail.warehouse != null) ...[
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  detail.warehouse!,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.68),
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-            ],
+        AppPageHeader(
+          title: detail.number,
+          subtitle: detail.warehouse,
+          trailing: StatusBadge(
+            status: detail.status,
+            label: detail.status.toUpperCase(),
           ),
         ),
         Padding(

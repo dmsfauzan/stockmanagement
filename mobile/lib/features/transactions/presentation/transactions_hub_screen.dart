@@ -101,25 +101,9 @@ class TransactionsHubScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          const AppHeaderBlob(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Transaksi',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(height: AppSpacing.xs),
-                Text(
-                  'Kelola dokumen operasional gudang',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
-                ),
-              ],
-            ),
+          const AppPageHeader(
+            title: 'Transaksi',
+            subtitle: 'Kelola dokumen operasional gudang',
           ),
           Expanded(
             child: GridView.builder(

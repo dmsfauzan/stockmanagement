@@ -23,80 +23,58 @@ class MoreScreen extends ConsumerWidget {
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
-          AppHeaderBlob(
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: AppColors.primary,
-                  child: Text(
-                    initial,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 22,
-                    ),
-                  ),
+          AppPageHeader(
+            leading: Container(
+              height: 48,
+              width: 48,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.primary, AppColors.primaryHover],
                 ),
-                const SizedBox(width: AppSpacing.lg),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user?.name ?? '-',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        user?.email ?? '-',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                      if ((user?.roles ?? []).isNotEmpty) ...[
-                        const SizedBox(height: AppSpacing.sm),
-                        Wrap(
-                          spacing: AppSpacing.xs,
-                          children: [
-                            for (final role in user!.roles)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.16),
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadius.chip,
-                                  ),
-                                ),
-                                child: Text(
-                                  role,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ],
-                  ),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                initial,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
                 ),
-              ],
+              ),
             ),
+            title: user?.name ?? '-',
+            subtitle: user?.email ?? '-',
+            child: (user?.roles.isNotEmpty ?? false)
+                ? Wrap(
+                    spacing: AppSpacing.xs,
+                    runSpacing: AppSpacing.xs,
+                    children: [
+                      for (final role in user!.roles)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceVariant(theme.brightness),
+                            borderRadius: BorderRadius.circular(AppRadius.chip),
+                            border: Border.all(
+                              color: AppColors.border(theme.brightness),
+                            ),
+                          ),
+                          child: Text(
+                            role,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppColors.muted(theme.brightness),
+                            ),
+                          ),
+                        ),
+                    ],
+                  )
+                : null,
           ),
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),

@@ -158,53 +158,34 @@ class DashboardScreen extends ConsumerWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            AppHeaderBlob(
-              color: AppColors.darkBase,
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppColors.primary,
-                    child: Text(
-                      _initials(user?.name),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                      ),
-                    ),
+            AppPageHeader(
+              leading: Container(
+                height: 48,
+                width: 48,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.primary, AppColors.primaryHover],
                   ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Selamat datang,',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.65),
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          user?.name ?? 'Pengguna',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Text(
+                  _initials(user?.name),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
                   ),
-                  IconButton(
-                    onPressed: () => _reload(ref),
-                    icon: const Icon(Icons.refresh, color: Colors.white),
-                    tooltip: 'Muat ulang',
-                  ),
-                ],
+                ),
+              ),
+              title: user?.name ?? 'Pengguna',
+              subtitle: 'Selamat datang kembali',
+              trailing: IconButton.filledTonal(
+                onPressed: () => _reload(ref),
+                icon: const Icon(Icons.refresh),
+                tooltip: 'Muat ulang',
               ),
             ),
             Padding(

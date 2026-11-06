@@ -740,3 +740,98 @@ class AppInfoRow extends StatelessWidget {
     );
   }
 }
+
+/// Header halaman putih bersih: judul/subjudul, leading & trailing opsional.
+///
+/// Pengganti header gelap agar seluruh layar terasa ringan dan konsisten.
+class AppPageHeader extends StatelessWidget {
+  const AppPageHeader({
+    super.key,
+    this.title,
+    this.subtitle,
+    this.leading,
+    this.trailing,
+    this.child,
+  });
+
+  final String? title;
+  final String? subtitle;
+  final Widget? leading;
+  final Widget? trailing;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.surface(theme.brightness),
+        border: Border(
+          bottom: BorderSide(color: AppColors.border(theme.brightness)),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (leading != null) ...[
+                    leading!,
+                    const SizedBox(width: AppSpacing.md),
+                  ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (title != null)
+                          Text(
+                            title!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              height: 1.2,
+                            ),
+                          ),
+                        if (subtitle != null) ...[
+                          if (title != null) const SizedBox(height: 2),
+                          Text(
+                            subtitle!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.muted(theme.brightness),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (trailing != null) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    trailing!,
+                  ],
+                ],
+              ),
+              if (child != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                child!,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

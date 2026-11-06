@@ -24,33 +24,14 @@ class _ToolsScreenState extends ConsumerState<ToolsScreen> {
     return Scaffold(
       body: Column(
         children: [
-          AppHeaderBlob(
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  tooltip: 'Kembali',
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                const Expanded(
-                  child: Text(
-                    'Alat',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ],
+          AppPageHeader(
+            leading: IconButton(
+              onPressed: () => Navigator.of(context).maybePop(),
+              icon: const Icon(Icons.arrow_back),
+              tooltip: 'Kembali',
+              visualDensity: VisualDensity.compact,
             ),
+            title: 'Alat',
           ),
           Expanded(
             child: Column(

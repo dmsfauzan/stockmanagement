@@ -244,27 +244,11 @@ class _TransactionDetailScreenState
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        AppHeaderBlob(
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  detail.number,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              StatusBadge(
-                status: detail.status,
-                label: detail.status.toUpperCase(),
-              ),
-            ],
+        AppPageHeader(
+          title: detail.number,
+          trailing: StatusBadge(
+            status: detail.status,
+            label: detail.status.toUpperCase(),
           ),
         ),
         Padding(
