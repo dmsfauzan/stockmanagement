@@ -25,20 +25,21 @@ class _TwoFactorChallengeScreenState
   String? _error;
 
   Future<void> _submit() async {
-    final repo = ref.read(authRepositoryProvider);
     setState(() {
       _loading = true;
       _error = null;
     });
 
     try {
-      await repo.challengeTwoFactor(
-        challengeToken: widget.challengeToken,
-        code: _code.text.trim().isEmpty ? null : _code.text.trim(),
-        recoveryCode: _recovery.text.trim().isEmpty
-            ? null
-            : _recovery.text.trim(),
-      );
+      await ref
+          .read(authStateProvider.notifier)
+          .completeTwoFactorChallenge(
+            challengeToken: widget.challengeToken,
+            code: _code.text.trim().isEmpty ? null : _code.text.trim(),
+            recoveryCode: _recovery.text.trim().isEmpty
+                ? null
+                : _recovery.text.trim(),
+          );
 
       if (!mounted) return;
       context.go('/dashboard');

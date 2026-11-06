@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/network/dio_client.dart';
+import '../../core/offline/outbox_service.dart';
+import '../../core/offline/response_cache.dart';
 import '../../core/storage/secure_store.dart';
 
 /// Pengguna yang sedang login (dari /me atau /login).
@@ -73,6 +75,27 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   Future<String?> pendingTwoFactorChallenge() async =>
       _pendingTwoFactorChallenge;
 
+  /// Selesaikan langkah 2FA: verifikasi kode, lalu muat profil agar state
+  /// auth ikut terbarui (tanpa ini router akan mengembalikan ke /login).
+  Future<void> completeTwoFactorChallenge({
+    required String challengeToken,
+    String? code,
+    String? recoveryCode,
+  }) async {
+    final repo = _ref.read(authRepositoryProvider);
+
+    await repo.challengeTwoFactor(
+      challengeToken: challengeToken,
+      code: code,
+      recoveryCode: recoveryCode,
+    );
+
+    final user = await repo.me();
+
+    _pendingTwoFactorChallenge = null;
+    state = AsyncValue.data(AuthState(user: user));
+  }
+
   Future<void> restore() async {
     try {
       final repo = _ref.read(authRepositoryProvider);
@@ -115,6 +138,19 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     } catch (_) {
       // Abaikan: bersihkan sesi lokal walau server gagal.
     }
+
+    _pendingTwoFactorChallenge = null;
+
+    // Jangan biarkan antrean/cache milik user sebelumnya dipakai user lain.
+    try {
+      await _ref.read(outboxServiceProvider).clear();
+    } catch (_) {}
+
+    try {
+      await _ref.read(responseCacheProvider).clear();
+    } catch (_) {}
+
+    _ref.invalidate(outboxCountProvider);
     state = const AsyncValue.data(AuthState());
   }
 }

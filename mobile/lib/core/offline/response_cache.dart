@@ -6,6 +6,9 @@ import 'package:sqflite/sqflite.dart';
 class ResponseCache {
   Database? _db;
 
+  /// Umur maksimum cache; data lebih tua dianggap tidak ada.
+  static const Duration ttl = Duration(minutes: 30);
+
   Future<Database> _open() async {
     if (_db != null) return _db!;
 
@@ -46,7 +49,25 @@ class ResponseCache {
       limit: 1,
     );
 
-    return rows.isEmpty ? null : rows.first['body'] as String?;
+    if (rows.isEmpty) return null;
+
+    final createdAt = DateTime.tryParse(
+      (rows.first['created_at'] as String?) ?? '',
+    );
+
+    if (createdAt == null || DateTime.now().difference(createdAt) > ttl) {
+      await db.delete('cache', where: 'key = ?', whereArgs: [key]);
+
+      return null;
+    }
+
+    return rows.first['body'] as String?;
+  }
+
+  /// Hapus seluruh cache (dipanggil saat logout).
+  Future<void> clear() async {
+    final db = await _open();
+    await db.delete('cache');
   }
 }
 

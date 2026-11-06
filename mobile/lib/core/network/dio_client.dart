@@ -89,6 +89,7 @@ final dioProvider = Provider<Dio>((ref) {
         final code = response.statusCode ?? 0;
 
         if (options.method == 'GET' &&
+            !_isAuthPath(options.path) &&
             code >= 200 &&
             code < 300 &&
             response.data != null) {
@@ -114,8 +115,10 @@ final dioProvider = Provider<Dio>((ref) {
           ref.read(sessionExpiredProvider.notifier).state++;
         }
 
-        // Sajikan cache bila GET gagal karena jaringan.
-        if (_isNetworkError(e) && e.requestOptions.method == 'GET') {
+        // Sajikan cache bila GET gagal karena jaringan (kecuali data auth).
+        if (_isNetworkError(e) &&
+            e.requestOptions.method == 'GET' &&
+            !_isAuthPath(e.requestOptions.path)) {
           try {
             final cached = await ref
                 .read(responseCacheProvider)
