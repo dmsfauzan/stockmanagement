@@ -16,7 +16,6 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController(text: 'admin@stock.test');
   final _password = TextEditingController();
   bool _obscure = true;
@@ -31,8 +30,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-
     setState(() {
       _loading = true;
       _error = null;
@@ -128,89 +125,78 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 440),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AppTextField(
-                        label: 'Alamat Email',
-                        controller: _email,
-                        hint: 'nama@perusahaan.com',
-                        keyboardType: TextInputType.emailAddress,
-                        prefixIcon: Icons.mail_outline,
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? 'Email wajib diisi'
-                            : null,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      AppTextField(
-                        label: 'Password',
-                        controller: _password,
-                        hint: '••••••••',
-                        obscure: _obscure,
-                        prefixIcon: Icons.lock_outline,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscure
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            size: 20,
-                          ),
-                          onPressed: () => setState(() => _obscure = !_obscure),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AppTextField(
+                      label: 'Alamat Email',
+                      controller: _email,
+                      hint: 'nama@perusahaan.com',
+                      keyboardType: TextInputType.emailAddress,
+                      prefixIcon: Icons.mail_outline,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    AppTextField(
+                      label: 'Password',
+                      controller: _password,
+                      hint: '••••••••',
+                      obscure: _obscure,
+                      prefixIcon: Icons.lock_outline,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscure
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          size: 20,
                         ),
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? 'Password wajib diisi'
-                            : null,
-                        onFieldSubmitted: (_) => _submit(),
+                        onPressed: () => setState(() => _obscure = !_obscure),
                       ),
-                      if (_error != null) ...[
-                        const SizedBox(height: AppSpacing.md),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: AppColors.error.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(
-                              AppRadius.button,
+                      onFieldSubmitted: (_) => _submit(),
+                    ),
+                    if (_error != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: AppColors.error.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(AppRadius.button),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              size: 18,
+                              color: AppColors.error,
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.error_outline,
-                                size: 18,
-                                color: AppColors.error,
-                              ),
-                              const SizedBox(width: AppSpacing.sm),
-                              Expanded(
-                                child: Text(
-                                  _error!,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: AppColors.error,
-                                  ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: Text(
+                                _error!,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: AppColors.error,
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: AppSpacing.xl),
-                      AppButton.primary(
-                        'Masuk',
-                        onPressed: _submit,
-                        loading: _loading,
-                        icon: Icons.login,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        'API: ${AppConfig.apiBaseUrl}',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.muted(theme.brightness),
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  ),
+                    const SizedBox(height: AppSpacing.xl),
+                    AppButton.primary(
+                      'Masuk',
+                      onPressed: _submit,
+                      loading: _loading,
+                      icon: Icons.login,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'API: ${AppConfig.apiBaseUrl}',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.muted(theme.brightness),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
