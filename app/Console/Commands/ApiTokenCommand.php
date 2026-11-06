@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\Services\Support\ApiTokenService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -41,7 +42,7 @@ class ApiTokenCommand extends Command
         $token = $user->createToken($name, $abilities, $expiresAt);
 
         $this->info("Token for {$user->email}:");
-        $this->line($token->plainTextToken);
+        $this->line(ApiTokenService::plainText($token));
         $this->info('Abilities: '.implode(', ', $abilities ?: ['*']));
 
         if ($expiresAt) {

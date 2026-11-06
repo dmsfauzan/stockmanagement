@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Permission;
 use App\Models\User;
+use App\Services\Support\ApiTokenService;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\PersonalAccessToken;
 use Livewire\Attributes\Layout;
@@ -80,7 +81,7 @@ class ApiTokensIndex extends Component
 
         $token = $user->createToken($this->tokenName, $abilities, $expiresAt);
 
-        $this->plainToken = $token->plainTextToken;
+        $this->plainToken = ApiTokenService::plainText($token);
         $this->plainTokenUserId = $user->id;
         $this->showCreateModal = false;
         $this->dispatch('toast', type: 'success', message: __('Token dibuat — salin sekarang, tidak bisa dilihat lagi.'));
@@ -115,7 +116,7 @@ class ApiTokensIndex extends Component
 
         $new = $user->createToken($name, $abilities, $expiresAt);
 
-        $this->plainToken = $new->plainTextToken;
+        $this->plainToken = ApiTokenService::plainText($new);
         $this->plainTokenUserId = $user->id;
 
         $this->dispatch('toast', type: 'success', message: __('Token di-rotate — salin token baru sekarang.'));

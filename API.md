@@ -21,6 +21,8 @@ Accept: application/json
 
 Token hanya ditampilkan sekali saat dibuat. `--abilities` menentukan permission yang boleh dipakai token; jika dikosongkan, token mewarisi semua permission user.
 
+Token yang dikembalikan tidak memakai prefix id Sanctum (`{id}|{token}`); kirim nilai token apa adanya pada header `Authorization: Bearer <token>`.
+
 Cek identitas: `GET /api/me` → `{ data: { id, name, email, roles, permissions } }`.
 
 ### Login dari aplikasi (mobile/SPA)

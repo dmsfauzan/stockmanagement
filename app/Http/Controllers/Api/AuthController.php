@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Services\Support\ApiTokenService;
 use App\Services\Support\TwoFactorService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,7 +49,7 @@ class AuthController extends ApiController
         $user->forceFill(['last_login_at' => now()])->save();
 
         return $this->created([
-            'token' => $token->plainTextToken,
+            'token' => ApiTokenService::plainText($token),
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -106,7 +107,7 @@ class AuthController extends ApiController
         $fresh->forceFill(['last_login_at' => now()])->save();
 
         return $this->created([
-            'token' => $token->plainTextToken,
+            'token' => ApiTokenService::plainText($token),
             'user' => [
                 'id' => $fresh->id,
                 'name' => $fresh->name,

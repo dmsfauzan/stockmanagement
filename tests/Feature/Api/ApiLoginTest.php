@@ -29,6 +29,7 @@ class ApiLoginTest extends TestCase
 
         $token = $response->json('data.token');
         $this->assertIsString($token);
+        $this->assertStringNotContainsString('|', $token);
 
         $this->withToken($token)
             ->getJson('/api/me')
