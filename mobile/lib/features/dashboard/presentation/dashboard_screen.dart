@@ -9,6 +9,7 @@ import '../../../core/network/dio_client.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
+import '../../../core/widgets/item_visual.dart';
 import '../../../core/widgets/stat_card.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../data/auth/auth_repository.dart';
@@ -286,36 +287,20 @@ class DashboardScreen extends ConsumerWidget {
                         return const EmptyState(title: 'Tidak ada low stock');
                       }
                       return Card(
+                        clipBehavior: Clip.antiAlias,
                         child: Column(
                           children: [
-                            for (final row in items)
-                              DataListRow(
-                                title:
-                                    '${row['sku'] ?? ''} — ${row['item_name'] ?? ''}',
-                                subtitle:
-                                    '${row['warehouse'] ?? '-'} · ${row['location'] ?? '-'}',
-                                trailing: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      '${row['on_hand'] ?? 0}',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium,
-                                    ),
-                                    const StatusBadge(
-                                      status: 'low_stock',
-                                      label: 'LOW',
-                                    ),
-                                  ],
-                                ),
-                                onTap: (row['item_id'] as num?) != null
+                            for (var i = 0; i < items.length; i++) ...[
+                              if (i > 0) const Divider(height: 1),
+                              _LowStockTile(
+                                row: items[i],
+                                onTap: (items[i]['item_id'] as num?) != null
                                     ? () => context.push(
-                                        '/item/${row['item_id']}',
+                                        '/item/${items[i]['item_id']}',
                                       )
                                     : null,
                               ),
+                            ],
                           ],
                         ),
                       );
@@ -328,6 +313,72 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LowStockTile extends StatelessWidget {
+  const _LowStockTile({required this.row, this.onTap});
+
+  final Map<String, dynamic> row;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final name = '${row['item_name'] ?? ''}';
+    final sku = '${row['sku'] ?? ''}';
+    final onHand = '${row['on_hand'] ?? 0}';
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            ItemVisual(label: name, size: 44),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '$sku · ${row['warehouse'] ?? '-'}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.muted(theme.brightness),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  onHand,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const StatusBadge(status: 'low_stock', label: 'LOW'),
+              ],
             ),
           ],
         ),

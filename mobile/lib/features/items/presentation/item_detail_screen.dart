@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
+import '../../../core/widgets/item_visual.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../data/items/item_repository.dart';
 import '../../../data/providers.dart';
@@ -78,48 +79,76 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
   }
 
   Widget _loaded(ItemDetail item) {
+    final theme = Theme.of(context);
+    final category = item.category?.name ?? item.name;
+
     return Column(
       children: [
-        AppHeaderBlob(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        Container(
+          width: double.infinity,
+          color: AppColors.surface(theme.brightness),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
+              ItemVisual(label: category, size: 72, radius: 18),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       item.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
+                      style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
+                        height: 1.2,
                       ),
                     ),
-                  ),
-                  if (item.status != null) ...[
-                    const SizedBox(width: AppSpacing.sm),
-                    StatusBadge(
-                      status: item.status!,
-                      label: item.status!.toUpperCase(),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${item.sku}${item.barcode != null && item.barcode!.isNotEmpty ? ' · ${item.barcode}' : ''}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.muted(theme.brightness),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.xs,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        if (item.category?.name != null)
+                          _pill(item.category!.name),
+                        if (item.unit?.code != null) _pill(item.unit!.code),
+                        if (item.status != null)
+                          StatusBadge(
+                            status: item.status!,
+                            label: item.status!.toUpperCase(),
+                          ),
+                      ],
                     ),
                   ],
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                '${item.sku}${item.barcode != null ? ' · ${item.barcode}' : ''}',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.68),
-                  fontSize: 13,
                 ),
               ),
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.sm,
+          ),
           child: SegmentedTabs(
             tabs: const ['Info', 'Inventory', 'Movement', 'Summary'],
             selected: _tab,
@@ -133,6 +162,27 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _pill(String text) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant(theme.brightness),
+        borderRadius: BorderRadius.circular(AppRadius.chip),
+        border: Border.all(color: AppColors.border(theme.brightness)),
+      ),
+      child: Text(
+        text,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: AppColors.muted(theme.brightness),
+        ),
+      ),
     );
   }
 
@@ -233,10 +283,17 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     children: [
-                      _metric('On Hand', b.onHand),
-                      _metric('Reserved', b.reserved),
-                      _metric('Karantina', b.quarantine),
-                      _metric('Available', b.available),
+                      Expanded(child: _metric('On Hand', b.onHand)),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(child: _metric('Available', b.available)),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    children: [
+                      Expanded(child: _metric('Reserved', b.reserved)),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(child: _metric('Karantina', b.quarantine)),
                     ],
                   ),
                 ],
@@ -353,14 +410,36 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
   }
 
   Widget _metric(String label, int value) {
-    return Expanded(
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.sm,
+        horizontal: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariant(theme.brightness),
+        borderRadius: BorderRadius.circular(AppRadius.button),
+      ),
       child: Column(
         children: [
           Text(
             '$value',
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          Text(label, style: AppText.caption, textAlign: TextAlign.center),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: AppText.caption.copyWith(
+              color: AppColors.muted(theme.brightness),
+            ),
+          ),
         ],
       ),
     );

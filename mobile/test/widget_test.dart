@@ -191,6 +191,20 @@ void main() {
     expect(find.text('Retur Pembelian'), findsOneWidget);
   });
 
+  testWidgets('Transactions hub has no overflow on a small screen', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MaterialApp(home: TransactionsHubScreen()));
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Barang Masuk'), findsOneWidget);
+  });
+
   test('Requisition detail parses lines', () {
     final detail = RequisitionDetail.fromJson({
       'id': 1,

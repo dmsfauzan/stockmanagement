@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
+import '../../../core/widgets/item_visual.dart';
 import '../../../core/widgets/status_badge.dart' show StatusBadge;
 import '../../../data/master/master_models.dart';
 import '../../../data/providers.dart';
@@ -262,66 +263,89 @@ class _StockListScreenState extends ConsumerState<StockListScreen> {
 
           return Card(
             margin: EdgeInsets.zero,
+            clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: row.itemId > 0
                   ? () => context.push('/item/${row.itemId}')
                   : null,
-              borderRadius: BorderRadius.circular(AppRadius.card),
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const AppIconBadge(icon: Icons.inventory_2_outlined),
+                    ItemVisual(label: row.itemName, size: 52),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${row.sku} — ${row.itemName}',
-                            maxLines: 1,
+                            row.itemName,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.xs),
+                          const SizedBox(height: 2),
                           Text(
-                            '${row.warehouse ?? '-'} · ${row.location ?? '-'}',
+                            row.sku,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: AppColors.muted(theme.brightness),
+                              letterSpacing: 0.2,
                             ),
                           ),
-                          if (row.status != null) ...[
-                            const SizedBox(height: AppSpacing.sm),
-                            StatusBadge(
-                              status: row.status!,
-                              label: row.status!.toUpperCase(),
-                            ),
-                          ],
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.place_outlined,
+                                size: 13,
+                                color: AppColors.muted(theme.brightness),
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  '${row.warehouse ?? '-'} · ${row.location ?? '-'}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: AppColors.muted(theme.brightness),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           '${row.onHand}',
-                          style: theme.textTheme.titleSmall?.copyWith(
+                          style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.w700,
+                            height: 1.1,
                           ),
                         ),
-                        const SizedBox(height: 2),
                         Text(
                           'avail ${row.available}',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.muted(theme.brightness),
                           ),
                         ),
+                        if (row.status != null) ...[
+                          const SizedBox(height: 4),
+                          StatusBadge(
+                            status: row.status!,
+                            label: row.status!.toUpperCase(),
+                          ),
+                        ],
                       ],
                     ),
                   ],

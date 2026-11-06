@@ -30,8 +30,18 @@ class WsmApp extends ConsumerWidget {
         darkTheme: AppTheme.dark(),
         themeMode: ref.watch(themeModeProvider),
         routerConfig: ref.watch(routerProvider),
-        builder: (context, child) =>
-            SessionListener(child: child ?? const SizedBox.shrink()),
+        builder: (context, child) {
+          // Batasi skala teks agar layout tidak overflow pada aksesibilitas
+          // ekstrem; tetap menghormati pembesaran wajar.
+          final mq = MediaQuery.of(context);
+
+          return MediaQuery(
+            data: mq.copyWith(
+              textScaler: mq.textScaler.clamp(maxScaleFactor: 1.4),
+            ),
+            child: SessionListener(child: child ?? const SizedBox.shrink()),
+          );
+        },
         debugShowCheckedModeBanner: false,
       ),
     );
