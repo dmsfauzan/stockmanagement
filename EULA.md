@@ -4,10 +4,10 @@
 
 Versi Perjanjian: 1.0 · Tanggal berlaku: 14 Oktober 2026
 
-> ⚠️ **SEBELUM DIPUBLIKASIKAN/DIPERDAGANGKAN:** lengkapi placeholder yang tersisa
-> (yurisdiksi `<KOTA/KABUPATEN>` dan ketentuan komersial) dengan data yang benar.
-> Dokumen ini adalah templat umum dan **bukan nasihat hukum** — mintalah
-> tinjauan dari penasihat hukum Anda sebelum dipakai secara komersial.
+> ⚠️ **Sebelum dipublikasikan/diperdagangkan:** tinjau kembali ketentuan komersial
+> (jumlah Instalasi, paket dukungan, dan harga) pada dokumen pesanan/invoice Anda.
+> Dokumen ini adalah templat umum dan **bukan nasihat hukum** — mintalah tinjauan
+> dari penasihat hukum Anda sebelum dipakai secara komersial.
 
 ---
 
@@ -57,7 +57,8 @@ tidak secara tegas diberikan di sini dipertahankan oleh Pemilik Lisensi.
 ## 5. Dukungan dan Pembaruan
 
 Lingkup dukungan, SLA, dan akses pembaruan (jika ada) ditentukan oleh paket komersial
-yang dipilih — mis. `<Basic / Pro / Enterprise>` — dan diatur terpisah pada dokumen
+yang dipilih — mis. **Basic** (1 Instalasi), **Pro** (multi-Instalasi), atau
+**Enterprise** (SLA & dukungan prioritas) — dan diatur terpisah pada dokumen
 pesanan.
 
 ## 6. Data Pengguna Akhir
@@ -86,7 +87,7 @@ Perangkat Lunak.
 
 Perjanjian ini diatur oleh hukum Republik Indonesia. Sengketa diselesaikan secara
 musyawarah; jika tidak tercapai, melalui pengadilan/yurisdiksi yang berwenang di
-`<KOTA/KABUPATEN>`.
+Jakarta Pusat.
 
 ---
 

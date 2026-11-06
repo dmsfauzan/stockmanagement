@@ -343,8 +343,8 @@ mendistribusikan, atau menjual kembali tanpa izin tertulis dari pemilik lisensi.
 
 Pemilik Lisensi: **Dimas Fauzan Dwiputra** · `dmsfauzandwptra@gmail.com`.
 
-> Sebelum dipublikasikan/dijual: lengkapi placeholder yang tersisa pada `EULA.md`
-> (mis. `<KOTA/KABUPATEN>` dan paket komersial) sesuai kebutuhan.
+Sejumlah parameter komersial pada `EULA.md` (jumlah Instalasi, paket, harga) ditentukan
+per pesanan/invoice; yurisdiksi hukum: Jakarta Pusat, Indonesia.
 
 UI terinspirasi Metronic, ditulis ulang dari nol dengan Tailwind — bukan salinan kode
 Metronic. Sebelum distribusi komersial, audit ulang lisensi seluruh dependensi
