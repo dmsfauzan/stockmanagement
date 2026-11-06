@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/theme/tokens.dart';
+import '../../../core/widgets/common.dart';
 import '../../../data/auth/auth_repository.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -73,133 +74,148 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    height: 72,
-                    width: 72,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: AppColors.indigoSoft,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.warehouse_outlined,
-                      size: 40,
-                      color: AppColors.indigo,
-                    ),
+      body: Column(
+        children: [
+          AppHeaderBlob(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 64,
+                  width: 64,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.35),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Stock Management',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineSmall,
+                  child: const Icon(
+                    Icons.warehouse_outlined,
+                    size: 34,
+                    color: Colors.white,
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Masuk untuk mengelola gudang',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                const Text(
+                  'Selamat Datang kembali,',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    height: 1.2,
                   ),
-                  const SizedBox(height: AppSpacing.xl),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          children: [
-                            TextFormField(
-                              controller: _email,
-                              keyboardType: TextInputType.emailAddress,
-                              autofillHints: const [AutofillHints.email],
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                prefixIcon: Icon(Icons.mail_outline),
-                              ),
-                              validator: (v) => (v == null || v.trim().isEmpty)
-                                  ? 'Email wajib diisi'
-                                  : null,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Masuk untuk melanjutkan mengelola gudang Anda',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.72),
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppTextField(
+                        label: 'Alamat Email',
+                        controller: _email,
+                        hint: 'nama@perusahaan.com',
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Icons.mail_outline,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Email wajib diisi'
+                            : null,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      AppTextField(
+                        label: 'Password',
+                        controller: _password,
+                        hint: '••••••••',
+                        obscure: _obscure,
+                        prefixIcon: Icons.lock_outline,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscure
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            size: 20,
+                          ),
+                          onPressed: () => setState(() => _obscure = !_obscure),
+                        ),
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? 'Password wajib diisi'
+                            : null,
+                        onFieldSubmitted: (_) => _submit(),
+                      ),
+                      if (_error != null) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.error.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(
+                              AppRadius.button,
                             ),
-                            const SizedBox(height: AppSpacing.md),
-                            TextFormField(
-                              controller: _password,
-                              obscureText: _obscure,
-                              decoration: InputDecoration(
-                                labelText: 'Password',
-                                prefixIcon: const Icon(Icons.lock_outline),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscure
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                size: 18,
+                                color: AppColors.error,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: Text(
+                                  _error!,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: AppColors.error,
                                   ),
-                                  onPressed: () =>
-                                      setState(() => _obscure = !_obscure),
                                 ),
                               ),
-                              validator: (v) => (v == null || v.isEmpty)
-                                  ? 'Password wajib diisi'
-                                  : null,
-                              onFieldSubmitted: (_) => _submit(),
-                            ),
-                            if (_error != null) ...[
-                              const SizedBox(height: AppSpacing.md),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.error_outline,
-                                    size: 18,
-                                    color: AppColors.rose,
-                                  ),
-                                  const SizedBox(width: AppSpacing.sm),
-                                  Expanded(
-                                    child: Text(
-                                      _error!,
-                                      style: const TextStyle(
-                                        color: AppColors.rose,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ],
-                            const SizedBox(height: AppSpacing.lg),
-                            FilledButton(
-                              onPressed: _loading ? null : _submit,
-                              child: _loading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Text('Masuk'),
-                            ),
-                          ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: AppSpacing.xl),
+                      AppButton.primary(
+                        'Masuk',
+                        onPressed: _submit,
+                        loading: _loading,
+                        icon: Icons.login,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        'API: ${AppConfig.apiBaseUrl}',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.muted(theme.brightness),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'API: ${AppConfig.apiBaseUrl}',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

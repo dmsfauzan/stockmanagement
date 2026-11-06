@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../network/connectivity.dart';
 import '../offline/outbox_service.dart';
+import '../theme/tokens.dart';
 
 /// Shell dengan bottom navigation (go_router StatefulShellRoute).
 class AppShell extends ConsumerWidget {
@@ -43,45 +44,54 @@ class AppShell extends ConsumerWidget {
           Expanded(child: navigationShell),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
+      bottomNavigationBar: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: AppColors.border(Theme.of(context).brightness),
+            ),
+          ),
         ),
-        destinations: [
-          const NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+        child: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: (index) => navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.qr_code_scanner_outlined),
-            selectedIcon: Icon(Icons.qr_code_scanner),
-            label: 'Scan',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.swap_horiz_outlined),
-            selectedIcon: Icon(Icons.swap_horiz),
-            label: 'Transaksi',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.inventory_2_outlined),
-            selectedIcon: Icon(Icons.inventory_2),
-            label: 'Stok',
-          ),
-          NavigationDestination(
-            icon: _OutboxBadge(
-              count: pending,
-              child: const Icon(Icons.more_horiz),
+          destinations: [
+            const NavigationDestination(
+              icon: Icon(Icons.dashboard_outlined),
+              selectedIcon: Icon(Icons.dashboard),
+              label: 'Dashboard',
             ),
-            selectedIcon: _OutboxBadge(
-              count: pending,
-              child: const Icon(Icons.more_horiz),
+            const NavigationDestination(
+              icon: Icon(Icons.qr_code_scanner_outlined),
+              selectedIcon: Icon(Icons.qr_code_scanner),
+              label: 'Scan',
             ),
-            label: 'Lainnya',
-          ),
-        ],
+            const NavigationDestination(
+              icon: Icon(Icons.swap_horiz_outlined),
+              selectedIcon: Icon(Icons.swap_horiz),
+              label: 'Transaksi',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.inventory_2_outlined),
+              selectedIcon: Icon(Icons.inventory_2),
+              label: 'Stok',
+            ),
+            NavigationDestination(
+              icon: _OutboxBadge(
+                count: pending,
+                child: const Icon(Icons.more_horiz),
+              ),
+              selectedIcon: _OutboxBadge(
+                count: pending,
+                child: const Icon(Icons.more_horiz),
+              ),
+              label: 'Lainnya',
+            ),
+          ],
+        ),
       ),
     );
   }

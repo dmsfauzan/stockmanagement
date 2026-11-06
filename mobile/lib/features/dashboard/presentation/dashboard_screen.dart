@@ -11,6 +11,7 @@ import '../../../core/widgets/common.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/stat_card.dart';
 import '../../../core/widgets/status_badge.dart';
+import '../../../data/auth/auth_repository.dart';
 
 final dashboardStockProvider =
     FutureProvider.autoDispose<({int items15d, int lowCount})>((ref) async {
@@ -93,7 +94,7 @@ final movementChartProvider =
             barRods: [
               BarChartRodData(
                 toY: qtyIn,
-                color: AppColors.sky,
+                color: AppColors.primary,
                 width: 6,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(3),
@@ -101,7 +102,7 @@ final movementChartProvider =
               ),
               BarChartRodData(
                 toY: qtyOut,
-                color: AppColors.rose,
+                color: AppColors.gold,
                 width: 6,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(3),
@@ -127,126 +128,205 @@ class DashboardScreen extends ConsumerWidget {
     ref.invalidate(movementChartProvider);
   }
 
+  String _initials(String? name) {
+    final trimmed = (name ?? '').trim();
+
+    if (trimmed.isEmpty) return 'WS';
+
+    final parts = trimmed.split(RegExp(r'\s+'));
+
+    if (parts.length == 1) {
+      return parts.first.substring(0, 1).toUpperCase();
+    }
+
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
+        .toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stock = ref.watch(dashboardStockProvider);
     final lowAsync = ref.watch(lowStockProvider);
     final turnoverAsync = ref.watch(turnoverProvider);
     final chartAsync = ref.watch(movementChartProvider);
+    final user = ref.watch(authStateProvider).valueOrNull?.user;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
       body: RefreshIndicator(
         onRefresh: () => _reload(ref),
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: EdgeInsets.zero,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: StatCard(
-                    label: 'Total Baris Stok',
-                    value: stock.when(
-                      data: (s) => '${s.items15d}',
-                      loading: () => '…',
-                      error: (e, _) => '–',
-                    ),
-                    icon: Icons.inventory_2_outlined,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: StatCard(
-                    label: 'Turnover',
-                    value: turnoverAsync.when(
-                      data: (t) => '${t['turnover'] ?? 0}x',
-                      loading: () => '…',
-                      error: (e, _) => '–',
-                    ),
-                    icon: Icons.autorenew,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            const SectionHeader(title: 'Stock Movement'),
-            Card(
-              child: Container(
-                height: 180,
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: chartAsync.when(
-                  data: (groups) {
-                    if (groups.isEmpty) {
-                      return const EmptyState(
-                        title: 'Belum ada movement',
-                        message: 'Belum ada pergerakan stok.',
-                      );
-                    }
-                    return BarChart(
-                      BarChartData(
-                        barGroups: groups,
-                        titlesData: const FlTitlesData(show: false),
-                        borderData: FlBorderData(show: false),
-                        gridData: const FlGridData(show: false),
+            AppHeaderBlob(
+              color: AppColors.darkBase,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.primary,
+                    child: Text(
+                      _initials(user?.name),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
                       ),
-                    );
-                  },
-                  loading: () => const SizedBox(height: 120, child: Skeleton()),
-                  error: (e, _) => ErrorCard(
-                    message: '$e',
-                    onRetry: () => ref.invalidate(movementChartProvider),
+                    ),
                   ),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            SectionHeader(
-              title: 'Low Stock (Top 5)',
-              action: TextButton(
-                onPressed: () => context.go('/stock'),
-                child: const Text('Lihat semua'),
-              ),
-            ),
-            lowAsync.when(
-              data: (items) {
-                if (items.isEmpty) {
-                  return const EmptyState(title: 'Tidak ada low stock');
-                }
-                return Card(
-                  child: Column(
-                    children: [
-                      for (final row in items)
-                        DataListRow(
-                          title:
-                              '${row['sku'] ?? ''} — ${row['item_name'] ?? ''}',
-                          subtitle:
-                              '${row['warehouse'] ?? '-'} · ${row['location'] ?? '-'}',
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                '${row['on_hand'] ?? 0}',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const StatusBadge(
-                                status: 'low_stock',
-                                label: 'LOW',
-                              ),
-                            ],
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Selamat datang,',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.65),
+                            fontSize: 12,
                           ),
-                          onTap: (row['item_id'] as num?) != null
-                              ? () => context.push('/item/${row['item_id']}')
-                              : null,
                         ),
+                        Text(
+                          user?.name ?? 'Pengguna',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => _reload(ref),
+                    icon: const Icon(Icons.refresh, color: Colors.white),
+                    tooltip: 'Muat ulang',
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: StatCard(
+                          label: 'Total Baris Stok',
+                          value: stock.when(
+                            data: (s) => '${s.items15d}',
+                            loading: () => '…',
+                            error: (e, _) => '–',
+                          ),
+                          icon: Icons.inventory_2_outlined,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: StatCard(
+                          label: 'Turnover',
+                          value: turnoverAsync.when(
+                            data: (t) => '${t['turnover'] ?? 0}x',
+                            loading: () => '…',
+                            error: (e, _) => '–',
+                          ),
+                          icon: Icons.autorenew,
+                        ),
+                      ),
                     ],
                   ),
-                );
-              },
-              loading: () => const ListSkeleton(rows: 4),
-              error: (e, _) => ErrorCard(
-                message: '$e',
-                onRetry: () => ref.invalidate(lowStockProvider),
+                  const SizedBox(height: AppSpacing.lg),
+                  const AppSectionTitle(title: 'Stock Movement'),
+                  const SizedBox(height: AppSpacing.md),
+                  Card(
+                    child: Container(
+                      height: 180,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: chartAsync.when(
+                        data: (groups) {
+                          if (groups.isEmpty) {
+                            return const EmptyState(
+                              title: 'Belum ada movement',
+                              message: 'Belum ada pergerakan stok.',
+                            );
+                          }
+                          return BarChart(
+                            BarChartData(
+                              barGroups: groups,
+                              titlesData: const FlTitlesData(show: false),
+                              borderData: FlBorderData(show: false),
+                              gridData: const FlGridData(show: false),
+                            ),
+                          );
+                        },
+                        loading: () =>
+                            const SizedBox(height: 120, child: Skeleton()),
+                        error: (e, _) => ErrorCard(
+                          message: '$e',
+                          onRetry: () => ref.invalidate(movementChartProvider),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  AppSectionTitle(
+                    title: 'Low Stock (Top 5)',
+                    action: TextButton(
+                      onPressed: () => context.go('/stock'),
+                      child: const Text('Lihat semua'),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  lowAsync.when(
+                    data: (items) {
+                      if (items.isEmpty) {
+                        return const EmptyState(title: 'Tidak ada low stock');
+                      }
+                      return Card(
+                        child: Column(
+                          children: [
+                            for (final row in items)
+                              DataListRow(
+                                title:
+                                    '${row['sku'] ?? ''} — ${row['item_name'] ?? ''}',
+                                subtitle:
+                                    '${row['warehouse'] ?? '-'} · ${row['location'] ?? '-'}',
+                                trailing: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '${row['on_hand'] ?? 0}',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium,
+                                    ),
+                                    const StatusBadge(
+                                      status: 'low_stock',
+                                      label: 'LOW',
+                                    ),
+                                  ],
+                                ),
+                                onTap: (row['item_id'] as num?) != null
+                                    ? () => context.push(
+                                        '/item/${row['item_id']}',
+                                      )
+                                    : null,
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                    loading: () => const ListSkeleton(rows: 4),
+                    error: (e, _) => ErrorCard(
+                      message: '$e',
+                      onRetry: () => ref.invalidate(lowStockProvider),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
