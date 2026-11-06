@@ -99,25 +99,51 @@ class TransactionsHubScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Transaksi')),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        itemCount: _entries.length,
-        separatorBuilder: (context, index) =>
-            const SizedBox(height: AppSpacing.sm),
-        itemBuilder: (context, index) {
-          final entry = _entries[index];
-
-          return Card(
-            child: DataListRow(
-              title: entry.title,
-              subtitle: entry.subtitle,
-              leading: Icon(entry.icon),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push(entry.path),
+      body: Column(
+        children: [
+          const AppHeaderBlob(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Transaksi',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Kelola dokumen operasional gudang',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: AppSpacing.md,
+                crossAxisSpacing: AppSpacing.md,
+                mainAxisExtent: 176,
+              ),
+              itemCount: _entries.length,
+              itemBuilder: (context, index) {
+                final entry = _entries[index];
+
+                return AppStatTile(
+                  title: entry.title,
+                  subtitle: entry.subtitle,
+                  icon: entry.icon,
+                  onTap: () => context.push(entry.path),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../theme/tokens.dart';
@@ -455,6 +457,248 @@ class AppMenuItem extends StatelessWidget {
                 ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Kotak ikon lembut (badge) yang konsisten di seluruh aplikasi.
+class AppIconBadge extends StatelessWidget {
+  const AppIconBadge({
+    super.key,
+    required this.icon,
+    this.color = AppColors.primary,
+    this.background,
+    this.size = 44,
+    this.iconSize = 22,
+  });
+
+  final IconData icon;
+  final Color color;
+  final Color? background;
+  final double size;
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: size,
+      width: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: background ?? color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppRadius.button),
+      ),
+      child: Icon(icon, color: color, size: iconSize),
+    );
+  }
+}
+
+/// Kartu berisi deretan item menu dengan divider otomatis.
+class AppMenuGroup extends StatelessWidget {
+  const AppMenuGroup({super.key, required this.children, this.clip = true});
+
+  final List<Widget> children;
+  final bool clip;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <Widget>[];
+
+    for (var i = 0; i < children.length; i++) {
+      if (i > 0) items.add(const Divider(height: 1));
+      items.add(children[i]);
+    }
+
+    return Card(
+      clipBehavior: clip ? Clip.antiAlias : Clip.none,
+      child: Column(children: items),
+    );
+  }
+}
+
+/// Tile ringkas untuk hub/grid: ikon di atas, judul + subjudul.
+class AppStatTile extends StatelessWidget {
+  const AppStatTile({
+    super.key,
+    required this.title,
+    required this.icon,
+    this.subtitle,
+    this.color = AppColors.primary,
+    this.onTap,
+  });
+
+  final String title;
+  final IconData icon;
+  final String? subtitle;
+  final Color color;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppIconBadge(icon: icon, color: color),
+              const SizedBox(height: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.muted(theme.brightness),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Input pencarian bergaya Semas dengan tombol bersihkan + debounce opsional.
+class AppSearchField extends StatefulWidget {
+  const AppSearchField({
+    super.key,
+    this.controller,
+    this.hint = 'Cari…',
+    this.onChanged,
+    this.onSubmitted,
+    this.debounce,
+  });
+
+  final TextEditingController? controller;
+  final String hint;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final Duration? debounce;
+
+  @override
+  State<AppSearchField> createState() => _AppSearchFieldState();
+}
+
+class _AppSearchFieldState extends State<AppSearchField> {
+  late final TextEditingController _controller =
+      widget.controller ?? TextEditingController();
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    if (widget.controller == null) _controller.dispose();
+    super.dispose();
+  }
+
+  void _handle(String value) {
+    setState(() {});
+
+    final onChanged = widget.onChanged;
+    if (onChanged == null) return;
+
+    if (widget.debounce == null) {
+      onChanged(value);
+      return;
+    }
+
+    _timer?.cancel();
+    _timer = Timer(widget.debounce!, () => onChanged(value));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      textInputAction: TextInputAction.search,
+      onChanged: _handle,
+      onSubmitted: widget.onSubmitted,
+      decoration: InputDecoration(
+        hintText: widget.hint,
+        prefixIcon: const Icon(Icons.search, size: 20),
+        suffixIcon: _controller.text.isEmpty
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.close, size: 18),
+                tooltip: 'Bersihkan',
+                onPressed: () {
+                  _controller.clear();
+                  _handle('');
+                },
+              ),
+      ),
+    );
+  }
+}
+
+/// Baris label–nilai untuk layar detail.
+class AppInfoRow extends StatelessWidget {
+  const AppInfoRow({
+    super.key,
+    required this.label,
+    this.value,
+    this.valueWidget,
+  });
+
+  final String label;
+  final String? value;
+  final Widget? valueWidget;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 124,
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: AppColors.muted(theme.brightness),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child:
+                valueWidget ??
+                Text(
+                  value ?? '-',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+          ),
+        ],
       ),
     );
   }

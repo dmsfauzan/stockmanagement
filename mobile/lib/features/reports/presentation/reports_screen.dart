@@ -108,23 +108,20 @@ class ReportsIndexScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Laporan')),
-      body: ListView.separated(
+      body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
-        itemCount: reportDefs.length,
-        separatorBuilder: (context, index) =>
-            const SizedBox(height: AppSpacing.sm),
-        itemBuilder: (context, index) {
-          final def = reportDefs[index];
-
-          return Card(
-            child: DataListRow(
-              title: def.title,
-              leading: Icon(def.icon),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push(def.path),
-            ),
-          );
-        },
+        children: [
+          AppMenuGroup(
+            children: [
+              for (final def in reportDefs)
+                AppMenuItem(
+                  title: def.title,
+                  icon: def.icon,
+                  onTap: () => context.push(def.path),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

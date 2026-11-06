@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/tokens.dart';
+import 'common.dart';
 
 class SectionHeader extends StatelessWidget {
   const SectionHeader({super.key, required this.title, this.action});
@@ -15,7 +16,12 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+            child: Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
           ),
           ?action,
         ],
@@ -38,21 +44,26 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 48,
-              color: AppColors.muted(Theme.of(context).brightness),
+            AppIconBadge(
+              icon: icon,
+              color: AppColors.primary,
+              size: 64,
+              iconSize: 30,
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.lg),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.center,
             ),
             if (message != null) ...[
@@ -60,8 +71,8 @@ class EmptyState extends StatelessWidget {
               Text(
                 message!,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.muted(Theme.of(context).brightness),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.muted(theme.brightness),
                 ),
               ),
             ],
@@ -88,9 +99,19 @@ class ErrorCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.error_outline, color: AppColors.rose),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(child: Text(message)),
+                const AppIconBadge(
+                  icon: Icons.error_outline,
+                  color: AppColors.error,
+                  size: 36,
+                  iconSize: 20,
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
               ],
             ),
             if (onRetry != null) ...[
@@ -110,7 +131,8 @@ class ErrorCard extends StatelessWidget {
   }
 }
 
-class Skeleton extends StatelessWidget {
+/// Kotak abu dengan animasi shimmer untuk status memuat.
+class Skeleton extends StatefulWidget {
   const Skeleton({super.key, this.height = 16, this.width, this.radius = 8});
 
   final double height;
@@ -118,16 +140,47 @@ class Skeleton extends StatelessWidget {
   final double radius;
 
   @override
+  State<Skeleton> createState() => _SkeletonState();
+}
+
+class _SkeletonState extends State<Skeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      width: width,
-      decoration: BoxDecoration(
-        color: AppColors.border(
-          Theme.of(context).brightness,
-        ).withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(radius),
-      ),
+    final brightness = Theme.of(context).brightness;
+    final base = AppColors.border(brightness);
+    final highlight = AppColors.surface(brightness);
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final t = _controller.value;
+
+        return Container(
+          height: widget.height,
+          width: widget.width,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.radius),
+            gradient: LinearGradient(
+              begin: Alignment(-1.0 + 2 * t, 0),
+              end: Alignment(1.0 + 2 * t, 0),
+              colors: [base, highlight, base],
+              stops: const [0.35, 0.5, 0.65],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -168,7 +221,7 @@ class SyncProgressBar extends StatelessWidget {
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.sm,
       ),
-      color: AppColors.indigoSoft,
+      color: AppColors.primarySoft,
       child: Row(
         children: [
           const SizedBox(
@@ -177,7 +230,13 @@ class SyncProgressBar extends StatelessWidget {
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
           const SizedBox(width: AppSpacing.sm),
-          Text(label, style: AppText.caption.copyWith(color: AppColors.indigo)),
+          Text(
+            label,
+            style: AppText.caption.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );

@@ -74,23 +74,20 @@ class MasterIndexScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Master Data')),
-      body: ListView.separated(
+      body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
-        itemCount: _tabs.length,
-        separatorBuilder: (context, index) =>
-            const SizedBox(height: AppSpacing.sm),
-        itemBuilder: (context, index) {
-          final tab = _tabs[index];
-
-          return Card(
-            child: DataListRow(
-              title: tab.title,
-              leading: Icon(tab.icon),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push(tab.path),
-            ),
-          );
-        },
+        children: [
+          AppMenuGroup(
+            children: [
+              for (final tab in _tabs)
+                AppMenuItem(
+                  title: tab.title,
+                  icon: tab.icon,
+                  onTap: () => context.push(tab.path),
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

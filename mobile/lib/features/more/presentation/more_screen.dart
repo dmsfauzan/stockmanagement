@@ -12,126 +12,171 @@ class MoreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final auth = ref.watch(authStateProvider);
     final user = auth.valueOrNull?.user;
+    final initial = (user?.name ?? '?').trim().isEmpty
+        ? '?'
+        : user!.name.trim().substring(0, 1).toUpperCase();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Lainnya')),
       body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: EdgeInsets.zero,
         children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppColors.indigoSoft,
-                    child: Text(
-                      (user?.name ?? '?').substring(0, 1).toUpperCase(),
-                      style: const TextStyle(
-                        color: AppColors.indigo,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.lg),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user?.name ?? '-',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(user?.email ?? '-', style: AppText.caption),
-                        if ((user?.roles ?? []).isNotEmpty) ...[
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            user!.roles.join(', '),
-                            style: AppText.caption.copyWith(
-                              color: AppColors.indigo,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Card(
-            child: Column(
+          AppHeaderBlob(
+            child: Row(
               children: [
-                DataListRow(
-                  title: 'Master Data',
-                  leading: const Icon(Icons.folder_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/master'),
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: AppColors.primary,
+                  child: Text(
+                    initial,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 22,
+                    ),
+                  ),
                 ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'Karantina',
-                  leading: const Icon(Icons.verified_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/quarantine'),
-                ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'Lacak Batch/Serial',
-                  leading: const Icon(Icons.timeline_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/traceability'),
-                ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'Recall',
-                  leading: const Icon(Icons.report_gmailerrorred_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/recalls'),
-                ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'Alat',
-                  leading: const Icon(Icons.handyman_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/tools'),
-                ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'Laporan',
-                  leading: const Icon(Icons.bar_chart_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/reports'),
-                ),
-                const Divider(height: 1),
-                DataListRow(
-                  title: 'Pengaturan',
-                  leading: const Icon(Icons.settings_outlined),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/settings'),
+                const SizedBox(width: AppSpacing.lg),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user?.name ?? '-',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        user?.email ?? '-',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                      if ((user?.roles ?? []).isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        Wrap(
+                          spacing: AppSpacing.xs,
+                          children: [
+                            for (final role in user!.roles)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.16),
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.chip,
+                                  ),
+                                ),
+                                child: Text(
+                                  role,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
-          Card(
-            child: DataListRow(
-              title: 'Keluar',
-              leading: const Icon(Icons.logout, color: AppColors.rose),
-              onTap: () async {
-                await ref.read(authStateProvider.notifier).logout();
-                if (context.mounted) context.go('/login');
-              },
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppMenuGroup(
+                  children: [
+                    AppMenuItem(
+                      title: 'Master Data',
+                      subtitle: 'Barang, kategori, supplier, gudang',
+                      icon: Icons.folder_outlined,
+                      onTap: () => context.push('/master'),
+                    ),
+                    AppMenuItem(
+                      title: 'Karantina',
+                      subtitle: 'Stok menunggu inspeksi',
+                      icon: Icons.verified_outlined,
+                      onTap: () => context.push('/quarantine'),
+                    ),
+                    AppMenuItem(
+                      title: 'Lacak Batch/Serial',
+                      subtitle: 'Telusuri asal & pergerakan',
+                      icon: Icons.timeline_outlined,
+                      onTap: () => context.push('/traceability'),
+                    ),
+                    AppMenuItem(
+                      title: 'Recall',
+                      subtitle: 'Tarik batch bermasalah',
+                      icon: Icons.report_gmailerrorred_outlined,
+                      onTap: () => context.push('/recalls'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                AppMenuGroup(
+                  children: [
+                    AppMenuItem(
+                      title: 'Alat',
+                      subtitle: 'Cetak label, utilitas gudang',
+                      icon: Icons.handyman_outlined,
+                      onTap: () => context.push('/tools'),
+                    ),
+                    AppMenuItem(
+                      title: 'Laporan',
+                      subtitle: 'Stok, valuasi, jurnal, dsb.',
+                      icon: Icons.bar_chart_outlined,
+                      onTap: () => context.push('/reports'),
+                    ),
+                    AppMenuItem(
+                      title: 'Pengaturan',
+                      subtitle: 'Tema, sinkronisasi offline',
+                      icon: Icons.settings_outlined,
+                      onTap: () => context.push('/settings'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Card(
+                  child: AppMenuItem(
+                    title: 'Keluar',
+                    icon: Icons.logout,
+                    trailing: const SizedBox.shrink(),
+                    onTap: () async {
+                      await ref.read(authStateProvider.notifier).logout();
+                      if (context.mounted) context.go('/login');
+                    },
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Center(
+                  child: Text(
+                    'API: ${AppConfig.apiBaseUrl}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.muted(theme.brightness),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Center(
-            child: Text('API: ${AppConfig.apiBaseUrl}', style: AppText.caption),
           ),
         ],
       ),
