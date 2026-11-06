@@ -14,7 +14,7 @@ class Outbox {
 
     _db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE outbox (
@@ -25,7 +25,8 @@ class Outbox {
             idempotency_key TEXT,
             created_at TEXT NOT NULL,
             attempts INTEGER NOT NULL DEFAULT 0,
-            next_attempt_at TEXT
+            next_attempt_at TEXT,
+            failed INTEGER NOT NULL DEFAULT 0
           )
         ''');
       },
@@ -36,6 +37,11 @@ class Outbox {
           );
           await db.execute(
             'ALTER TABLE outbox ADD COLUMN next_attempt_at TEXT',
+          );
+        }
+        if (oldVersion < 3) {
+          await db.execute(
+            'ALTER TABLE outbox ADD COLUMN failed INTEGER NOT NULL DEFAULT 0',
           );
         }
       },
@@ -57,13 +63,13 @@ class Outbox {
     return rows.map(OutboxEntry.fromMap).toList();
   }
 
-  /// Entri yang siap dicoba (belum menunggu backoff).
+  /// Entri yang siap dicoba (belum menunggu backoff & belum gagal permanen).
   Future<List<OutboxEntry>> due() async {
     final db = await _open();
     final now = DateTime.now().toIso8601String();
     final rows = await db.query(
       'outbox',
-      where: 'next_attempt_at IS NULL OR next_attempt_at <= ?',
+      where: '(next_attempt_at IS NULL OR next_attempt_at <= ?) AND failed = 0',
       whereArgs: [now],
       orderBy: 'id ASC',
     );
@@ -73,7 +79,18 @@ class Outbox {
 
   Future<int> count() async {
     final db = await _open();
-    final result = await db.rawQuery('SELECT COUNT(*) AS c FROM outbox');
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) AS c FROM outbox WHERE failed = 0',
+    );
+
+    return (result.first['c'] as int?) ?? 0;
+  }
+
+  Future<int> failedCount() async {
+    final db = await _open();
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) AS c FROM outbox WHERE failed = 1',
+    );
 
     return (result.first['c'] as int?) ?? 0;
   }
@@ -91,6 +108,18 @@ class Outbox {
   Future<void> remove(int id) async {
     final db = await _open();
     await db.delete('outbox', where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// Tandai entri gagal permanen (4xx) agar tetap terlihat, tidak dicoba lagi.
+  Future<void> markFailed(int id) async {
+    final db = await _open();
+    await db.update('outbox', {'failed': 1}, where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// Hapus semua entri yang gagal permanen.
+  Future<void> discardFailed() async {
+    final db = await _open();
+    await db.delete('outbox', where: 'failed = 1');
   }
 
   Future<void> clear() async {

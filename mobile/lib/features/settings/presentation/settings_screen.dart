@@ -118,6 +118,7 @@ class SettingsScreen extends ConsumerWidget {
                 onTap: () async {
                   final result = await ref.read(outboxServiceProvider).flush();
                   ref.invalidate(outboxCountProvider);
+                  ref.invalidate(outboxFailedCountProvider);
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -136,8 +137,29 @@ class SettingsScreen extends ConsumerWidget {
                 onTap: () async {
                   await ref.read(outboxServiceProvider).clear();
                   ref.invalidate(outboxCountProvider);
+                  ref.invalidate(outboxFailedCountProvider);
                 },
               ),
+              if ((ref.watch(outboxFailedCountProvider).valueOrNull ?? 0) >
+                  0) ...[
+                AppMenuItem(
+                  title: 'Gagal dikirim',
+                  subtitle:
+                      '${ref.watch(outboxFailedCountProvider).valueOrNull} dokumen ditolak server',
+                  icon: Icons.error_outline,
+                  iconColor: AppColors.error,
+                  trailing: const SizedBox.shrink(),
+                ),
+                AppMenuItem(
+                  title: 'Hapus antrean gagal',
+                  icon: Icons.delete_forever_outlined,
+                  iconColor: AppColors.error,
+                  onTap: () async {
+                    await ref.read(outboxServiceProvider).discardFailed();
+                    ref.invalidate(outboxFailedCountProvider);
+                  },
+                ),
+              ],
             ],
           ),
           const SizedBox(height: AppSpacing.lg),

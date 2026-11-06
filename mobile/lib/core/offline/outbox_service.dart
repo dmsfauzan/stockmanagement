@@ -72,6 +72,10 @@ class OutboxService {
 
   Future<void> clear() => _outbox.clear();
 
+  Future<int> failedCount() => _outbox.failedCount();
+
+  Future<void> discardFailed() => _outbox.discardFailed();
+
   /// Kirim ulang seluruh antrean. Berhenti pada error jaringan berikutnya.
   Future<OutboxFlushResult> flush() async {
     if (_flushing) {
@@ -117,13 +121,14 @@ class OutboxService {
         } on DioException catch (e) {
           final code = e.response?.statusCode;
 
-          // 4xx (kecuali 401/429) = permanen → buang agar tidak nyangkut.
+          // 4xx (kecuali 401/429) = permanen → tandai gagal agar tetap terlihat
+          // dan bisa ditinjau/dihapus pengguna (bukan dibuang diam-diam).
           if (code != null &&
               code >= 400 &&
               code < 500 &&
               code != 401 &&
               code != 429) {
-            await _outbox.remove(entry.id!);
+            await _outbox.markFailed(entry.id!);
             failed++;
           } else {
             // Masih offline / server error → backoff lalu coba lagi nanti.
@@ -161,4 +166,8 @@ final outboxServiceProvider = Provider<OutboxService>(
 
 final outboxCountProvider = FutureProvider<int>(
   (ref) => ref.watch(outboxProvider).count(),
+);
+
+final outboxFailedCountProvider = FutureProvider<int>(
+  (ref) => ref.watch(outboxProvider).failedCount(),
 );

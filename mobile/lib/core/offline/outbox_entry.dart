@@ -10,6 +10,7 @@ class OutboxEntry {
     required this.createdAt,
     this.attempts = 0,
     this.nextAttemptAt,
+    this.failed = false,
   });
 
   final int? id;
@@ -21,6 +22,10 @@ class OutboxEntry {
   final int attempts;
   final String? nextAttemptAt;
 
+  /// True bila server menolak permanen (4xx) — tidak dicoba ulang, menunggu
+  /// dibersihkan/ditinjau pengguna.
+  final bool failed;
+
   factory OutboxEntry.fromMap(Map<String, dynamic> map) => OutboxEntry(
     id: map['id'] as int?,
     method: '${map['method']}',
@@ -30,6 +35,7 @@ class OutboxEntry {
     createdAt: '${map['created_at']}',
     attempts: (map['attempts'] as int?) ?? 0,
     nextAttemptAt: map['next_attempt_at'] as String?,
+    failed: ((map['failed'] as int?) ?? 0) == 1,
   );
 
   Map<String, dynamic> toMap() => {
@@ -41,5 +47,6 @@ class OutboxEntry {
     'created_at': createdAt,
     'attempts': attempts,
     'next_attempt_at': nextAttemptAt,
+    'failed': failed ? 1 : 0,
   };
 }
