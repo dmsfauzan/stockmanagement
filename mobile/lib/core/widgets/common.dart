@@ -165,6 +165,30 @@ class AppButton extends StatelessWidget {
     this.loading = false,
   }) : variant = AppButtonVariant.secondary;
 
+  const AppButton.outline(
+    this.label, {
+    super.key,
+    this.onPressed,
+    this.icon,
+    this.loading = false,
+  }) : variant = AppButtonVariant.outline;
+
+  const AppButton.ghost(
+    this.label, {
+    super.key,
+    this.onPressed,
+    this.icon,
+    this.loading = false,
+  }) : variant = AppButtonVariant.ghost;
+
+  const AppButton.destructive(
+    this.label, {
+    super.key,
+    this.onPressed,
+    this.icon,
+    this.loading = false,
+  }) : variant = AppButtonVariant.destructive;
+
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
@@ -173,11 +197,21 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effective = loading ? null : onPressed;
+    final spinnerColor =
+        variant == AppButtonVariant.primary ||
+            variant == AppButtonVariant.destructive
+        ? Colors.white
+        : AppColors.primary;
+
     final child = loading
-        ? const SizedBox(
-            height: 18,
-            width: 18,
-            child: CircularProgressIndicator(strokeWidth: 2),
+        ? SizedBox(
+            height: 20,
+            width: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: spinnerColor,
+            ),
           )
         : Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -190,18 +224,238 @@ class AppButton extends StatelessWidget {
             ],
           );
 
-    final effective = loading ? null : onPressed;
-
-    if (variant == AppButtonVariant.secondary) {
-      return OutlinedButton(
-        onPressed: effective,
-        style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-        child: child,
-      );
+    switch (variant) {
+      case AppButtonVariant.secondary:
+        return OutlinedButton(onPressed: effective, child: child);
+      case AppButtonVariant.outline:
+        return OutlinedButton(
+          onPressed: effective,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.text(Theme.of(context).brightness),
+            side: BorderSide(
+              color: AppColors.border(Theme.of(context).brightness),
+            ),
+          ),
+          child: child,
+        );
+      case AppButtonVariant.ghost:
+        return TextButton(
+          onPressed: effective,
+          style: TextButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+          child: child,
+        );
+      case AppButtonVariant.destructive:
+        return FilledButton(
+          onPressed: effective,
+          style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+          child: child,
+        );
+      case AppButtonVariant.primary:
+        return FilledButton(onPressed: effective, child: child);
     }
-
-    return FilledButton(onPressed: effective, child: child);
   }
 }
 
-enum AppButtonVariant { primary, secondary }
+enum AppButtonVariant { primary, secondary, outline, ghost, destructive }
+
+/// Header melengkung ala Semas (radius bawah besar) — dipakai di login,
+/// dashboard, dan layar utama lain.
+class AppHeaderBlob extends StatelessWidget {
+  const AppHeaderBlob({
+    super.key,
+    required this.child,
+    this.color = AppColors.darkBase,
+    this.radius = AppRadius.header,
+    this.padding = const EdgeInsets.fromLTRB(
+      AppSpacing.lg,
+      AppSpacing.lg,
+      AppSpacing.lg,
+      AppSpacing.xl,
+    ),
+  });
+
+  final Widget child;
+  final Color color;
+  final double radius;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(radius)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(padding: padding, child: child),
+      ),
+    );
+  }
+}
+
+/// Field berlabel sederhana bergaya Semas.
+class AppTextField extends StatelessWidget {
+  const AppTextField({
+    super.key,
+    required this.label,
+    this.controller,
+    this.hint,
+    this.obscure = false,
+    this.keyboardType,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.validator,
+    this.onFieldSubmitted,
+    this.maxLines = 1,
+  });
+
+  final String label;
+  final TextEditingController? controller;
+  final String? hint;
+  final bool obscure;
+  final TextInputType? keyboardType;
+  final IconData? prefixIcon;
+  final Widget? suffixIcon;
+  final String? Function(String?)? validator;
+  final void Function(String)? onFieldSubmitted;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppColors.text(theme.brightness),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        TextFormField(
+          controller: controller,
+          obscureText: obscure,
+          keyboardType: keyboardType,
+          maxLines: obscure ? 1 : maxLines,
+          validator: validator,
+          onFieldSubmitted: onFieldSubmitted,
+          style: theme.textTheme.bodyMedium,
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: prefixIcon != null
+                ? Icon(prefixIcon, size: 20, color: AppColors.slate500)
+                : null,
+            suffixIcon: suffixIcon,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Judul bagian + aksi opsional.
+class AppSectionTitle extends StatelessWidget {
+  const AppSectionTitle({super.key, required this.title, this.action});
+
+  final String title;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+        ?action,
+      ],
+    );
+  }
+}
+
+/// Baris menu: ikon kotak lembut + judul/subjudul + chevron.
+class AppMenuItem extends StatelessWidget {
+  const AppMenuItem({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.icon,
+    this.trailing,
+    this.onTap,
+  });
+
+  final String title;
+  final String? subtitle;
+  final IconData? icon;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            if (icon != null)
+              Container(
+                height: 44,
+                width: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.primarySoft,
+                  borderRadius: BorderRadius.circular(AppRadius.button),
+                ),
+                child: Icon(icon, color: AppColors.primary, size: 22),
+              ),
+            if (icon != null) const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.muted(theme.brightness),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            trailing ??
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.muted(theme.brightness),
+                ),
+          ],
+        ),
+      ),
+    );
+  }
+}

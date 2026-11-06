@@ -20,6 +20,8 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.card),
@@ -31,29 +33,46 @@ class StatCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  if (icon != null) ...[
-                    Icon(
-                      icon,
-                      size: 18,
-                      color: Theme.of(context).colorScheme.primary,
+                  if (icon != null)
+                    Container(
+                      height: 36,
+                      width: 36,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySoft,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(icon, size: 20, color: AppColors.primary),
                     ),
-                    const SizedBox(width: 6),
-                  ],
+                  if (icon != null) const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       label.toUpperCase(),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: AppColors.muted(Theme.of(context).brightness),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: AppColors.muted(theme.brightness),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(value, style: Theme.of(context).textTheme.headlineSmall),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                value,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               if (hint != null) ...[
                 const SizedBox(height: AppSpacing.xs),
-                Text(hint!, style: Theme.of(context).textTheme.bodySmall),
+                Text(
+                  hint!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.muted(theme.brightness),
+                  ),
+                ),
               ],
             ],
           ),

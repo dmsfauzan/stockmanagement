@@ -1,45 +1,63 @@
 import 'package:flutter/material.dart';
 
-/// Design tokens aplikasi mobile (selaras web: indigo + slate).
+/// Design tokens aplikasi mobile — mengadopsi palet & tipografi "Semas"
+/// (biru #0066FF + aksen emas #F7B006, font Poppins).
 class AppColors {
-  // Brand
-  static const indigo = Color(0xFF4F46E5);
-  static const indigoHover = Color(0xFF4338CA);
-  static const indigoSoft = Color(0xFFEEF2FF);
+  // Brand (Semas)
+  static const primary = Color(0xFF0066FF);
+  static const primaryHover = Color(0xFF0052CC);
+  static const primarySoft = Color(0xFFE6F0FF);
+  static const secondary = Color(0xFFFF2D87);
+  static const gold = Color(0xFFF7B006);
+  static const goldSoft = Color(0xFFFEE8BA);
+  static const darkBase = Color(0xFF1E2128);
 
-  // Slate
-  static const slate50 = Color(0xFFF8FAFC);
-  static const slate100 = Color(0xFFF1F5F9);
-  static const slate200 = Color(0xFFE2E8F0);
-  static const slate400 = Color(0xFF94A3B8);
-  static const slate500 = Color(0xFF64748B);
-  static const slate700 = Color(0xFF334155);
-  static const slate800 = Color(0xFF1E293B);
-  static const slate900 = Color(0xFF0F172A);
+  // Alias lama (dipertahankan agar layar lain ikut ter-recolor).
+  static const indigo = primary;
+  static const indigoHover = primaryHover;
+  static const indigoSoft = primarySoft;
+
+  // Neutral (Semas)
+  static const slate50 = Color(0xFFF8F9FE);
+  static const slate100 = Color(0xFFF1F4F8);
+  static const slate200 = Color(0xFFE5E5EA);
+  static const slate400 = Color(0xFFA1A1AA);
+  static const slate500 = Color(0xFF717171);
+  static const slate700 = Color(0xFF3F3F46);
+  static const slate800 = Color(0xFF2B2F38);
+  static const slate900 = Color(0xFF1E2128);
 
   // Status
-  static const emerald = Color(0xFF059669);
-  static const amber = Color(0xFFD97706);
-  static const rose = Color(0xFFE11D48);
-  static const sky = Color(0xFF0284C7);
-  static const teal = Color(0xFF0D9488);
+  static const success = Color(0xFF10B981);
+  static const warning = Color(0xFFF59E0B);
+  static const error = Color(0xFFEF4444);
+  static const info = Color(0xFF0066FF);
+  static const emerald = success;
+  static const amber = warning;
+  static const rose = error;
+  static const sky = info;
+  static const teal = Color(0xFF14B8A6);
 
   static Color surface(Brightness b) =>
-      b == Brightness.light ? Colors.white : slate800;
+      b == Brightness.light ? Colors.white : darkBase;
+  static Color surfaceVariant(Brightness b) =>
+      b == Brightness.light ? const Color(0xFFF0F2F5) : slate800;
   static Color background(Brightness b) =>
-      b == Brightness.light ? slate100 : slate900;
+      b == Brightness.light ? slate50 : const Color(0xFF12141A);
   static Color border(Brightness b) =>
       b == Brightness.light ? slate200 : slate700;
   static Color text(Brightness b) =>
-      b == Brightness.light ? slate900 : slate100;
+      b == Brightness.light ? const Color(0xFF0A0A0F) : slate100;
   static Color muted(Brightness b) =>
       b == Brightness.light ? slate500 : slate400;
 }
 
 class AppRadius {
-  static const card = 14.0;
+  static const card = 16.0;
   static const button = 12.0;
+  static const input = 12.0;
   static const chip = 999.0;
+  static const header = 48.0;
 }
 
 class AppSpacing {
@@ -51,11 +69,11 @@ class AppSpacing {
 }
 
 class AppText {
-  static const family = 'Inter';
+  static const family = 'Poppins';
 
   static const display = TextStyle(
     fontSize: 24,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w700,
     height: 1.2,
   );
   static const title = TextStyle(
@@ -76,41 +94,41 @@ class AppText {
 /// Peta warna status → (bg, fg) untuk [StatusBadge].
 class StatusColors {
   static const Map<String, Color> _tone = {
-    'normal': AppColors.emerald,
-    'good': AppColors.emerald,
-    'active': AppColors.emerald,
-    'posted': AppColors.emerald,
-    'completed': AppColors.emerald,
-    'fulfilled': AppColors.emerald,
-    'incoming': AppColors.emerald,
-    'approved': Color(0xFF2563EB),
-    'low': AppColors.amber,
-    'low_stock': AppColors.amber,
-    'pending': AppColors.amber,
-    'submitted': AppColors.amber,
-    'requested': AppColors.amber,
+    'normal': AppColors.success,
+    'good': AppColors.success,
+    'active': AppColors.success,
+    'posted': AppColors.success,
+    'completed': AppColors.success,
+    'fulfilled': AppColors.success,
+    'incoming': AppColors.success,
+    'approved': AppColors.primary,
+    'low': AppColors.warning,
+    'low_stock': AppColors.warning,
+    'pending': AppColors.warning,
+    'submitted': AppColors.warning,
+    'requested': AppColors.warning,
     'draft': AppColors.slate500,
     'inactive': AppColors.slate500,
     'cancelled': AppColors.slate500,
     'closed': AppColors.slate500,
-    'out': AppColors.rose,
-    'out_of_stock': AppColors.rose,
-    'rejected': AppColors.rose,
-    'expired': AppColors.rose,
-    'recalled': AppColors.rose,
-    'over': AppColors.sky,
-    'overstock': AppColors.sky,
-    'in_transit': AppColors.sky,
-    'expiring_30': AppColors.amber,
-    'expiring_90': AppColors.sky,
-    'quarantine': AppColors.amber,
-    'picking': AppColors.sky,
+    'out': AppColors.error,
+    'out_of_stock': AppColors.error,
+    'rejected': AppColors.error,
+    'expired': AppColors.error,
+    'recalled': AppColors.error,
+    'over': AppColors.info,
+    'overstock': AppColors.info,
+    'in_transit': AppColors.info,
+    'expiring_30': AppColors.warning,
+    'expiring_90': AppColors.info,
+    'quarantine': AppColors.warning,
+    'picking': AppColors.info,
     'picked': AppColors.teal,
-    'packed': AppColors.indigo,
-    'short': AppColors.amber,
-    'partial': AppColors.amber,
-    'assembly': AppColors.indigo,
-    'disassembly': AppColors.amber,
+    'packed': AppColors.primary,
+    'short': AppColors.warning,
+    'partial': AppColors.warning,
+    'assembly': AppColors.primary,
+    'disassembly': AppColors.warning,
   };
 
   static Color tone(String status) =>
