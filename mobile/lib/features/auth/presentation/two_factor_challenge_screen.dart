@@ -25,6 +25,12 @@ class _TwoFactorChallengeScreenState
   String? _error;
 
   Future<void> _submit() async {
+    if (widget.challengeToken.isEmpty) {
+      setState(() => _error = 'Sesi 2FA tidak valid. Silakan login ulang.');
+
+      return;
+    }
+
     setState(() {
       _loading = true;
       _error = null;

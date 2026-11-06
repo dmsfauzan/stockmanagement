@@ -75,7 +75,13 @@ class ItemVisual extends StatelessWidget {
 
     if (key.isEmpty) return _palette.first;
 
-    return _palette[key.hashCode.abs() % _palette.length];
+    // Hash deterministik (stabil lintas versi Dart/run).
+    var hash = 0;
+    for (final unit in key.codeUnits) {
+      hash = (hash * 31 + unit) & 0x7fffffff;
+    }
+
+    return _palette[hash % _palette.length];
   }
 
   @override

@@ -53,7 +53,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (!mounted) return;
 
       if (pending != null) {
-        context.go('/two-factor/$pending');
+        context.go('/two-factor', extra: pending);
       } else {
         setState(() => _error = 'Diperlukan verifikasi 2FA.');
       }

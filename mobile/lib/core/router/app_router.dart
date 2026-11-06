@@ -68,9 +68,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
-        path: '/two-factor/:challengeToken',
+        path: '/two-factor',
         builder: (context, state) => TwoFactorChallengeScreen(
-          challengeToken: state.pathParameters['challengeToken'] ?? '',
+          challengeToken: (state.extra as String?) ?? '',
         ),
       ),
       StatefulShellRoute.indexedStack(
